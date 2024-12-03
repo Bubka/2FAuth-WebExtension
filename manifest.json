@@ -1,0 +1,37 @@
+{
+    "{{chrome}}.manifest_version": 3,
+    "{{firefox}}.manifest_version": 3,
+    "name": "2FAuth WebExtension",
+    "version": "0.0.0",
+    "description": "Official 2FAuth browser extension",
+    "{{chrome}}.action": {
+        "default_popup": "src/popup/index.html"
+    },
+    "{{firefox}}.browser_action": {
+        "default_popup": "src/popup/index.html"
+    },
+    "background": {
+        "type": "module",
+        "{{chrome}}.service_worker": "src/background/index.js",
+        "{{firefox}}.scripts": [
+            "src/background/index.js"
+        ],
+        "{{firefox}}.persistent": false
+    },
+    "permissions": [
+        "storage",
+        "unlimitedStorage",
+        "clipboardWrite",
+        "alarms",
+        "idle",
+        "tabs",
+        "{{firefox}}.<all_urls>",
+        "{{chrome}}.activeTab",
+        "{{chrome}}.background"
+    ],
+    "icons": {
+        "16": "icons/16.png",
+        "48": "icons/48.png",
+        "128": "icons/128.png"
+    }
+}

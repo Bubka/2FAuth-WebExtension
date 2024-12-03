@@ -1,0 +1,49 @@
+{
+    "name": "2fauth-browser-extension",
+    "displayName": "2FAuth",
+    "version": "0.0.0",
+    "description": "Official 2FAuth web extension",
+    "private": true,
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Bubka/2FAuth-WebExtension"
+    },
+    "scripts": {
+        "dev": "vite",
+        "devv": "vite build --watch --mode development",
+        "build": "vite build",
+        "build-chrome": "TARGET=chrome vite build",
+        "build-ff": "cross-env TARGET=firefox vite build",
+        "lint": "eslint . --fix"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.14.0",
+        "@fortawesome/fontawesome-svg-core": "^6.4.2",
+        "@fortawesome/free-brands-svg-icons": "^6.4.2",
+        "@fortawesome/free-regular-svg-icons": "^6.4.2",
+        "@fortawesome/free-solid-svg-icons": "^6.4.2",
+        "@fortawesome/vue-fontawesome": "^3.0.3",
+        "@kyvg/vue3-notification": "^3.0.2",
+        "@vitejs/plugin-vue": "^5.1.4",
+        "@vueuse/core": "^12.0.0",
+        "axios": "^1.1.2",
+        "bulma": "0.9.4",
+        "bulma-checkradio": "2.1.3",
+        "cross-env": "^7.0.3",
+        "crypto-js": "^4.2.0",
+        "eslint-plugin-vue": "^9.30.0",
+        "pinia": "^2.2.6",
+        "sass": "1.67",
+        "unplugin-auto-import": "^0.18.6",
+        "vite": "^5.4.10",
+        "vite-plugin-web-extension": "^4.3.1",
+        "vue-i18n": "^10.0.5",
+        "vue-router": "^4.5.0",
+        "webext-bridge": "^6.0.1",
+        "webextension-polyfill": "^0.12.0"
+    },
+    "dependencies": {
+        "vue": "^3.5.12"
+    }
+}

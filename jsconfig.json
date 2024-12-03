@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@popup/*": ["./src/popup/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}
