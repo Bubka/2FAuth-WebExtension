@@ -4,6 +4,7 @@ const router = createRouter({
 	history: createMemoryHistory(),
 	routes: [
         { path: '/', name: 'landing', component: () => import('../views/Landing.vue'), meta: { middlewares: [] } },
+        { path: '/accounts', name: 'accounts', component: () => import('../views/Accounts.vue'), meta: { middlewares: [] } },
         { path: '/setup', name: 'setup', component: () => import('../views/Setup.vue'), meta: { middlewares: [] } },
         { path: '/purpose', name: 'purpose', component: () => import('../views/Purpose.vue'), meta: { middlewares: [] } },
 
