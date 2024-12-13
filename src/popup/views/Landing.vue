@@ -1,17 +1,21 @@
 <script setup>
-    const version = __VERSION__
-    const displayName = __DISPLAY_NAME__
-    const gitURL = __GITHUB_URL__
+    import { useExtensionStore } from '@/stores/extensionStore';
+    
+    const extensionStore = useExtensionStore();
 
 </script>
 
 <template>
     <div>
-        <h1 class="title has-text-grey-dark" v-html="$t('title.popup')"></h1>
-        <div class="block">
-            {{ $t('message.hello') }}
-        </div>
-        <RouterLink :to="{ name: 'help' }">{{ $t('title.help') }}</RouterLink>
-        <p>{{ version }}</p>
+        <h1 class="title has-text-grey-dark" v-html="$t('title.popup.twofauth')"></h1>
+        <p class="block">{{ $t('message.bind_2fauth_to_use_extension') }}</p>
+        <p class="block mt-6 has-text-centered">
+            <RouterLink id="btnConfigureMe" class="button is-link is-rounded is-main" :to="{ name: 'setup' }">{{ $t('message.configure') }}</RouterLink>
+        </p>
     </div>
+    <VueFooter>
+        <router-link id="lnkWhy" :to="{ name: 'why' }" class="has-text-grey">
+                {{ $t('link.why_this') }}
+            </router-link>
+    </VueFooter>
 </template>
