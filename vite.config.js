@@ -35,6 +35,9 @@ export default defineConfig({
                 '@vueuse/core',
                 {
                     'webextension-polyfill': [['*', 'browser']],
+                    '@kyvg/vue3-notification': [
+                        'useNotification'
+                    ],
                 },
             ],
             dts: 'src/types/auto-imports.d.ts',
