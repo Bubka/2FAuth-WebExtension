@@ -14,7 +14,7 @@
         </p>
     </div>
     <VueFooter>
-        <router-link id="lnkWhy" :to="{ name: 'why' }" class="has-text-grey">
+        <router-link id="lnkWhy" :to="{ name: 'purpose' }" class="has-text-grey">
                 {{ $t('link.why_this') }}
             </router-link>
     </VueFooter>

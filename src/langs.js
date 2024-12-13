@@ -22,6 +22,8 @@ const en = {
         ui_icons_by: 'UI Icons by',
         twofauth_doc: '2FAuth documentation',
         how_to_create_a_pat: 'How to create a PAT',
+        purpose_description: 'This web extension is an add-on to the 2FAuth webapp. It lets you access the 2FA data of your 2FAuth user account and generate OTPs directly from your browser bar.',
+        purpose_requirements: 'You must have and bind a 2FAuth user account to use this extension. This requires a Personal Access Token (PAT).,'
     },
     field: {
         hostUrl: {
@@ -42,11 +44,13 @@ const en = {
             twofauth: '2FAuth webext',
             setup: 'Setup',
             about: 'About',
+            purpose: 'Purpose',
         }
     },
     link: {
         about: 'About',
         setup: 'Setup',
+        landing: 'Landing',
         why_this: 'Why do I see this?',
     }
 }
