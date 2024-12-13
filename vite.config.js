@@ -21,6 +21,14 @@ function generateManifest() {
 export default defineConfig({
     build: {
         emptyOutDir: true,
+        sourcemap: true,
+        // rollupOptions: {
+        //     input: {
+        //         // popup: 'src/popup/index.html',
+        //         // setup: 'src/setup/index.html',
+        //         // options: 'src/options/index.html',
+        //     },
+        // },
     },
     plugins: [
         vue(),
