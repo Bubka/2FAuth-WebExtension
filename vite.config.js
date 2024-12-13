@@ -52,7 +52,8 @@ export default defineConfig({
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url)),
             '~': fileURLToPath(new URL('./src', import.meta.url)),
-            '@popup': fileURLToPath(new URL('./src/popup', import.meta.url))
+            '@popup': fileURLToPath(new URL('./src/popup', import.meta.url)),
+            '@public': fileURLToPath(new URL('./public', import.meta.url))
         },
     },
     define,
