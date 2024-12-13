@@ -11,6 +11,7 @@ const en = {
         caps_lock_is_on: 'Caps lock is On',
         search: 'Search',
         clear_search: 'Clear search',
+        all: 'All',
         close_the_x_page: 'Close the :pagetitle page',
         back: 'Back',
         cancel: 'Cancel',
