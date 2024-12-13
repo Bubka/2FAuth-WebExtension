@@ -12,6 +12,8 @@ const en = {
         search: 'Search',
         clear_search: 'Clear search',
         all: 'All',
+        error_occured: 'An error occured:',
+        resource_not_found: 'Resource not found',
         close_the_x_page: 'Close the :pagetitle page',
         back: 'Back',
         cancel: 'Cancel',
