@@ -5,7 +5,6 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import Popup from './Popup.vue'
 import router from './router'
-import FontAwesomeIcon from './icons'
 import i18n from '../i18n';
 
 const popup = createApp(Popup)
@@ -24,6 +23,7 @@ popup.use(router)
 popup.use(Notifications)
 
 // Global components registration
+import FontAwesomeIcon   from './icons'
 popup
     .component('FontAwesomeIcon', FontAwesomeIcon)
 
