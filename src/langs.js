@@ -9,6 +9,8 @@ const en = {
         mandatory_rules: 'Mandatory',
         optional_rules_you_should_follow: 'Recommanded (highly)',
         caps_lock_is_on: 'Caps lock is On',
+        search: 'Search',
+        clear_search: 'Clear search',
         close_the_x_page: 'Close the :pagetitle page',
         back: 'Back',
         cancel: 'Cancel',
