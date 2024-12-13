@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import webExtension, { readJsonFile } from 'vite-plugin-web-extension'
+// import vueDevTools from 'vite-plugin-vue-devtools'
 import { defineViteConfig as define } from './define.config'
 
 function generateManifest() {
@@ -23,6 +24,7 @@ export default defineConfig({
     },
     plugins: [
         vue(),
+        // vueDevTools(),
         webExtension({
             manifest: generateManifest,
             watchFilePaths: ['package.json', 'manifest.json'],
