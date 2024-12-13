@@ -24,9 +24,11 @@ popup.use(Notifications)
 
 // Global components registration
 import FontAwesomeIcon   from './icons'
+import Modal             from '@popup/layouts/Modal.vue'
 import Footer            from '@popup/layouts/Footer.vue'
 popup
     .component('FontAwesomeIcon', FontAwesomeIcon)
+    .component('Modal', Modal)
     .component('VueFooter', Footer)
 
 popup.mount('#popup')
