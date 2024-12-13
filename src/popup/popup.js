@@ -25,10 +25,21 @@ popup.use(Notifications)
 // Global components registration
 import FontAwesomeIcon   from './icons'
 import Modal             from '@popup/layouts/Modal.vue'
+import FormField         from '@popup/components/formElements/FormField.vue'
+import FormPasswordField from '@popup/components/formElements/FormPasswordField.vue'
+import FormTextarea      from '@popup/components/formElements/FormTextarea.vue'
+import FieldError        from '@popup/components/formElements/FieldError.vue'
+import ButtonBackCloseCancel from '@popup/components/formElements/ButtonBackCloseCancel.vue'
 import Footer            from '@popup/layouts/Footer.vue'
+
 popup
     .component('FontAwesomeIcon', FontAwesomeIcon)
     .component('Modal', Modal)
+    .component('FormField', FormField)
+    .component('FormPasswordField', FormPasswordField)
+    .component('FormTextarea', FormTextarea)
+    .component('FieldError', FieldError)
+    .component('ButtonBackCloseCancel', ButtonBackCloseCancel)
     .component('VueFooter', Footer)
 
 popup.mount('#popup')
