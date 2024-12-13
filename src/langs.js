@@ -15,6 +15,13 @@ const en = {
         close: 'Close',
         configure: 'Configure',
         bind_2fauth_to_use_extension: 'The perfect companion to your 2FAuth web application',
+        twofauth_teaser: '2FAuth is a web app to manage your Two-Factor Authentication (2FA) accounts and generate their security codes',
+        resources: 'Resources',
+        credits: 'Credits',
+        made_with: 'Made with',
+        ui_icons_by: 'UI Icons by',
+        twofauth_doc: '2FAuth documentation',
+        how_to_create_a_pat: 'How to create a PAT',
     },
     field: {
         hostUrl: {
@@ -34,9 +41,11 @@ const en = {
         popup: {
             twofauth: '2FAuth webext',
             setup: 'Setup',
+            about: 'About',
         }
     },
     link: {
+        about: 'About',
         setup: 'Setup',
         why_this: 'Why do I see this?',
     }
