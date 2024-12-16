@@ -58,6 +58,7 @@ import FormTextarea      from '@popup/components/formElements/FormTextarea.vue'
 import FieldError        from '@popup/components/formElements/FieldError.vue'
 import ButtonBackCloseCancel from '@popup/components/formElements/ButtonBackCloseCancel.vue'
 import Footer            from '@popup/layouts/Footer.vue'
+import VueButton         from '@popup/components/formElements/Button.vue'
 
 popup
     .component('FontAwesomeIcon', FontAwesomeIcon)
@@ -68,5 +69,6 @@ popup
     .component('FieldError', FieldError)
     .component('ButtonBackCloseCancel', ButtonBackCloseCancel)
     .component('VueFooter', Footer)
+    .component('VueButton', VueButton)
 
 popup.mount('#popup')
