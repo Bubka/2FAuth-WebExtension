@@ -11,8 +11,13 @@ import i18n from '../i18n'
 
 const popup = createApp(Popup)
 
+// Localization
+popup.use(i18n)
+
+// Stores
 const pinia = createPinia()
 const persistedStatePlugin = createPersistedStatePlugin({
+    overwrite: true,
     storage: {
         getItem: async (key) => {
             return storage.local.get(key).then(async (result) => {
@@ -28,17 +33,14 @@ const persistedStatePlugin = createPersistedStatePlugin({
             return storage.local.remove(key)
         },
     },
+    // serialize: (value) => JSON.stringify(value),
+    // deserialize: (value) => JSON.parse(value),
 })
 pinia.use((context) => {
     if (context.store.$id == 'extensionStore') {
         persistedStatePlugin(context)
     }
 })
-
-// Localization
-popup.use(i18n)
-
-// Stores
 popup.use(pinia)
 
 // Router

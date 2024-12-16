@@ -38,7 +38,11 @@ const en = {
         twofauth_doc: '2FAuth documentation',
         how_to_create_a_pat: 'How to create a PAT',
         purpose_description: 'This web extension is an add-on to the 2FAuth webapp. It lets you access the 2FA data of your 2FAuth user account and generate OTPs directly from your browser bar.',
-        purpose_requirements: 'You must have and bind a 2FAuth user account to use this extension. This requires a Personal Access Token (PAT).,'
+        purpose_requirements: 'You must have and bind a 2FAuth user account to use this extension. This requires a Personal Access Token (PAT).',
+        test: 'Test',
+        hi_x_its_all_good: 'Hi {username}, it\'s all good',
+        save: 'Save',
+        submit: 'Submit',
     },
     error: {
         cannot_create_otp_without_secret: 'Cannot create an OTP without a secret',

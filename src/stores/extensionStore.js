@@ -40,6 +40,10 @@ export const useExtensionStore = defineStore('extensionStore', {
         }
     },
 
+    getters: {
+      isConfigured: (state) => state.hostUrl.length > 0 && state.apiToken.length > 0,
+    },
+
     actions: {
 
     },

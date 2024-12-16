@@ -1,22 +1,42 @@
 import axios from "axios"
 import { useNotifyStore } from '@popup/stores/notify'
+import { useExtensionStore } from '@/stores/extensionStore'
 
 export const httpClientFactory = () => {
-	let baseURL = 'https://testing.2fauth.app/api/v1'
-    let token = ''
 
 	const httpClient = axios.create({
-		baseURL,
-		headers: { 'Authorization': 'Bearer ' + token , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' },
 		withCredentials: false,
         withXSRFToken: false,
 	})
+
+
+	httpClient.interceptors.request.use(
+        async function (config) {
+            const extensionStore = useExtensionStore()
+
+            if (Object.prototype.hasOwnProperty.call(config, 'ignoreRequestInterceptor') && config.ignoreRequestInterceptor === true) {
+                return config
+            }
+
+            config.baseURL = extensionStore.hostUrl + '/api/v1'
+		    config.headers = {
+                ...config.headers,
+                ...{ 'Authorization': 'Bearer ' + extensionStore.apiToken , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' }
+            }
+
+            return config
+        },
+        (error) => {
+            Promise.reject(error)
+        }
+    )
 
     httpClient.interceptors.response.use(
         (response) => {
             return response;
         },
-        async function (error) {            
+        async function (error) {
+
             if (error.response && [407].includes(error.response.status)) {
                 useNotifyStore().error(error)
                 return new Promise(() => {})
