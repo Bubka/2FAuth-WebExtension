@@ -3,12 +3,37 @@ import './assets/popup.scss'
 import Notifications from '@kyvg/vue3-notification'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2'
+import { storage } from 'webextension-polyfill'
 import Popup from './Popup.vue'
 import router from './router'
-import i18n from '../i18n';
+import i18n from '../i18n'
 
 const popup = createApp(Popup)
+
 const pinia = createPinia()
+const persistedStatePlugin = createPersistedStatePlugin({
+    storage: {
+        getItem: async (key) => {
+            return storage.local.get(key).then(async (result) => {
+                return result[key]
+            })
+        },
+        setItem: async (key, value) => {
+            return storage.local.set({
+                [key]: value,
+            })
+        },
+        removeItem: async (key) => {
+            return storage.local.remove(key)
+        },
+    },
+})
+pinia.use((context) => {
+    if (context.store.$id == 'extensionStore') {
+        persistedStatePlugin(context)
+    }
+})
 
 // Localization
 popup.use(i18n)
