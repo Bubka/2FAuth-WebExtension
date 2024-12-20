@@ -1,14 +1,20 @@
 <script setup>
+    import { useI18n } from 'vue-i18n'
+    import twofaccountService from '@popup/services/twofaccountService'
     import { useExtensionStore } from '@/stores/extensionStore'
     import { useNotifyStore } from '@popup/stores/notify'
     import { useTwofaccounts } from '@popup/stores/twofaccounts'
     import { useGroups } from '@popup/stores/groups'
     import { UseColorMode } from '@vueuse/components'
+    import { useDisplayablePassword } from '@popup/composables/helpers'
     import SearchBox from '@popup/components/SearchBox.vue'
     import GroupSwitch from '@popup/components/GroupSwitch.vue'
     import Spinner from '@popup/components/Spinner.vue'
     import OtpDisplay from '@popup/components/OtpDisplay.vue'
+    import TotpLooper from '@popup/components/TotpLooper.vue'
+    import Dots from '@popup/components/Dots.vue'
 
+    const { t } = useI18n({ useScope: "global" });
     const extensionStore = useExtensionStore()
     const notify = useNotifyStore()
     const { copy, copied } = useClipboard()
@@ -16,6 +22,8 @@
     const groups = useGroups()
     const showGroupSwitch = ref(false)
     const showOtpInModal = ref(false)
+    const isRenewingOTPs = ref(false)
+    const renewedPeriod = ref(null)
     
     const otpDisplay = ref(null)
     const otpDisplayProps = ref({
@@ -24,6 +32,8 @@
         service : '',
         icon : '',
     })
+    const looperRefs = ref([])
+    const dotsRefs = ref([])
 
     /**
      * Returns whether or not the accounts should be displayed
@@ -52,8 +62,8 @@
     /**
      * Shows an OTP in a modal or directly copies it to the clipboard
      */
-     function showOrCopy(account) {
-        if (!extensionStore.getOtpOnRequest && account.otp_type.includes('totp')) {
+     async function showOrCopy(account) {
+        if (!extensionStore.preferences.getOtpOnRequest && account.otp_type.includes('totp')) {
             copyToClipboard(account.otp.password)
         }
         else {
@@ -68,7 +78,7 @@
         copy(password)
 
         if (copied) {
-            // if (user.preferences.kickUserAfter == -1) {
+            // if (extensionStore.preferences.kickUserAfter == -1) {
             //     user.logout({ kicked: true})
             // }
             if (extensionStore.preferences.clearSearchOnCopy) {
@@ -80,34 +90,112 @@
                 : extensionStore.preferences.defaultGroup
             }
             
-            notify.success({ text: trans('commons.copied_to_clipboard') })
+            notify.success({ text: t('commons.copied_to_clipboard') })
         }
     }
 
     /**
      * Gets a fresh OTP from backend and copies it
      */
-    async function getAndCopyOTP(account) { // TODO: à activer
-        // twofaccountService.getOtpById(account.id).then(response => {
-        //     let otp = response.data
-        //     copyToClipboard(otp.password)
+    async function getAndCopyOTP(account) {
+        twofaccountService.getOtpById(account.id).then(response => {
+            let otp = response.data
+            copyToClipboard(otp.password)
 
-        //     if (otp.otp_type == 'hotp') {
-        //         let hotpToIncrement = accounts.value.find((acc) => acc.id == account.id)
+            if (otp.otp_type == 'hotp') {
+                let hotpToIncrement = accounts.value.find((acc) => acc.id == account.id)
                 
-        //         if (hotpToIncrement != undefined) {
-        //             hotpToIncrement.counter = otp.counter
-        //         }
-        //     }
-        // })
+                // TODO : à koi ça sert ?
+                if (hotpToIncrement != undefined) {
+                    hotpToIncrement.counter = otp.counter
+                }
+            }
+        })
+    }
+
+    /**
+     * Turns dots On for all dots components that match the provided period
+     */
+    function turnDotsOn(period, stepIndex) {
+        dotsRefs.value
+            .filter((dots) => dots.props.period == period || period == undefined)
+            .forEach((dot) => {
+                dot.turnOn(stepIndex)
+        })
+    }
+
+    /**
+     * Turns dots Off for all dots components that match the provided period
+     */
+    function turnDotsOff(period) {
+        dotsRefs.value
+            .filter((dots) => dots.props.period == period || period == undefined)
+            .forEach((dot) => {
+                dot.turnOff()
+        })
+    }
+
+    /**
+     * Updates "Always On" OTPs for all TOTP accounts and (re)starts loopers
+     */
+    async function updateTotps(period) {
+        isRenewingOTPs.value = true
+        turnDotsOff(period)
+        let fetchPromise
+
+        if (period == undefined) {
+            renewedPeriod.value = -1
+            fetchPromise = twofaccountService.getAll(true)
+        } else {
+            renewedPeriod.value = period
+            fetchPromise = twofaccountService.getByIds(twofaccounts.accountIdsWithPeriod(period).join(','), true)
+        }
+
+        fetchPromise.then(response => {
+            let generatedAt = 0
+
+            // twofaccounts TOTP updates
+            response.data.forEach((account) => {
+                if (account.otp_type === 'totp') {
+                    const index = twofaccounts.items.findIndex(acc => acc.id === account.id)
+                    if (twofaccounts.items[index] == undefined) {
+                        twofaccounts.items.push(account)
+                    }
+                    else twofaccounts.items[index].otp = account.otp
+                    generatedAt = account.otp.generated_at
+                }
+            })
+
+            // Loopers restart at new timestamp
+            looperRefs.value.forEach((looper) => {
+                if (looper.props.period == period || period == undefined) {
+                    nextTick().then(() => {
+                        looper.startLoop(generatedAt)
+                    })
+                }
+            })
+        })
+        .finally(() => {
+            isRenewingOTPs.value = false
+            renewedPeriod.value = null
+        })
     }
 
     onMounted(async () => {
-        twofaccounts.fetch().then(() => {
-            // if (twofaccounts.backendWasNewer) {
-            //     notify.info({ text: trans('commons.data_refreshed_to_reflect_server_changes'), duration: 10000 })
-            // }
-        })
+        // This SFC is reached only if the user has some twofaccounts (see the starter middleware).
+        // This allows to display accounts without latency.
+        //
+        // We sync the store with the backend again to
+        if (! extensionStore.preferences.getOtpOnRequest) {
+            updateTotps()
+        }
+        else {
+            twofaccounts.fetch().then(() => {
+                // if (twofaccounts.backendWasNewer) {
+                //     notify.info({ text: trans('commons.data_refreshed_to_reflect_server_changes'), duration: 10000 })
+                // }
+            })
+        }
         groups.fetch()
     })
 
@@ -161,6 +249,20 @@
                 @please-clear-search="twofaccounts.filter = ''">
             </OtpDisplay>
         </Modal>
+        <!-- totp loopers -->
+        <span v-if="!extensionStore.preferences.getOtpOnRequest">
+            <TotpLooper
+                v-for="period in twofaccounts.periods"
+                :key="period.period"
+                :autostart="false"
+                :period="period.period"
+                :generated_at="period.generated_at"
+                v-on:loop-ended="updateTotps(period.period)"
+                v-on:loop-started="turnDotsOn(period.period, $event)"
+                v-on:stepped-up="turnDotsOn(period.period, $event)"
+                ref="looperRefs"
+            ></TotpLooper>
+        </span>
         <!-- show accounts list -->
         <div class="container" v-if="showAccounts == true">
             <!-- accounts -->
@@ -176,6 +278,39 @@
                                     <span class="has-ellipsis is-family-primary is-size-6 is-size-7-mobile has-text-grey ">{{ account.account }}</span>
                                 </div>
                             </div>
+                            <transition name="popLater">
+                                <div v-show="extensionStore.preferences.getOtpOnRequest == false" class="has-text-right">
+                                    <span v-if="account.otp != undefined">
+                                        <span v-if="isRenewingOTPs == true && (renewedPeriod == -1 || renewedPeriod == account.period)" class="has-nowrap has-text-grey has-text-centered is-size-5">
+                                            <FontAwesomeIcon :icon="['fas', 'circle-notch']" spin />
+                                        </span>
+                                        <span v-else class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('message.copy_to_clipboard')">
+                                            {{ useDisplayablePassword(account.otp.password, extensionStore.preferences.showOtpAsDot && extensionStore.preferences.revealDottedOTP && revealPassword == account.id) }}
+                                        </span>
+                                        <Dots
+                                            v-if="account.otp_type.includes('totp')"
+                                            :class="'condensed'"
+                                            ref="dotsRefs"
+                                            :period="account.period" />
+                                    </span>
+                                    <span v-else>
+                                        <!-- get hotp button -->
+                                        <button type="button" class="button tag" :class="mode == 'dark' ? 'is-dark' : 'is-white'" @click="showOTP(account)" :title="$t('message.import_this_account')">
+                                            {{ $t('message.generate') }}
+                                        </button>
+                                    </span>
+                                </div>
+                            </transition>
+                            <transition name="popLater" v-if="extensionStore.preferences.showOtpAsDot && extensionStore.preferences.revealDottedOTP">
+                                <div v-show="extensionStore.preferences.getOtpOnRequest == false" class="has-text-right">
+                                    <button v-if="revealPassword == account.id" type="button" class="pr-0 button is-ghost has-text-grey-dark" @click.stop="revealPassword = null">
+                                        <font-awesome-icon :icon="['fas', 'eye']" />
+                                    </button>
+                                    <button v-else type="button" class="pr-0 button is-ghost has-text-grey-dark" @click.stop="revealPassword = account.id">
+                                        <font-awesome-icon :icon="['fas', 'eye-slash']" />
+                                    </button>
+                                </div>
+                            </transition>
                         </div>
                     </div>
                 </span>

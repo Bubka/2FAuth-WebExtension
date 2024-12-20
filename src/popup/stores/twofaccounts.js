@@ -38,13 +38,13 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
      * ex: The items collection has 3 accounts with a period of 30s and 5 accounts with a period of 40s
      *     => The method will return [30, 40]
      */
-    // const periods = computed(() => {
-    //     return items.value.filter(account => account.otp_type == 'totp').map(function(item) {
-    //         return { period: item.period, generated_at: item.otp?.generated_at }
-    //     }).filter((value, index, self) => index === self.findIndex((t) => (
-    //         t.period === value.period
-    //     ))).sort()
-    // })
+    const periods = computed(() => {
+        return items.value.filter(account => account.otp_type == 'totp').map(function(item) {
+            return { period: item.period, generated_at: item.otp?.generated_at }
+        }).filter((value, index, self) => index === self.findIndex((t) => (
+            t.period === value.period
+        ))).sort()
+    })
 
     const isEmpty = computed(() => items.value.length == 0)
     const count = computed(() => items.value.length)
@@ -67,7 +67,7 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
         if (isOutOfAge || force) {
             fetchedOn.value = Date.now()
 
-            await twofaccountService.getAll().then(response => {
+            await twofaccountService.getAll(! extensionStore.preferences.getOtpOnRequest).then(response => {
                 // Defines if the store was up-to-date with the backend
                 if (force) {
                     backendWasNewer.value = response.data.length !== items.value.length
@@ -95,6 +95,15 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
 
         isFetching.value = false
     }
+        
+    /**
+     * Gets the IDs of all accounts that match the given period
+     * @param {*} period 
+     * @returns {Array<Number>} IDs of matching accounts
+     */
+    function accountIdsWithPeriod(period) {
+        return items.value.filter(a => a.period == period).map(item => item.id)
+    }
     
     return {
         // STATE
@@ -107,12 +116,13 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
 
         // GETTERS
         filtered,
-        // periods,
+        periods,
         isEmpty,
         count,
         filteredCount,
 
         // ACTIONS
-        fetch
+        fetch,
+        accountIdsWithPeriod,
     }
 })
