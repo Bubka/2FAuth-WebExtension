@@ -72,3 +72,8 @@ popup
     .component('VueButton', VueButton)
 
 popup.mount('#popup')
+
+import { useExtensionStore } from '@/stores/extensionStore'
+const extensionStore = useExtensionStore()
+extensionStore.applyTheme()
+extensionStore.resetGroupFilter()

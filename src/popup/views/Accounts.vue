@@ -170,7 +170,7 @@
                         <div class="tfa-container">
                             <div tabindex="0" class="tfa-cell tfa-content is-size-5" @click.exact="showOrCopy(account)" @keyup.enter="showOrCopy(account)" @click.ctrl="getAndCopyOTP(account)" role="button">  
                                 <div class="tfa-text has-ellipsis">
-                                    <img v-if="account.icon" role="presentation" class="tfa-icon" :src="'https://testing.2fauth.app/storage/icons/' + account.icon" alt="">
+                                    <img v-if="account.icon && extensionStore.preferences.showAccountsIcons" role="presentation" class="tfa-icon" :src="'https://testing.2fauth.app/storage/icons/' + account.icon" alt="">
                                     <img v-else-if="account.icon == null" role="presentation" class="tfa-icon" :src="'https://testing.2fauth.app/storage/noicon.svg'" alt="">
                                     {{ account.service ? account.service : $t('message.no_service') }}<FontAwesomeIcon class="has-text-danger is-size-5 ml-2" v-if="account.account === $t('message.indecipherable')" :icon="['fas', 'exclamation-circle']" />
                                     <span class="has-ellipsis is-family-primary is-size-6 is-size-7-mobile has-text-grey ">{{ account.account }}</span>
@@ -182,8 +182,11 @@
             </div>
             <VueFooter>
                 <router-link id="lnkLanding" :to="{ name: 'landing' }" class="has-text-grey">
-                {{ $t('link.landing') }}
-            </router-link>
+                    {{ $t('link.landing') }}
+                </router-link>
+                <router-link id="lnkLanding" :to="{ name: 'settings.options' }" class="has-text-grey">
+                    - {{ $t('link.settings') }}
+                </router-link>
             </VueFooter>
         </div>
         <Spinner :isVisible="twofaccounts.isFetching && ! showAccounts"  :type="'fullscreen-overlay'" message="message.fetching_data" />

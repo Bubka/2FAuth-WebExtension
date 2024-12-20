@@ -11,6 +11,7 @@ const router = createRouter({
         { path: '/setup', name: 'setup', component: () => import('../views/Setup.vue'), meta: {  } },
         { path: '/purpose', name: 'purpose', component: () => import('../views/Purpose.vue'), meta: {  } },
 
+        { path: '/settings/options', name: 'settings.options', component: () => import('../views/settings/Options.vue'), meta: { middlewares: [authGuard], watchedByKicker: true } },
         { path: '/about', name: 'about', component: () => import('../views/About.vue') },
         
         { path: '/error', name: 'genericError', component: () => import('../views/Error.vue'), meta: { watchedByKicker: true } },

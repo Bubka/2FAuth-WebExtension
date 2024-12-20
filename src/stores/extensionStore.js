@@ -47,5 +47,26 @@ export const useExtensionStore = defineStore('extensionStore', {
 
     actions: {
 
+
+        /**
+         * Applies the theme persisted in the store
+         */
+        async applyTheme() {
+            await this.$persistedState.isReady()
+            const mode = useColorMode({
+                attribute: 'data-theme',
+            })
+            mode.value = this.preferences.theme == 'system' ? 'auto' : this.preferences.theme
+        },
+
+        /**
+         * Resets the group filter to default
+         */
+        async resetGroupFilter() {
+            await this.$persistedState.isReady()
+            if (! this.preferences.rememberActiveGroup ) {
+                this.preferences.activeGroup = 0
+            }
+        },
     },
 })
