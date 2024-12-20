@@ -20,7 +20,7 @@ const persistedStatePlugin = createPersistedStatePlugin({
     overwrite: true,
     storage: {
         getItem: async (key) => {
-            return storage.local.get(key).then(async (result) => {
+            return storage.local.get(key).then((result) => {
                 return result[key]
             })
         },
