@@ -43,7 +43,7 @@ const en = {
         hi_x_its_all_good: 'Hi {username}, it\'s all good',
         save: 'Save',
         submit: 'Submit',
-        ext_setup: 'Ext. setup',
+        extension: 'Extension',
         options: 'Options',
         general: "General",
         setting_saved: "Setting saved",
@@ -83,6 +83,7 @@ const en = {
         otp_generation_on_home_title: 'Show all passwords in the main view, without doing anything',
         import_this_account: 'Import this account',
         generate: 'Generate',
+        change_password: 'Change password',
     },
     error: {
         cannot_create_otp_without_secret: 'Cannot create an OTP without a secret',

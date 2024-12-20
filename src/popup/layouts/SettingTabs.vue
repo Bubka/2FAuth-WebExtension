@@ -6,8 +6,8 @@
             'id'   : 'lnkTabOptions'
         },
         {
-            'name' : 'message.ext_setup',
-            'view' : 'settings.extsetup',
+            'name' : 'message.extension',
+            'view' : 'settings.extension',
             'id'   : 'lnkTabExtSetup'
         },
     ])
