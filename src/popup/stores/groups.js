@@ -16,7 +16,7 @@ export const useGroups = defineStore('groups', () => {
     // GETTERS
 
     const current = computed(() => {
-        const group = items.value.find(item => item.id === parseInt(extensionStore.activeGroup))
+        const group = items.value.find(item => item.id === parseInt(extensionStore.preferences.activeGroup))
 
         return group ? group.name : t('message.all')
     })

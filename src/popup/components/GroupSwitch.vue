@@ -15,11 +15,7 @@
      * Sets the selected group as the active group
      */
     function setActiveGroup(id) {
-        extensionStore.activeGroup = id
-
-        // if( user.preferences.rememberActiveGroup ) {
-        //     userService.updatePreference('activeGroup', id)
-        // }
+        extensionStore.preferences.activeGroup = id
 
         emit('update:showGroupSwitch', false)
     }

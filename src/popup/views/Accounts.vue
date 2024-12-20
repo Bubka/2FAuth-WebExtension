@@ -71,13 +71,13 @@
             // if (user.preferences.kickUserAfter == -1) {
             //     user.logout({ kicked: true})
             // }
-            if (extensionStore.clearSearchOnCopy) {
+            if (extensionStore.preferences.clearSearchOnCopy) {
                 twofaccounts.filter = ''
             }
-            if (extensionStore.viewDefaultGroupOnCopy) {
-                extensionStore.activeGroup = extensionStore.defaultGroup == -1
-                ? extensionStore.activeGroup
-                : extensionStore.defaultGroup
+            if (extensionStore.preferences.viewDefaultGroupOnCopy) {
+                extensionStore.preferences.activeGroup = extensionStore.preferences.defaultGroup == -1
+                ? extensionStore.preferences.activeGroup
+                : extensionStore.preferences.defaultGroup
             }
             
             notify.success({ text: trans('commons.copied_to_clipboard') })

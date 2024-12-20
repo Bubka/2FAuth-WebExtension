@@ -20,10 +20,10 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
     const filtered = computed(() => {
         return items.value.filter(
             item => {
-                if (parseInt(extensionStore.activeGroup) > 0 ) {
+                if (parseInt(extensionStore.preferences.activeGroup) > 0 ) {
                     return ((item.service ? item.service.toLowerCase().includes(filter.value.toLowerCase()) : false) ||
                         item.account.toLowerCase().includes(filter.value.toLowerCase())) &&
-                        (item.group_id == parseInt(extensionStore.activeGroup))
+                        (item.group_id == parseInt(extensionStore.preferences.activeGroup))
                 }
                 else {
                     return ((item.service ? item.service.toLowerCase().includes(filter.value.toLowerCase()) : false) ||
