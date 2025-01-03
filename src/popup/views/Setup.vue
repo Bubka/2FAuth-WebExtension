@@ -1,14 +1,14 @@
 <script setup>
     import { storeToRefs } from 'pinia'
-    import { useExtensionStore } from '@/stores/extensionStore'
+    import { useSettingStore } from '@/stores/settingStore'
     import { useNotifyStore } from '@popup/stores/notify'
     import userService from '@popup/services/userService'
     import FormButtons from '@popup/components/formElements/FormButtons.vue'
     
-    const extensionStore = useExtensionStore()
+    const settingStore = useSettingStore()
     const router = useRouter()
     const notify = useNotifyStore()
-    const { hostUrl, apiToken, extPassword } = storeToRefs(extensionStore)
+    const { hostUrl, apiToken, extPassword } = storeToRefs(settingStore)
 
     const _hostUrl = ref(hostUrl.value)
     const _apiToken = ref(apiToken.value)
@@ -57,7 +57,7 @@
             returnError: true,
             ignoreRequestInterceptor: true,
         }).then(response => {
-            extensionStore.$patch({
+            settingStore.$patch({
                 hostUrl: _hostUrl.value,
                 apiToken: _apiToken.value,
                 extPassword: _extPassword.value,

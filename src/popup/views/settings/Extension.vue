@@ -1,17 +1,17 @@
 <script setup>
-    import { useExtensionStore } from '@/stores/extensionStore'
+    import { useSettingStore } from '@/stores/settingStore'
     import { useNotifyStore } from '@popup/stores/notify'
     import SettingTabs from '@popup/layouts/SettingTabs.vue'
     import userService from '@popup/services/userService'
     import FormButtons from '@popup/components/formElements/FormButtons.vue'
 
-    const extensionStore = useExtensionStore()
+    const settingStore = useSettingStore()
     const router = useRouter()
     const notify = useNotifyStore()
 
-    const _hostUrl = ref(extensionStore.hostUrl)
-    const _apiToken = ref(extensionStore.apiTokenPartial)
-    const _extPassword = ref(extensionStore.extPassword)
+    const _hostUrl = ref(settingStore.hostUrl)
+    const _apiToken = ref(settingStore.apiTokenPartial)
+    const _extPassword = ref(settingStore.extPassword)
 
     const errors = ref('')
     const isRunning = ref(false)

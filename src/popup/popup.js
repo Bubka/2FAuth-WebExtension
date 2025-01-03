@@ -37,7 +37,7 @@ const persistedStatePlugin = createPersistedStatePlugin({
     // deserialize: (value) => JSON.parse(value),
 })
 pinia.use((context) => {
-    if (['extensionStore', 'preferenceStore'].includes(context.store.$id)) {
+    if (['settingStore', 'preferenceStore'].includes(context.store.$id)) {
         persistedStatePlugin(context)
     }
 })
@@ -73,7 +73,7 @@ popup
 
 popup.mount('#popup')
 
-import { usePreferenceStore } from '@/stores/extensionStore'
+import { usePreferenceStore } from '@/stores/preferenceStore'
 const preferenceStore = usePreferenceStore()
 preferenceStore.applyTheme()
 preferenceStore.resetGroupFilter()

@@ -1,6 +1,6 @@
 import { createRouter, createMemoryHistory } from 'vue-router'
 import middlewarePipeline from "@popup/router/middlewarePipeline";
-import { useExtensionStore } from '@/stores/extensionStore'
+import { useSettingStore } from '@/stores/settingStore'
 import authGuard    from './middlewares/authGuard'
 
 const router = createRouter({
@@ -24,10 +24,10 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
     const middlewares = to.meta.middlewares
-    const extensionStore = useExtensionStore()
-    await extensionStore.$persistedState.isReady()
+    const settingStore = useSettingStore()
+    await settingStore.$persistedState.isReady()
 
-    const stores = { extensionStore: extensionStore }
+    const stores = { settingStore: settingStore }
     const nextMiddleware = {}
     const context = { to, from, next, nextMiddleware, stores }
 

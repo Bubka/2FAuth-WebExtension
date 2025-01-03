@@ -1,9 +1,9 @@
 // import authService from '@/services/authService'
 
 export default async function authGuard({ to, next, nextMiddleware, stores }) {
-    const { extensionStore } = stores
+    const { settingStore } = stores
 
-    if (! extensionStore.isConfigured) {
+    if (! settingStore.isConfigured) {
         next({ name: 'landing' })
     } else {
         nextMiddleware()

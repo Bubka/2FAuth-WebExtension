@@ -1,7 +1,7 @@
 <script setup>
-    import { useExtensionStore } from '@/stores/extensionStore';
+    // import { useSettingStore } from '@/stores/settingStore';
     
-    const extensionStore = useExtensionStore();
+    // const settingStore = useSettingStore();
 
 </script>
 

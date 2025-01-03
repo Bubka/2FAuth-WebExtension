@@ -1,6 +1,6 @@
 import axios from "axios"
 import { useNotifyStore } from '@popup/stores/notify'
-import { useExtensionStore } from '@/stores/extensionStore'
+import { useSettingStore } from '@/stores/settingStore'
 
 export const httpClientFactory = () => {
 
@@ -12,16 +12,16 @@ export const httpClientFactory = () => {
 
 	httpClient.interceptors.request.use(
         async function (config) {
-            const extensionStore = useExtensionStore()
+            const settingStore = useSettingStore()
 
             if (Object.prototype.hasOwnProperty.call(config, 'ignoreRequestInterceptor') && config.ignoreRequestInterceptor === true) {
                 return config
             }
 
-            config.baseURL = extensionStore.hostUrl + '/api/v1'
+            config.baseURL = settingStore.hostUrl + '/api/v1'
 		    config.headers = {
                 ...config.headers,
-                ...{ 'Authorization': 'Bearer ' + extensionStore.apiToken , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' }
+                ...{ 'Authorization': 'Bearer ' + settingStore.apiToken , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' }
             }
 
             return config

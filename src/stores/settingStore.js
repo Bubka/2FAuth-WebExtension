@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export const useExtensionStore = defineStore('extensionStore', {
+export const useSettingStore = defineStore('settingStore', {
 
     state: () => {
         return {
