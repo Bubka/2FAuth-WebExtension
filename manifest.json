@@ -12,9 +12,9 @@
     },
     "background": {
         "type": "module",
-        "{{chrome}}.service_worker": "src/background/index.js",
+        "{{chrome}}.service_worker": "src/background/serviceworker.js",
         "{{firefox}}.scripts": [
-            "src/background/index.js"
+            "src/background/serviceworker.js"
         ],
         "{{firefox}}.persistent": false
     },
