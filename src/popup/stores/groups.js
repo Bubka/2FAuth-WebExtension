@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
-import { useExtensionStore } from '@/stores/extensionStore'
+import { usePreferenceStore } from '@/stores/preferenceStore'
 import { useI18n } from 'vue-i18n';
 import groupService from '@popup/services/groupService'
 
 export const useGroups = defineStore('groups', () => {
 
-    const extensionStore = useExtensionStore()
+    const preferenceStore = usePreferenceStore()
     const { t } = useI18n()
 
     // STATE
@@ -16,7 +16,7 @@ export const useGroups = defineStore('groups', () => {
     // GETTERS
 
     const current = computed(() => {
-        const group = items.value.find(item => item.id === parseInt(extensionStore.preferences.activeGroup))
+        const group = items.value.find(item => item.id === parseInt(preferenceStore.activeGroup))
 
         return group ? group.name : t('message.all')
     })

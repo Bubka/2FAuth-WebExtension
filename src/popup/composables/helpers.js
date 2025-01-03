@@ -1,4 +1,4 @@
-import { useExtensionStore } from '@/stores/extensionStore'
+import { usePreferenceStore } from '@/stores/preferenceStore'
 import { tabs } from 'webextension-polyfill'
 
 export function openUrlInNewTab(url) {
@@ -57,12 +57,12 @@ export function useValidationErrorIdGenerator(field) {
 }
 
 export function useDisplayablePassword(pwd, reveal = false) {
-    const extensionStore = useExtensionStore()
+    const preferenceStore = usePreferenceStore()
 
-	if (extensionStore.preferences.formatPassword && pwd.length > 0) {
-		const x = Math.ceil(extensionStore.preferences.formatPasswordBy < 1
-			? pwd.length * extensionStore.preferences.formatPasswordBy
-			: extensionStore.preferences.formatPasswordBy)
+	if (preferenceStore.formatPassword && pwd.length > 0) {
+		const x = Math.ceil(preferenceStore.formatPasswordBy < 1
+			? pwd.length * preferenceStore.formatPasswordBy
+			: preferenceStore.formatPasswordBy)
 			
 		const chunks = pwd.match(new RegExp(`.{1,${x}}`, 'g'));
 		if (chunks) {
@@ -70,7 +70,7 @@ export function useDisplayablePassword(pwd, reveal = false) {
 		}
 	}
 
-	return extensionStore.preferences.showOtpAsDot && !reveal ? pwd.replace(/[0-9]/g, '●') : pwd
+	return preferenceStore.showOtpAsDot && !reveal ? pwd.replace(/[0-9]/g, '●') : pwd
 }
 
 export function startsWithUppercase(str) {

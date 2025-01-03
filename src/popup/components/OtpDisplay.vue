@@ -1,6 +1,6 @@
 <script setup>
     import { useI18n } from 'vue-i18n'
-    import { useExtensionStore } from '@/stores/extensionStore'
+    import { usePreferenceStore } from '@/stores/preferenceStore'
     import Spinner from '@popup/components/Spinner.vue'
     import TotpLooper from '@popup/components/TotpLooper.vue'
     import Dots from '@popup/components/Dots.vue'
@@ -9,7 +9,7 @@
     import { UseColorMode } from '@vueuse/components'
     import { useDisplayablePassword } from '@popup/composables/helpers'
 
-    const extensionStore = useExtensionStore()
+    const preferenceStore = usePreferenceStore()
     const { t } = useI18n({ useScope: "global" });
     const notify = useNotifyStore()
     const { copy, copied } = useClipboard({ legacy: true })
@@ -125,7 +125,7 @@
             await getOtp()
             focusOnOTP()
 
-            if (extensionStore.preferences.getOtpOnRequest && parseInt(extensionStore.preferences.autoCloseTimeout) > 0) {
+            if (preferenceStore.getOtpOnRequest && parseInt(preferenceStore.autoCloseTimeout) > 0) {
                 startAutoCloseTimer()
             }
         }
@@ -144,7 +144,7 @@
             let otp = response.data
             password.value = otp.password
 
-            if(extensionStore.preferences.copyOtpOnDisplay) {
+            if(preferenceStore.copyOtpOnDisplay) {
                 copyOTP(otp.password)
             }
 
@@ -239,21 +239,21 @@
         copy(otp.replace(/ /g, ''))
 
         if (copied) {
-            // if(extensionStore.preferences.kickUserAfter == -1 && (permit_closing || false) === true && route.name != 'importAccounts') {
+            // if(preferenceStore.kickUserAfter == -1 && (permit_closing || false) === true && route.name != 'importAccounts') {
             //     user.logout({ kicked: true})
             // }
             // else
-            if(extensionStore.preferences.closeOtpOnCopy && (permit_closing || false) === true) {
+            if(preferenceStore.closeOtpOnCopy && (permit_closing || false) === true) {
                 closeMe()
             }
 
-            if(extensionStore.preferences.clearSearchOnCopy) {
+            if(preferenceStore.clearSearchOnCopy) {
                 emit("please-clear-search");
             }
-            if (extensionStore.preferences.viewDefaultGroupOnCopy) {
-                extensionStore.preferences.activeGroup = extensionStore.preferences.defaultGroup == -1 ?
-                    extensionStore.preferences.activeGroup
-                    : extensionStore.preferences.defaultGroup
+            if (preferenceStore.viewDefaultGroupOnCopy) {
+                preferenceStore.activeGroup = preferenceStore.defaultGroup == -1 ?
+                    preferenceStore.activeGroup
+                    : preferenceStore.defaultGroup
             }
 
             notify.success({ text: t('message.copied_to_clipboard') })
@@ -294,7 +294,7 @@
      * Starts an auto close timer
      */
     function startAutoCloseTimer() {
-        let duration = parseInt(extensionStore.preferences.autoCloseTimeout) // in minutes
+        let duration = parseInt(preferenceStore.autoCloseTimeout) // in minutes
         
         autoCloseTimeout.value = setTimeout(function() {
             closeMe()
@@ -324,7 +324,7 @@
                     @keyup.enter="copyOTP(password, true)"
                     :title="$t('message.copy_to_clipboard')"
                 >
-                    {{ useDisplayablePassword(password, extensionStore.preferences.showOtpAsDot && extensionStore.preferences.revealDottedOTP && revealPassword) }}
+                    {{ useDisplayablePassword(password, preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP && revealPassword) }}
                 </span>
                 <span v-else tabindex="0" class="otp is-size-1">
                     <Spinner :isVisible="showInlineSpinner" :type="'raw'" />
@@ -335,7 +335,7 @@
         <p v-show="isHMacBased(otpauthParams.otp_type)">
             {{ $t('message.counter') }}: {{ otpauthParams.counter }}
         </p>
-        <p v-if="extensionStore.preferences.showOtpAsDot && extensionStore.preferences.revealDottedOTP" class="mt-3">
+        <p v-if="preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP" class="mt-3">
             <button type="button" class="button is-ghost has-text-grey-dark" @click.stop="revealPassword = !revealPassword">
                 <font-awesome-icon v-if="revealPassword" :icon="['fas', 'eye']" />
                 <font-awesome-icon v-else :icon="['fas', 'eye-slash']" />

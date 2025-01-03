@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
-import { useExtensionStore } from '@/stores/extensionStore'
+import { usePreferenceStore } from '@/stores/preferenceStore'
 import twofaccountService from '@popup/services/twofaccountService'
 
 export const useTwofaccounts = defineStore('twofaccounts', () => {
 
-    const extensionStore = useExtensionStore()
+    const preferenceStore = usePreferenceStore()
 
     // STATE
 
@@ -20,10 +20,10 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
     const filtered = computed(() => {
         return items.value.filter(
             item => {
-                if (parseInt(extensionStore.preferences.activeGroup) > 0 ) {
+                if (parseInt(preferenceStore.activeGroup) > 0 ) {
                     return ((item.service ? item.service.toLowerCase().includes(filter.value.toLowerCase()) : false) ||
                         item.account.toLowerCase().includes(filter.value.toLowerCase())) &&
-                        (item.group_id == parseInt(extensionStore.preferences.activeGroup))
+                        (item.group_id == parseInt(preferenceStore.activeGroup))
                 }
                 else {
                     return ((item.service ? item.service.toLowerCase().includes(filter.value.toLowerCase()) : false) ||
@@ -67,7 +67,7 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
         if (isOutOfAge || force) {
             fetchedOn.value = Date.now()
 
-            await twofaccountService.getAll(! extensionStore.preferences.getOtpOnRequest).then(response => {
+            await twofaccountService.getAll(! preferenceStore.getOtpOnRequest).then(response => {
                 // Defines if the store was up-to-date with the backend
                 if (force) {
                     backendWasNewer.value = response.data.length !== items.value.length

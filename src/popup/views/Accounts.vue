@@ -1,7 +1,7 @@
 <script setup>
     import { useI18n } from 'vue-i18n'
     import twofaccountService from '@popup/services/twofaccountService'
-    import { useExtensionStore } from '@/stores/extensionStore'
+    import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useNotifyStore } from '@popup/stores/notify'
     import { useTwofaccounts } from '@popup/stores/twofaccounts'
     import { useGroups } from '@popup/stores/groups'
@@ -15,7 +15,7 @@
     import Dots from '@popup/components/Dots.vue'
 
     const { t } = useI18n({ useScope: "global" });
-    const extensionStore = useExtensionStore()
+    const preferenceStore = usePreferenceStore()
     const notify = useNotifyStore()
     const { copy, copied } = useClipboard()
     const twofaccounts = useTwofaccounts()
@@ -63,7 +63,7 @@
      * Shows an OTP in a modal or directly copies it to the clipboard
      */
      async function showOrCopy(account) {
-        if (!extensionStore.preferences.getOtpOnRequest && account.otp_type.includes('totp')) {
+        if (!preferenceStore.getOtpOnRequest && account.otp_type.includes('totp')) {
             copyToClipboard(account.otp.password)
         }
         else {
@@ -78,16 +78,16 @@
         copy(password)
 
         if (copied) {
-            // if (extensionStore.preferences.kickUserAfter == -1) {
+            // if (preferenceStore.kickUserAfter == -1) {
             //     user.logout({ kicked: true})
             // }
-            if (extensionStore.preferences.clearSearchOnCopy) {
+            if (preferenceStore.clearSearchOnCopy) {
                 twofaccounts.filter = ''
             }
-            if (extensionStore.preferences.viewDefaultGroupOnCopy) {
-                extensionStore.preferences.activeGroup = extensionStore.preferences.defaultGroup == -1
-                ? extensionStore.preferences.activeGroup
-                : extensionStore.preferences.defaultGroup
+            if (preferenceStore.viewDefaultGroupOnCopy) {
+                preferenceStore.activeGroup = preferenceStore.defaultGroup == -1
+                ? preferenceStore.activeGroup
+                : preferenceStore.defaultGroup
             }
             
             notify.success({ text: t('commons.copied_to_clipboard') })
@@ -186,7 +186,7 @@
         // This allows to display accounts without latency.
         //
         // We sync the store with the backend again to
-        if (! extensionStore.preferences.getOtpOnRequest) {
+        if (! preferenceStore.getOtpOnRequest) {
             updateTotps()
         }
         else {
@@ -250,7 +250,7 @@
             </OtpDisplay>
         </Modal>
         <!-- totp loopers -->
-        <span v-if="!extensionStore.preferences.getOtpOnRequest">
+        <span v-if="!preferenceStore.getOtpOnRequest">
             <TotpLooper
                 v-for="period in twofaccounts.periods"
                 :key="period.period"
@@ -272,20 +272,20 @@
                         <div class="tfa-container">
                             <div tabindex="0" class="tfa-cell tfa-content is-size-5" @click.exact="showOrCopy(account)" @keyup.enter="showOrCopy(account)" @click.ctrl="getAndCopyOTP(account)" role="button">  
                                 <div class="tfa-text has-ellipsis">
-                                    <img v-if="account.icon && extensionStore.preferences.showAccountsIcons" role="presentation" class="tfa-icon" :src="'https://testing.2fauth.app/storage/icons/' + account.icon" alt="">
+                                    <img v-if="account.icon && preferenceStore.showAccountsIcons" role="presentation" class="tfa-icon" :src="'https://testing.2fauth.app/storage/icons/' + account.icon" alt="">
                                     <img v-else-if="account.icon == null" role="presentation" class="tfa-icon" :src="'https://testing.2fauth.app/storage/noicon.svg'" alt="">
                                     {{ account.service ? account.service : $t('message.no_service') }}<FontAwesomeIcon class="has-text-danger is-size-5 ml-2" v-if="account.account === $t('message.indecipherable')" :icon="['fas', 'exclamation-circle']" />
                                     <span class="has-ellipsis is-family-primary is-size-6 is-size-7-mobile has-text-grey ">{{ account.account }}</span>
                                 </div>
                             </div>
                             <transition name="popLater">
-                                <div v-show="extensionStore.preferences.getOtpOnRequest == false" class="has-text-right">
+                                <div v-show="preferenceStore.getOtpOnRequest == false" class="has-text-right">
                                     <span v-if="account.otp != undefined">
                                         <span v-if="isRenewingOTPs == true && (renewedPeriod == -1 || renewedPeriod == account.period)" class="has-nowrap has-text-grey has-text-centered is-size-5">
                                             <FontAwesomeIcon :icon="['fas', 'circle-notch']" spin />
                                         </span>
                                         <span v-else class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('message.copy_to_clipboard')">
-                                            {{ useDisplayablePassword(account.otp.password, extensionStore.preferences.showOtpAsDot && extensionStore.preferences.revealDottedOTP && revealPassword == account.id) }}
+                                            {{ useDisplayablePassword(account.otp.password, preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP && revealPassword == account.id) }}
                                         </span>
                                         <Dots
                                             v-if="account.otp_type.includes('totp')"
@@ -301,8 +301,8 @@
                                     </span>
                                 </div>
                             </transition>
-                            <transition name="popLater" v-if="extensionStore.preferences.showOtpAsDot && extensionStore.preferences.revealDottedOTP">
-                                <div v-show="extensionStore.preferences.getOtpOnRequest == false" class="has-text-right">
+                            <transition name="popLater" v-if="preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP">
+                                <div v-show="preferenceStore.getOtpOnRequest == false" class="has-text-right">
                                     <button v-if="revealPassword == account.id" type="button" class="pr-0 button is-ghost has-text-grey-dark" @click.stop="revealPassword = null">
                                         <font-awesome-icon :icon="['fas', 'eye']" />
                                     </button>

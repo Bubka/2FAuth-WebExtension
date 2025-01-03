@@ -1,8 +1,8 @@
 <script setup>
     import { UseColorMode } from '@vueuse/components'
-    import { useExtensionStore } from '@/stores/extensionStore'
+    import { usePreferenceStore } from '@/stores/preferenceStore'
 
-    const extensionStore = useExtensionStore()
+    const preferenceStore = usePreferenceStore()
 
     const props = defineProps({
         showGroupSwitch: Boolean,
@@ -15,7 +15,7 @@
      * Sets the selected group as the active group
      */
     function setActiveGroup(id) {
-        extensionStore.preferences.activeGroup = id
+        preferenceStore.activeGroup = id
 
         emit('update:showGroupSwitch', false)
     }
