@@ -21,7 +21,7 @@ const persistedStatePlugin = createPersistedStatePlugin({
     storage: {
         getItem: async (key) => {
             return storage.local.get(key).then((result) => {
-                return result[key]
+                return Promise.resolve(result[key])
             })
         },
         setItem: async (key, value) => {
