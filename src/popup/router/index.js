@@ -1,18 +1,19 @@
 import { createRouter, createMemoryHistory } from 'vue-router'
-import middlewarePipeline from "@popup/router/middlewarePipeline";
+import middlewarePipeline  from '@popup/router/middlewarePipeline'
 import { useSettingStore } from '@/stores/settingStore'
-import authGuard    from './middlewares/authGuard'
+import mustBeConfigured    from './middlewares/mustBeConfigured'
 
 const router = createRouter({
 	history: createMemoryHistory('/'),
 	routes: [
-        { path: '/accounts', name: 'accounts', component: () => import('../views/Accounts.vue'), meta: { middlewares: [authGuard] }, alias: '/' },
         { path: '/landing', name: 'landing', component: () => import('../views/Landing.vue'), meta: {  } },
         { path: '/setup', name: 'setup', component: () => import('../views/Setup.vue'), meta: {  } },
-        { path: '/purpose', name: 'purpose', component: () => import('../views/Purpose.vue'), meta: {  } },
+        { path: '/purpose', name: 'purpose', component: () => import('../views/Purpose.vue'), meta: { } },
 
-        { path: '/settings/options', name: 'settings.options', component: () => import('../views/settings/Options.vue'), meta: { middlewares: [authGuard], watchedByKicker: true } },
-        { path: '/settings/extension', name: 'settings.extension', component: () => import('../views/settings/Extension.vue'), meta: { middlewares: [authGuard], watchedByKicker: true } },
+        { path: '/unlock', name: 'unlock', component: () => import('../views/Unlock.vue'), meta: { middlewares: [mustBeConfigured] } },
+        { path: '/accounts', name: 'accounts', component: () => import('../views/Accounts.vue'), meta: { middlewares: [mustBeConfigured] }, alias: '/' },
+        { path: '/settings/options', name: 'settings.options', component: () => import('../views/settings/Options.vue'), meta: { middlewares: [mustBeConfigured], watchedByKicker: true } },
+        { path: '/settings/extension', name: 'settings.extension', component: () => import('../views/settings/Extension.vue'), meta: { middlewares: [mustBeConfigured], watchedByKicker: true } },
         
         { path: '/about', name: 'about', component: () => import('../views/About.vue') },
         
@@ -22,10 +23,9 @@ const router = createRouter({
 	]
 })
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, from, next) => {
     const middlewares = to.meta.middlewares
     const settingStore = useSettingStore()
-    await settingStore.$persistedState.isReady()
 
     const stores = { settingStore: settingStore }
     const nextMiddleware = {}
