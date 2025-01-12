@@ -84,10 +84,23 @@ const en = {
         import_this_account: 'Import this account',
         generate: 'Generate',
         change_password: 'Change password',
+        unlock: 'Unlock',
+        unlock_description: 'The extension is locked to protect its data. Enter the extension password to access your 2FAs.',
     },
     error: {
         cannot_create_otp_without_secret: 'Cannot create an OTP without a secret',
         not_a_supported_otp_type: 'This OTP format is not currently supported',
+        change_failed_please_retry: 'Change failed, please retry',
+        encryption_key_generation_failed: 'Generation of encryption key failed',
+        failed_to_decipher_pat: 'Failed to decipher PAT',
+        failed_to_derive_key: 'Failed to derive key',
+        failed_to_get_password: 'Failed to get password',
+        failed_to_load_settings: 'Failed to load settings from the store',
+        failed_to_set_encryption_parameters: 'Failed to set encryption parameters',
+        failed_to_encrypt_pat: 'Failed to encrypt PAT',
+        failed_to_regenerate_iv: 'Failed to regenerate IV',
+        failed_to_store_encrypted_pat: 'Failed to store encrypted PAT',
+        unknown_error_during_pat_encryption: 'Unknown error during PAT encryption',
     },
     field: {
         hostUrl: {

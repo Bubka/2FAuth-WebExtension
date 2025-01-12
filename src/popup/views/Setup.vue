@@ -1,18 +1,24 @@
 <script setup>
+    import { useI18n } from 'vue-i18n'
     import { storeToRefs } from 'pinia'
     import { useSettingStore } from '@/stores/settingStore'
-    import { useNotifyStore } from '@popup/stores/notify'
+    import { useNotifyStore }  from '@popup/stores/notify'
+    import { useBusStore }     from '@popup/stores/busStore'
+
+    import { sendMessage } from 'webext-bridge/popup'
     import userService from '@popup/services/userService'
     import FormButtons from '@popup/components/formElements/FormButtons.vue'
     
+    const { t } = useI18n({ useScope: "global" })
     const settingStore = useSettingStore()
+    const busStore = useBusStore()
     const router = useRouter()
     const notify = useNotifyStore()
-    const { hostUrl, apiToken, extPassword } = storeToRefs(settingStore)
+    const { hostUrl } = storeToRefs(settingStore)
 
-    const _hostUrl = ref(hostUrl.value)
-    const _apiToken = ref(apiToken.value)
-    const _extPassword = ref(extPassword.value)
+    const _hostUrl = ref('')
+    const _apiToken = ref('')
+    const _extPassword = ref(null)
 
     const errors = ref('')
     const isTesting = ref(false)
@@ -56,14 +62,34 @@
             headers: { 'Authorization': 'Bearer ' + _apiToken.value , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' },
             returnError: true,
             ignoreRequestInterceptor: true,
-        }).then(response => {
+        }).then(async () => {
+            const { status: setEncKeyStatus } = await sendMessage('SET_ENC_KEY', { password: _extPassword.value }, 'background')
+
+            if (! setEncKeyStatus) {
+                notify.alert({ text: t('error.encryption_key_generation_failed') })
+                return
+            }
+
+            const { status: tokenEncryptionStatus, reason: failedEncReason } = await sendMessage('ENCRYPT_PAT', { apiToken: _apiToken.value }, 'background')
+
+            if (! tokenEncryptionStatus) {
+                notify.alert({ text: t(failedEncReason) })
+                return
+            }
+
             settingStore.$patch({
                 hostUrl: _hostUrl.value,
-                apiToken: _apiToken.value,
-                extPassword: _extPassword.value,
+                hasPassword: true,
             })
 
-            router.push({ name: 'accounts' })
+            const { status: unlockingStatus, reason: failedUnlockReason } = await sendMessage('UNLOCK', { }, 'background')
+
+            if (unlockingStatus) {
+                router.push({ name: 'accounts' })
+            }
+            else {
+                notify.alert({ text: t(failedUnlockReason) })
+            }               
         })
         .catch(error => {
             notify.error(error)

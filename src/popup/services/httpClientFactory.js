@@ -1,5 +1,6 @@
 import axios from "axios"
 import { useNotifyStore } from '@popup/stores/notify'
+import { sendMessage } from 'webext-bridge/popup'
 import { useSettingStore } from '@/stores/settingStore'
 
 export const httpClientFactory = () => {
@@ -12,16 +13,17 @@ export const httpClientFactory = () => {
 
 	httpClient.interceptors.request.use(
         async function (config) {
-            const settingStore = useSettingStore()
-
             if (Object.prototype.hasOwnProperty.call(config, 'ignoreRequestInterceptor') && config.ignoreRequestInterceptor === true) {
                 return config
             }
+            
+            const settingStore = useSettingStore()
+            const { pat } = await sendMessage('GET_PAT', { }, 'background')
 
             config.baseURL = settingStore.hostUrl + '/api/v1'
 		    config.headers = {
                 ...config.headers,
-                ...{ 'Authorization': 'Bearer ' + settingStore.apiToken , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' }
+                ...{ 'Authorization': 'Bearer ' + pat , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' }
             }
 
             return config
@@ -36,6 +38,7 @@ export const httpClientFactory = () => {
             return response;
         },
         async function (error) {
+            console.log(error)
 
             if (error.response && [407].includes(error.response.status)) {
                 useNotifyStore().error(error)
@@ -43,7 +46,7 @@ export const httpClientFactory = () => {
             }
 
             // Return the error when we need to handle it at component level
-            if (Object.prototype.hasOwnProperty.call(error.config, 'returnError') && error.config.returnError === true) {
+            if (error.hasOwnProperty('returnError') && error.config.returnError === true) {
                 return Promise.reject(error)
             }
             
@@ -53,12 +56,12 @@ export const httpClientFactory = () => {
             }
 
             // Always return the form validation errors
-            if (error.response.status === 422) {
+            if (error.response && [422].includes(error.response.status)) {
                 return Promise.reject(error)
             }
 
             // Not found
-            if (error.response.status === 404) {
+            if (error.response && [404].includes(error.response.status)) {
                 useNotifyStore().notFound()
                 return new Promise(() => {})
             }
