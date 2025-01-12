@@ -37,7 +37,7 @@ const persistedStatePlugin = createPersistedStatePlugin({
     // deserialize: (value) => JSON.parse(value),
 })
 pinia.use((context) => {
-    if (['settingStore', 'preferenceStore'].includes(context.store.$id)) {
+    if (['settings', 'preferences'].includes(context.store.$id)) {
         persistedStatePlugin(context)
     }
 })
