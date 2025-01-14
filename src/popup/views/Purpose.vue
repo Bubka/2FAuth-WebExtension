@@ -13,12 +13,8 @@
             {{ $t('message.purpose_requirements') }}
         </p>
         <p class="block">
-            <a @click="openUrlInNewTab('https://docs.2fauth.app/')">
-                {{ $t('message.twofauth_doc') }} <FontAwesomeIcon :icon="['fas', 'arrow-up-right-from-square']" size="xs" />
-            </a>
-            <br />
             <a @click="openUrlInNewTab('https://docs.2fauth.app/api/#creating-an-access-token')">
-                {{ $t('message.how_to_create_a_pat') }} <FontAwesomeIcon :icon="['fas', 'arrow-up-right-from-square']" size="xs" />
+                {{ $t('message.docs_how_to_create_a_pat') }} <FontAwesomeIcon :icon="['fas', 'arrow-up-right-from-square']" size="xs" />
             </a>
         </p>
     </div>
