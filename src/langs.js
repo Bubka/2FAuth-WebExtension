@@ -112,6 +112,7 @@ const en = {
         failed_to_get_encryption_parameters: 'Failed to get encryption parameters',
         wrong_password: 'Wrong password',
         reset_extension: 'Reset extension',
+        failed_to_connect_with_host: 'Connection failed',
     },
     field: {
         hostUrl: {
