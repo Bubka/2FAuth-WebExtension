@@ -35,20 +35,26 @@
         username.value = null
 
         userService.get({
-            baseURL: _hostUrl.value + '/api/v1',
-            headers: { 'Authorization': 'Bearer ' + _apiToken.value , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' },
-            returnError: true,
-            ignoreRequestInterceptor: true,
-        }).then(response => {
-            username.value = response.data.name
-            isConnected.value = true
-        })
-        .catch(error => {
-            isConnected.value = false
-        })
-        .finally(() => {
-            isTesting.value = false
-        })
+            isTesting.value = true
+            isConnected.value = null
+            username.value = null
+
+            userService.get({
+                baseURL: _hostUrl.value + '/api/v1',
+                headers: { 'Authorization': 'Bearer ' + _apiToken.value , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' },
+                returnError: true,
+                ignoreRequestInterceptor: true,
+            }).then(response => {
+                username.value = response.data.name
+                isConnected.value = true
+            })
+            .catch(error => {
+                isConnected.value = false
+            })
+            .finally(() => {
+                isTesting.value = false
+            })
+        }
     }
 
     /**
@@ -72,15 +78,48 @@
 
             const { status: tokenEncryptionStatus, reason: failedEncReason } = await sendMessage('ENCRYPT_PAT', { apiToken: _apiToken.value }, 'background')
 
-            if (! tokenEncryptionStatus) {
-                notify.alert({ text: t(failedEncReason) })
-                return
-            }
+            isSaving.value = true
 
-            settingStore.$patch({
-                hostUrl: _hostUrl.value,
-                hasPassword: true,
+            userService.get({
+                baseURL: _hostUrl.value + '/api/v1',
+                headers: { 'Authorization': 'Bearer ' + _apiToken.value , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' },
+                returnError: true,
+                ignoreRequestInterceptor: true,
+            }).then(async () => {
+                const { status: setEncKeyStatus } = await sendMessage('SET_ENC_KEY', { password: _extPassword.value }, 'background')
+
+                if (! setEncKeyStatus) {
+                    notify.alert({ text: t('error.encryption_key_generation_failed') })
+                    return
+                }
+
+                const { status: tokenEncryptionStatus, reason: failedEncReason } = await sendMessage('ENCRYPT_PAT', { apiToken: _apiToken.value }, 'background')
+
+                if (! tokenEncryptionStatus) {
+                    notify.alert({ text: t(failedEncReason) })
+                    return
+                }
+
+                settingStore.$patch({
+                    hostUrl: _hostUrl.value,
+                })
+
+                const { status: unlockingStatus, reason: failedUnlockReason } = await sendMessage('UNLOCK', { }, 'background')
+
+                if (unlockingStatus) {
+                    router.push({ name: 'accounts' })
+                }
+                else {
+                    notify.alert({ text: t(failedUnlockReason) })
+                }               
             })
+            .catch(error => {
+                notify.error(error)
+            })
+            .finally(() => {
+                isSaving.value = false
+            })
+        }
 
             const { status: unlockingStatus, reason: failedUnlockReason } = await sendMessage('UNLOCK', { }, 'background')
 

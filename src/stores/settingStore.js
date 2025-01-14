@@ -5,7 +5,6 @@ export const useSettingStore = defineStore('settings', {
     state: () => {
         return {
             hostUrl: '',
-            extPassword: '',
         }
     },
 

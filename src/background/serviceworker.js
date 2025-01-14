@@ -1,14 +1,14 @@
 import { onMessage } from 'webext-bridge/background'
 
-const SETTING_STORE = 'settingStore'
 const CRYPTO_STORE = 'cryptoStore'
 const EXTSTATE_STORE = 'extstateStore'
 const PREFERENCE_STORE = 'preferenceStore'
 // const DEBUG_STORE_KEY = '2fauth-debug'
+
 const decoder = new TextDecoder()
 const encoder = new TextEncoder()
-// // const _browser = (typeof browser === "undefined") ? chrome : browser
 const _crypto = (typeof window === "undefined") ? crypto : window.crypto
+
 const default_state = {
     loaded: false,
     locked: false,
@@ -75,7 +75,10 @@ onMessage('SET_ENC_KEY', ({ data }) => {
 })
 onMessage('GET_PAT', getPat)
 onMessage('CHECK_LOCKED', isLocked)
+onMessage('LOCK_EXTENSION', lockNow)
 onMessage('UNLOCK', unlockExt)
+onMessage('GET_PARTIAL_PAT', getPartialPat)
+onMessage('RESET_EXT', resetExt)
 
 
 // /**
@@ -150,7 +153,7 @@ async function swlog(...logs) {
  * TODO: Needs testing without dev-tools windows open to see if it still triggers ( hint: it doesn't seem to :/ )
  */
 function handleBrowserClosed(window_id) {
-    _browser.windows.getAll().then(window_list => {
+    browser.windows.getAll().then(window_list => {
         if (window_list.length === 0) {
             if (state.kickAfter !== null) {
                 lockNow();
@@ -362,7 +365,7 @@ function lockNow() {
 //     if (state.kickAfter !== null && state.kickAfter !== 'null') {
 //         const kickAfter = parseInt(state.kickAfter);
 //         if (kickAfter > 0) {
-//             _browser.alarms.create('lock-extension', { delayInMinutes: kickAfter });
+//             browser.alarms.create('lock-extension', { delayInMinutes: kickAfter });
 //         } else if (kickAfter === 0) {
 //             lockNow();
 //         }
@@ -379,12 +382,24 @@ function getPat() {
     return Promise.resolve({ status: true, pat: state.pat });
 }
 
+// /**
+//  * Get the Personal Access Token truncated
+//  *
+//  * @returns {Promise<Awaited<{pat: string, status: boolean}>>}
+//  */
+function getPartialPat() {
+    // swlog(state.pat)
+    return Promise.resolve({ status: true, partialPat: state.pat.substring(0, 10) + ' ... ' + state.pat.slice(-10) })
+}
+
+
 /**
  * Check if the extension is currently or should be locked
  *
  * @returns {Promise<{[p: string]: any} | {locked: boolean}>}
  */
 function isLocked() {
+    swlog('~~~ checking isLocked ~~~')
     // This is triggered each time the extension loads, so we will use it as a point to load/generate the salt and iv for encryption
     return loadState().then(() => {
         return browser.storage.local.get({ [CRYPTO_STORE]: null }).then(stores => {
@@ -394,24 +409,19 @@ function isLocked() {
                 encryptionParams.default = stores[CRYPTO_STORE].default ?? true;
                 return new Promise(resolve => resolve())
             } else {
-                return generateEncDetails(true);
+                return generateCryptoParams(true);
             }
         }, () => new Promise(resolve => resolve()));
     }).then(() => {
         return browser.storage.local.get({ [CRYPTO_STORE]: {} }).then(stores => {
-            // console.log(stores)
             let return_value = { locked: false }
 
-            // The extension can only be locked if there is an encrypted PAT stored and the user has set a password
-            // if (cryptoData.hasOwnProperty(CRYPTO_STORE) && Object.getOwnPropertyNames(stores[CRYPTO_STORE]) > 0) {
-            //         // console.log(stores[CRYPTO_STORE])
-            //         settings = JSON.parse(stores[SETTING_STORE])
-            //     if (settings.hasOwnProperty('encryptedApiToken')) {
-            //         return_value.locked = settings['encryptedApiToken'].length > 0 && state.locked === true
-            //     }
-            // }
+            // The extension can only be locked if there is a PAT in storage and the user has set a password
             if (stores.hasOwnProperty(CRYPTO_STORE) && stores[CRYPTO_STORE].hasOwnProperty('encryptedApiToken')) {
+                swlog('  has encrypted pat & state.locked => locked == true')
+                swlog('  state.locked from isLocked: ', state.locked)
                 return_value.locked = stores[CRYPTO_STORE]['encryptedApiToken'].length > 0 && state.locked === true
+                swlog('  return_value.locked from isLocked: ', return_value.locked)
             }
             // If the user has not set a password and locked is true, unlock the PAT using a null key
             if (return_value.locked === true && encryptionParams.default === true) {
@@ -433,17 +443,29 @@ function isLocked() {
  *
  * @returns {Promise<unknown>}
  */
-// function resetExt() {
-//     swlog('Resetting extension');
-//     encryptionParams = {
-//         salt: null, iv: null, default: true
-//     };
-//     state.locked = false;
-//     state.kickAfter = null;
-//     state.pat = '';
+function resetExt() {
+    swlog('~~~ Resetting extension ~~~')
 
-//     return new Promise(resolve => resolve());
-// }
+    encryptionParams = {
+        salt: null,
+        iv: null,
+        default: true
+    }
+    state.locked = false
+    state.lastActiveAt = null
+    state.kickAfter = false
+    state.pat = ''
+
+    browser.storage.local.clear().then(() => {
+        return generateCryptoParams(true).then(() => {
+                return storeState().then(() => {
+                    swlog('  Extension reset done')
+                    return new Promise(resolve => resolve())
+                
+            })
+        })
+    })
+}
 
 /**
  * Attempt to unlock the extension
@@ -451,14 +473,13 @@ function isLocked() {
  * @returns {Promise<{[p: string]: any} | {status: boolean}>}
  */
 function unlockExt() {
-    swlog('Unlocking extension')
+    swlog('~~~ Unlocking extension~~~ ')
 
     return browser.storage.local.get({ [CRYPTO_STORE]: {} }).then(stores => {
         if (!stores || stores.hasOwnProperty(CRYPTO_STORE) === false) {
             swlog('  failed (unlocking extension) - settings not loaded')
-            return { status: true }
+            return { status: true, reason: 'error.failed_to_get_encryption_parameters' }
         }
-        swlog('stores', stores)
         
         // settings = JSON.parse(settings[CRYPTO_STORE])
         // state.pat = settings['encryptedApiToken'] || ''
@@ -471,7 +492,10 @@ function unlockExt() {
                         state.pat = decipheredPat
                         state.locked = false
                         swlog('  done (unlocking extension)')
-                        return { status: true }
+                        swlog('  state.locked from unlockExt: ', state.locked)
+                        return  storeState().then(() => {
+                            return { status: true }
+                        })
                         // return browser.alarms.clear('lock-extension').then(() => {
                         //     return { status: true }
                         // }, () => {
@@ -507,9 +531,9 @@ function unlockExt() {
  */
 function setEncKey(key) {
     swlog('Setting enc key');
-    swlog('  incoming key length = ' + key.length);
+    swlog('  incoming key length = ' + key?.length);
     encryptionKey = key;
-    swlog('  stored key length = ' + encryptionKey.length);
+    swlog('  stored key length = ' + encryptionKey?.length);
     swlog('  done (setting enc key)');
     return Promise.resolve({ status: true });
 }
@@ -529,7 +553,7 @@ function getEncKey() {
  * @param set_default
  * @returns {Promise<void>}
  */
-function generateEncDetails(set_default = false) {
+function generateCryptoParams(set_default = false) {
     swlog('Generating new encryption iv + salt')
 
     encryptionParams.iv = _crypto.getRandomValues(new Uint8Array(12))
@@ -537,6 +561,7 @@ function generateEncDetails(set_default = false) {
 
     if (set_default) {
         encryptionParams.default = true
+        swlog('encryptionParams.default set to true')
     }
 
     // Store the generated salt + iv (the iv is re-generated every time the pat is encrypted)
@@ -544,7 +569,8 @@ function generateEncDetails(set_default = false) {
         [CRYPTO_STORE]: {
             iv: Array(...new Uint8Array(encryptionParams.iv)),
             salt: Array(...new Uint8Array(encryptionParams.salt)),
-            default: encryptionParams.default
+            default: encryptionParams.default,
+            encryptedApiToken: '',
         }
     }).then(data => {
         swlog('  done (generating new encryption iv + salt)')
@@ -563,7 +589,7 @@ function generateEncDetails(set_default = false) {
  */
 // function changeEncKey(key) {
 //     swlog('Changing the password');
-//     return generateEncDetails().then(
+//     return generateCryptoParams().then(
 //         () => setEncKey(key)).then(
 //             () => {
 //                 swlog('  done (changing the password)');
@@ -659,16 +685,30 @@ function encryptPat(apiToken) {
         return deriveKey(encryptionKey, encryptionParams.salt).then(derivatedKey => {
             swlog('  Regenerating encryption iv...')
 
-            encryptionParams.iv = _crypto.getRandomValues(new Uint8Array(12))
-            encryptionParams.default = derivatedKey === null
+            try {
+                encryptionParams.iv = _crypto.getRandomValues(new Uint8Array(12))
+                encryptionParams.default = derivatedKey === null
 
-            return browser.storage.local.set({
-                [CRYPTO_STORE]: {
-                    iv: Array(...new Uint8Array(encryptionParams.iv)),
-                    salt: Array(...new Uint8Array(encryptionParams.salt)),
+                const ivArray = Array(...new Uint8Array(encryptionParams.iv))
+                const saltArray = Array(...new Uint8Array(encryptionParams.salt))
+
+                var _cryptoParams = {
+                    iv: ivArray,
+                    salt: saltArray,
                     default: encryptionParams.default
                 }
-            }).then(() => {
+            } catch (err) {
+                swlog('  failed (encrypting)')
+                return { status: false, encryptedApiToken: null, reason: 'error.failed_to_set_encryption_parameters' }
+            }
+
+            // return browser.storage.local.set({
+            //     [CRYPTO_STORE]: {
+            //         iv: ivArray,
+            //         salt: saltArray,
+            //         default: encryptionParams.default
+            //     }
+            // }).then(() => {
                 swlog('  done (regenerating encryption iv)')
                 swlog('  Encrypting...')
 
@@ -677,14 +717,12 @@ function encryptPat(apiToken) {
                 }, derivatedKey, encoder.encode(apiToken).buffer).then(ciphertext => {
                     swlog('  done (encrypting)')
 
-                    const encryptedApiToken = Array(...new Uint8Array(ciphertext))
+                    _cryptoParams.encryptedApiToken = Array(...new Uint8Array(ciphertext))
 
                     return browser.storage.local.set({
-                        [CRYPTO_STORE]: {
-                            encryptedApiToken: encryptedApiToken
-                        }
+                        [CRYPTO_STORE]: _cryptoParams
                     }).then(() => {
-                        return { status: true, encryptedApiToken: encryptedApiToken }
+                        return { status: true, encryptedApiToken: _cryptoParams.encryptedApiToken }
                     }, () => {
                         swlog('  failed (saving encrypted PAT)')
     
@@ -695,11 +733,11 @@ function encryptPat(apiToken) {
 
                     return { status: false, encryptedApiToken: null, reason: 'error.failed_to_encrypt_pat' }
                 })
-            }, () => {
-                swlog('  failed (encrypting)')
+            // }, () => {
+            //     swlog('  failed (encrypting)')
 
-                return { status: false, encryptedApiToken: null, reason: 'error.failed_to_set_encryption_parameters' }
-            })
+            //     return { status: false, encryptedApiToken: null, reason: 'error.failed_to_set_encryption_parameters' }
+            // })
         })
     } catch (e) {
         swlog('  failed (regenerating encryption iv)', e)

@@ -55,6 +55,14 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
 
     // ACTIONS
 
+    function $reset() {
+        items.value = []
+        filter.value = ''
+        backendWasNewer.value = false
+        fetchedOn.value = null
+        isFetching.value = false
+    }
+
     /**
      * Refreshes the accounts collection using the backend
      */
@@ -122,6 +130,7 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
         filteredCount,
 
         // ACTIONS
+        $reset,
         fetch,
         accountIdsWithPeriod,
     }

@@ -86,6 +86,13 @@ const en = {
         change_password: 'Change password',
         unlock: 'Unlock',
         unlock_description: 'The extension is locked to protect its data. Enter the extension password to access your 2FAs.',
+        reset_extension: 'Reset extension',
+        reset_extension_description: 'The extension will be stripped of its current configuration and 2FA data. It will be available again for rebinding to a 2FAuth user account.',
+        reset_extension_description_bis: 'Use this option if you forgot the extension password.',
+        token_remains_valid: 'This action does not revoke the personal access token in use.',
+        reset: 'Reset',
+        danger_zone: 'Danger zone',
+        are_you_sure: 'Are you sure?',
     },
     error: {
         cannot_create_otp_without_secret: 'Cannot create an OTP without a secret',
@@ -101,6 +108,10 @@ const en = {
         failed_to_regenerate_iv: 'Failed to regenerate IV',
         failed_to_store_encrypted_pat: 'Failed to store encrypted PAT',
         unknown_error_during_pat_encryption: 'Unknown error during PAT encryption',
+        invalid_or_unknown_token: 'Invalid or unknown personal access token',
+        failed_to_get_encryption_parameters: 'Failed to get encryption parameters',
+        wrong_password: 'Wrong password',
+        reset_extension: 'Reset extension',
     },
     field: {
         hostUrl: {
@@ -186,6 +197,7 @@ const en = {
             setup: 'Setup',
             about: 'About',
             purpose: 'Purpose',
+            reset_extension: 'Reset extension',
         }
     },
     link: {
@@ -195,6 +207,7 @@ const en = {
         accounts: '2FAs',
         why_this: 'Why do I see this?',
         settings: 'Settings',
+        reset_extension: 'Reset extension',
     },
     alt: {
         icon_to_illustrate_the_account: 'Icon that illustrates the account',

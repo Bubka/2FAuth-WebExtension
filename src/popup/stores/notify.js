@@ -10,10 +10,10 @@ export const useNotifyStore = defineStore('notify', () => {
 
     // STATE
 
-    const err = ref(null);
-    const message = ref(null);
-    const originalMessage = ref(null);
-    const debug = ref(null);
+    const err = ref(null)
+    const message = ref(null)
+    const originalMessage = ref(null)
+    const debug = ref(null)
 
     // ACTIONS
 
@@ -50,40 +50,40 @@ export const useNotifyStore = defineStore('notify', () => {
     }
 
     function notFound(error) {
-        router.push({ name: '404' });
+        router.push({ name: '404' })
     }
 
     function error(error) {
-        parseError(error);
-        router.push({ name: 'genericError' });
+        parseError(error)
+        router.push({ name: 'genericError' })
     }
 
     function info(notification) {
-        notify({ type: 'is-info', ...notification });
+        notify({ type: 'is-info', ...notification })
     }
 
     function success(notification) {
-        notify({ type: 'is-success', ...notification });
+        notify({ type: 'is-success', ...notification })
     }
 
     function warn(notification) {
-        notify({ type: 'is-warning', ...notification });
+        notify({ type: 'is-warning', ...notification })
     }
 
     function alert(notification) {
-        notify({ type: 'is-danger', ...notification });
+        notify({ type: 'is-danger', ...notification })
     }
 
-    function forbidden(notification) {
-        notify({ type: 'is-danger', ...notification });
+    function forbidden() {
+        notify({ type: 'is-danger', text: t('error.invalid_or_unknown_token') })
     }
 
     function action(notification) {
-        notify({ type: 'is-dark', ...notification });
+        notify({ type: 'is-dark', ...notification })
     }
 
     function clear() {
-        notify({ clean: true });
+        notify({ clean: true })
     }
 
     return {
@@ -101,5 +101,5 @@ export const useNotifyStore = defineStore('notify', () => {
         forbidden,
         action,
         clear
-    };
-});
+    }
+})

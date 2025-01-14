@@ -38,8 +38,6 @@ export const httpClientFactory = () => {
             return response;
         },
         async function (error) {
-            console.log(error)
-
             if (error.response && [407].includes(error.response.status)) {
                 useNotifyStore().error(error)
                 return new Promise(() => {})
@@ -52,7 +50,7 @@ export const httpClientFactory = () => {
             
             if (error.response && [401].includes(error.response.status)) {
                 useNotifyStore().forbidden()
-                return new Promise(() => {})
+                return Promise.reject(error)
             }
 
             // Always return the form validation errors
