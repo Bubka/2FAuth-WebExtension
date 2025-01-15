@@ -33,7 +33,7 @@ let encryptionParams = {
     iv: null
 }
 let state = { ...default_state }
-// let enable_debug = true
+let enable_debug = false
 let encryptionKey = null
 
 // Lancer quand une fenêtre est fermée.
@@ -90,9 +90,9 @@ async function swlog(...logs) {
     // if (enable_debug === null) {
     //     enable_debug = (await browser.storage.local.get(DEBUG_STORE_KEY))[DEBUG_STORE_KEY]
     // }
-    // if (enable_debug) {
+    if (enable_debug) {
         console.log('[2FAuth-SW]', ...logs)
-    // }
+    }
 }
 
 // browser.windows.onMessage.addListener(handleMessages)
