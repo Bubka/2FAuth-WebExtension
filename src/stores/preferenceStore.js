@@ -45,16 +45,16 @@ export const usePreferenceStore = defineStore('preferences', {
         /**
          * Fetches the user preferences
          */
-        isBound() {
-            userService.get({
-                returnError: true,
-            }).then(response => {
-                return true
-            })
-            .catch(error => {
-                return false
-            })
-        },
+        // isBound() {
+        //     userService.get({
+        //         returnError: true,
+        //     }).then(response => {
+        //         return true
+        //     })
+        //     .catch(error => {
+        //         return false
+        //     })
+        // },
 
         /**
          * Applies the theme persisted in the store

@@ -1,7 +1,4 @@
 <script setup>
-    // import { useSettingStore } from '@/stores/settingStore';
-    
-    // const settingStore = useSettingStore();
 
 </script>
 

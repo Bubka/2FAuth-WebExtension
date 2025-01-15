@@ -418,7 +418,6 @@ function isLocked() {
 
             // The extension can only be locked if there is a PAT in storage and the user has set a password
             if (stores.hasOwnProperty(CRYPTO_STORE) && stores[CRYPTO_STORE].hasOwnProperty('encryptedApiToken')) {
-                swlog('  has encrypted pat & state.locked => locked == true')
                 swlog('  state.locked from isLocked: ', state.locked)
                 return_value.locked = stores[CRYPTO_STORE]['encryptedApiToken'].length > 0 && state.locked === true
                 swlog('  return_value.locked from isLocked: ', return_value.locked)

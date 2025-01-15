@@ -14,7 +14,7 @@
     import TotpLooper from '@popup/components/TotpLooper.vue'
     import Dots from '@popup/components/Dots.vue'
 
-    const { t } = useI18n({ useScope: "global" });
+    const { t } = useI18n({ useScope: "global" })
     const preferenceStore = usePreferenceStore()
     const notify = useNotifyStore()
     const { copy, copied } = useClipboard()
