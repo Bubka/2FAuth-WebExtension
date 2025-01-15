@@ -72,8 +72,3 @@ popup
     .component('VueButton', VueButton)
 
 popup.mount('#popup')
-
-import { usePreferenceStore } from '@/stores/preferenceStore'
-const preferenceStore = usePreferenceStore()
-preferenceStore.applyTheme()
-preferenceStore.resetGroupFilter()

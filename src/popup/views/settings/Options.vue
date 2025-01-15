@@ -120,11 +120,15 @@
      * Applies theme
      */
     function applyTheme() {
-        const mode = useColorMode({
-            attribute: 'data-theme',
-        })
+        preferenceStore.applyTheme()
+        notifySuccess()
+    }
 
-        mode.value = preferenceStore.theme == 'system' ? 'auto' : preferenceStore.theme
+    /**
+     * Sets the autolock delay
+     */
+    async function changeLockDelay() {    
+        preferenceStore.kickUserAfter = kickAfter.value
         notifySuccess()
     }
 
@@ -148,7 +152,7 @@
                         </a>
                     </div>
                     <!-- theme -->
-                    <FormToggle v-model="preferenceStore.theme" @update:model-value="preferenceStore.applyTheme()" :choices="themes" fieldName="theme" label="field.theme.label" help="field.theme.help"/>
+                    <FormToggle v-model="preferenceStore.theme" @update:model-value="applyTheme()" :choices="themes" fieldName="theme" label="field.theme.label" help="field.theme.help"/>
                     <!-- show icon -->
                     <FormCheckbox v-model="preferenceStore.showAccountsIcons" @update:model-value="notifySuccess" fieldName="showAccountsIcons" label="field.show_accounts_icons.label" help="field.show_accounts_icons.help" />
                     <!-- password format -->

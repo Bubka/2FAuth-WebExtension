@@ -29,6 +29,9 @@
                 kickUserAfter.value = parseInt(preferenceStore.kickUserAfter)
             }
         )
+
+        preferenceStore.applyTheme()
+        preferenceStore.resetGroupFilter()
     })
 
 </script>
