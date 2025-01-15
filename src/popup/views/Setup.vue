@@ -46,7 +46,7 @@
                 username.value = response.data.name
                 isConnected.value = true
             })
-            .catch(error => {
+            .catch((error) => {
                 isConnected.value = false
             })
             .finally(() => {

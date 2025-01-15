@@ -44,7 +44,7 @@ export const httpClientFactory = () => {
             }
 
             // Return the error when we need to handle it at component level
-            if (error.hasOwnProperty('returnError') && error.config.returnError === true) {
+            if (error.config.hasOwnProperty('returnError') && error.config.returnError === true) {
                 return Promise.reject(error)
             }
             
