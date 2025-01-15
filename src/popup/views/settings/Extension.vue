@@ -4,7 +4,7 @@
     import { useNotifyStore } from '@popup/stores/notify'
     import { sendMessage } from 'webext-bridge/popup'
     import SettingTabs from '@popup/layouts/SettingTabs.vue'
-    import { useResetExtension } from '@popup/composables/helpers'
+    import { useResetExtension } from '@popup/composables/resetter'
 
     const { t } = useI18n({ useScope: "global" })
     const settingStore = useSettingStore()
