@@ -1,6 +1,7 @@
 <script setup>
     import { useI18n } from 'vue-i18n'
     import { usePreferenceStore } from '@/stores/preferenceStore'
+    import { useSettingStore } from '@/stores/settingStore'
     import Spinner from '@popup/components/Spinner.vue'
     import TotpLooper from '@popup/components/TotpLooper.vue'
     import Dots from '@popup/components/Dots.vue'
@@ -10,6 +11,7 @@
     import { useDisplayablePassword } from '@popup/composables/helpers'
 
     const preferenceStore = usePreferenceStore()
+    const settingStore = useSettingStore()
     const { t } = useI18n({ useScope: "global" });
     const notify = useNotifyStore()
     const { copy, copied } = useClipboard({ legacy: true })
@@ -306,7 +308,7 @@
 <template>
     <div>
         <figure class="image is-64x64" :class="{ 'no-icon': !otpauthParams.icon }" style="display: inline-block">
-            <img :src="'https://testing.2fauth.app/storage/icons/' + otpauthParams.icon" v-if="otpauthParams.icon" :alt="$t('alt.icon_to_illustrate_the_account')">
+            <img :src="settingStore.hostUrl + '/storage/icons/' + otpauthParams.icon" v-if="otpauthParams.icon" :alt="$t('alt.icon_to_illustrate_the_account')">
         </figure>
         <UseColorMode v-slot="{ mode }">
             <p class="is-size-4 has-ellipsis" :class="mode == 'dark' ? 'has-text-grey-light' : 'has-text-grey'">{{ otpauthParams.service }}</p>

@@ -2,6 +2,7 @@
     import { useI18n } from 'vue-i18n'
     import twofaccountService from '@popup/services/twofaccountService'
     import { usePreferenceStore } from '@/stores/preferenceStore'
+    import { useSettingStore } from '@/stores/settingStore'
     import { useNotifyStore } from '@popup/stores/notify'
     import { useTwofaccounts } from '@popup/stores/twofaccounts'
     import { useGroups } from '@popup/stores/groups'
@@ -16,6 +17,7 @@
 
     const { t } = useI18n({ useScope: "global" })
     const preferenceStore = usePreferenceStore()
+    const settingStore = useSettingStore()
     const notify = useNotifyStore()
     const { copy, copied } = useClipboard()
     const twofaccounts = useTwofaccounts()
@@ -272,8 +274,8 @@
                         <div class="tfa-container">
                             <div tabindex="0" class="tfa-cell tfa-content is-size-5" @click.exact="showOrCopy(account)" @keyup.enter="showOrCopy(account)" @click.ctrl="getAndCopyOTP(account)" role="button">  
                                 <div class="tfa-text has-ellipsis">
-                                    <img v-if="account.icon && preferenceStore.showAccountsIcons" role="presentation" class="tfa-icon" :src="'https://testing.2fauth.app/storage/icons/' + account.icon" alt="">
-                                    <img v-else-if="account.icon == null" role="presentation" class="tfa-icon" :src="'https://testing.2fauth.app/storage/noicon.svg'" alt="">
+                                    <img v-if="account.icon && preferenceStore.showAccountsIcons" role="presentation" class="tfa-icon" :src="settingStore.hostUrl + '/storage/icons/' + account.icon" alt="">
+                                    <img v-else-if="account.icon == null" role="presentation" class="tfa-icon" :src="settingStore.hostUrl + '/storage/noicon.svg'" alt="">
                                     {{ account.service ? account.service : $t('message.no_service') }}<FontAwesomeIcon class="has-text-danger is-size-5 ml-2" v-if="account.account === $t('message.indecipherable')" :icon="['fas', 'exclamation-circle']" />
                                     <span class="has-ellipsis is-family-primary is-size-6 is-size-7-mobile has-text-grey ">{{ account.account }}</span>
                                 </div>
