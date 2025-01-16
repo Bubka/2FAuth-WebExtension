@@ -1,18 +1,20 @@
 <script setup>
     import { useI18n } from 'vue-i18n'
+    import { sendMessage } from 'webext-bridge/popup'
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useSettingStore } from '@/stores/settingStore'
+    import { useNotifyStore } from '@popup/stores/notify'
+    import { UseColorMode } from '@vueuse/components'
+    import { useDisplayablePassword } from '@popup/composables/helpers'
     import Spinner from '@popup/components/Spinner.vue'
     import TotpLooper from '@popup/components/TotpLooper.vue'
     import Dots from '@popup/components/Dots.vue'
     import twofaccountService from '@popup/services/twofaccountService'
-    import { useNotifyStore } from '@popup/stores/notify'
-    import { UseColorMode } from '@vueuse/components'
-    import { useDisplayablePassword } from '@popup/composables/helpers'
 
     const preferenceStore = usePreferenceStore()
     const settingStore = useSettingStore()
-    const { t } = useI18n({ useScope: "global" });
+    const { t } = useI18n({ useScope: "global" })
+    const router = useRouter()
     const notify = useNotifyStore()
     const { copy, copied } = useClipboard({ legacy: true })
     // const route = useRoute()
@@ -241,11 +243,11 @@
         copy(otp.replace(/ /g, ''))
 
         if (copied) {
-            // if(preferenceStore.kickUserAfter == -1 && (permit_closing || false) === true && route.name != 'importAccounts') {
-            //     user.logout({ kicked: true})
-            // }
-            // else
-            if(preferenceStore.closeOtpOnCopy && (permit_closing || false) === true) {
+            if (preferenceStore.kickUserAfter == -1) {
+                sendMessage('LOCK_EXTENSION', { }, 'background').then(() => {
+                    router.push('unlock')
+                })
+            } else if(preferenceStore.closeOtpOnCopy && (permit_closing || false) === true) {
                 closeMe()
             }
 

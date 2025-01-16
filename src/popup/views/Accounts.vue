@@ -8,6 +8,7 @@
     import { useGroups } from '@popup/stores/groups'
     import { UseColorMode } from '@vueuse/components'
     import { useDisplayablePassword } from '@popup/composables/helpers'
+    import { sendMessage } from 'webext-bridge/popup'
     import SearchBox from '@popup/components/SearchBox.vue'
     import GroupSwitch from '@popup/components/GroupSwitch.vue'
     import Spinner from '@popup/components/Spinner.vue'
@@ -16,6 +17,7 @@
     import Dots from '@popup/components/Dots.vue'
 
     const { t } = useI18n({ useScope: "global" })
+    const router = useRouter()
     const preferenceStore = usePreferenceStore()
     const settingStore = useSettingStore()
     const notify = useNotifyStore()
@@ -80,9 +82,12 @@
         copy(password)
 
         if (copied) {
-            // if (preferenceStore.kickUserAfter == -1) {
-            //     user.logout({ kicked: true})
-            // }
+            console.log('preferenceStore.kickUserAfter', preferenceStore.kickUserAfter)
+            if (preferenceStore.kickUserAfter == -1) {
+                sendMessage('LOCK_EXTENSION', { }, 'background').then(() => {
+                    router.push('unlock')
+                })
+            }
             if (preferenceStore.clearSearchOnCopy) {
                 twofaccounts.filter = ''
             }
