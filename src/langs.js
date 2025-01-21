@@ -1,6 +1,7 @@
 const en = {
     message: {
         reveal_password: 'Reveal password',
+        hide_password: 'Hide password',
         has_lower_case: 'Has lower case',
         has_upper_case: 'Has upper case',
         has_special_char: 'Has special char',
