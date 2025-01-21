@@ -27,13 +27,11 @@
             const { status: unlockingStatus, reason } = await sendMessage('UNLOCK', { }, 'background')
             isBusy.value = false
 
-            console.log('Exiting unlock function')
-
             if (unlockingStatus) {
                 router.push({ name: 'accounts' })
             }
             else {
-                console.log('reason: ', t(reason))
+                console.log('💀 Cannot unlock: ', t(reason))
                 notify.alert({ text: t('error.wrong_password') })
             }
         // }

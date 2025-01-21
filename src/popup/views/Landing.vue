@@ -12,7 +12,7 @@
     </div>
     <VueFooter>
         <router-link id="lnkWhy" :to="{ name: 'purpose' }" class="has-text-grey">
-                {{ $t('link.why_this') }}
-            </router-link>
+            {{ $t('link.why_this') }}
+        </router-link>
     </VueFooter>
 </template>
