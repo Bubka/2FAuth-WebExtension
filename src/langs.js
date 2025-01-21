@@ -113,6 +113,7 @@ const en = {
         wrong_password: 'Wrong password',
         reset_extension: 'Reset extension',
         failed_to_connect_with_host: 'Connection failed',
+        failed_to_set_autolock_delay: 'Failed to set the auto-lock delay',
     },
     field: {
         hostUrl: {
@@ -165,7 +166,7 @@ const en = {
         },
         auto_lock: {
             label: 'Auto lock',
-            help: 'Log out the user automatically in case of inactivity. Has no effect when authentication is handled by a proxy and no custom logout url is specified.'
+            help: 'Lock the extension automatically to prevent illegitimate access to its data'
         },
         otp_generation: {
             label: 'Show Password',

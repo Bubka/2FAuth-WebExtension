@@ -1,5 +1,6 @@
 <script setup>
     import { useI18n } from 'vue-i18n'
+    import { sendMessage } from 'webext-bridge/popup'
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useGroups } from '@popup/stores/groups'
     import { useNotifyStore } from '@popup/stores/notify'
@@ -12,9 +13,8 @@
     const groups = useGroups()
     const notify = useNotifyStore()
     const preferenceStore = usePreferenceStore()
-    const { t } = useI18n({ useScope: "global" });
-
-    // const returnTo = useStorage($2fauth.prefix + 'returnTo', 'accounts')
+    const { t } = useI18n({ useScope: "global" })
+    const kickAfter = ref(preferenceStore.kickUserAfter)
 
     const themes = [
         { text: 'message.light', value: 'light', icon: 'sun' },
@@ -127,9 +127,14 @@
     /**
      * Sets the autolock delay
      */
-    async function changeLockDelay() {    
-        preferenceStore.kickUserAfter = kickAfter.value
-        notifySuccess()
+    async function changeAutolockDelay() {
+        const { status } = await sendMessage('SET_AUTOLOCK_DELAY', { kickAfter: kickAfter.value }, 'background')
+         
+        if (status) {
+            preferenceStore.kickUserAfter = kickAfter.value
+            notifySuccess()
+        }
+        else notify.alert({ text: t('error.failed_to_set_autolock_delay') })
     }
 
 </script>
@@ -171,7 +176,7 @@
                     
                     <h4 class="title is-4 pt-4 has-text-grey-light">{{ $t('message.security') }}</h4>
                     <!-- auto lock -->
-                    <FormSelect v-model="extensionStore.preferences.kickUserAfter" @update:model-value="notifySuccess" :options="kickUserAfters" fieldName="kickUserAfter" label="field.auto_lock.label" help="field.auto_lock.help" />
+                    <FormSelect v-model="kickAfter" @update:model-value="changeAutolockDelay()" :options="kickUserAfters" fieldName="kickUserAfter" label="field.auto_lock.label" help="field.auto_lock.help" />
                     <!-- get OTP on request -->
                     <FormToggle v-model="preferenceStore.getOtpOnRequest" @update:model-value="notifySuccess" :choices="getOtpTriggers" fieldName="getOtpOnRequest" label="field.otp_generation.label" help="field.otp_generation.help"/>
                         <!-- close otp on copy -->
