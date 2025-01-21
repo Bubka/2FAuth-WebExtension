@@ -2,7 +2,7 @@ import { onMessage } from 'webext-bridge/background'
 
 const CRYPTO_STORE = 'cryptoStore'
 const EXTSTATE_STORE = 'extstateStore'
-const PREFERENCE_STORE = 'preferenceStore'
+const PREFERENCE_STORE = 'preferences'
 const BACKGROUND_LOG = 'backgroundLog'
 
 const decoder = new TextDecoder()
@@ -10,10 +10,10 @@ const encoder = new TextEncoder()
 const _crypto = (typeof window === "undefined") ? crypto : window.crypto
 
 const default_state = {
-    loaded: false,
+    loadedFromStore: false,
     locked: false,
     lastActiveAt: null,
-    kickAfter: false,
+    kickAfter: null,
     pat: ''
 }
 
@@ -36,6 +36,7 @@ let state = { ...default_state }
 let enable_debug = true
 let encryptionKey = null
 
+//  MARK: Listeners
 // Lancer quand une fenêtre est fermée.
 browser.windows.onRemoved.addListener(handleBrowserClosed)
 
@@ -54,7 +55,7 @@ browser.runtime.onInstalled.addListener(handleUpdates)
 browser.runtime.onSuspend.addListener(handleClose)
 
 // Cet évènement est déclenché lorsque l'alarme se déclenche.
-// browser.alarms.onAlarm.addListener(handleAlarms)
+browser.alarms.onAlarm.addListener(handleAlarms)
 
 // Lancé lorsque le système change passe à l'état actif, inactif ou vérouillé. L'écouteur d'événement reçoit une chaîne qui a l'une des trois valeurs suivantes :
 //     "vérouillé" si l'écran est vérouillé ou si l'économisateur d'écran s'active
@@ -66,7 +67,10 @@ browser.idle.onStateChanged.addListener(handleSystemStateChange)
 browser.runtime.onConnect.addListener(handleOnConnect)
 
 
-// onMessage('SET_LOCK_DELAY', setLockDelay)
+// MARK: Messages
+onMessage('SET_AUTOLOCK_DELAY', ({ data }) => {
+    return setAutolockDelay(data.kickAfter)
+})
 onMessage('ENCRYPT_PAT', ({ data }) => {
     return encryptPat(data.apiToken)
 })
@@ -75,12 +79,14 @@ onMessage('SET_ENC_KEY', ({ data }) => {
 })
 onMessage('GET_PAT', getPat)
 onMessage('CHECK_LOCKED', isLocked)
-onMessage('LOCK_EXTENSION', lockNow)
+onMessage('LOCK_EXTENSION', () => {
+    return lockNow('popup request')
+})
 onMessage('UNLOCK', unlockExt)
 onMessage('GET_PARTIAL_PAT', getPartialPat)
 onMessage('RESET_EXT', resetExt)
 
-
+//  MARK: Loggers
 // /**
 //  * Debug logging
 //  *
@@ -92,57 +98,6 @@ async function swlog(...logs) {
     }
 }
 
-// browser.windows.onMessage.addListener(handleMessages)
-
-/**
- * Listen for messages from the extension
- */
-// function handleMessages(message, sender, response) {
-//     console.log('message', message)
-//     console.log('sender', sender)
-//     console.log('response', response)
-    
-//     const message_type = message.type ? message.type : undefined
-//     swlog('Got command', message_type)
-
-//     switch (message_type) {
-//         case 'LOCK_EXTENSION':
-//             lockExtension().then(data => response(data))
-//             break
-//         // case 'GET-PAT':
-//         //     getPat().then(data => response(data));
-//         //     break;
-//         // case 'CHECK-LOCKED':
-//         //     isLocked().then(data => response(data));
-//         //     break;
-//         // case 'SET-ENC-KEY':
-//         //     setEncKey(message.payload).then(data => response(data));
-//         //     break;
-//         // case 'CHANGE-ENC-KEY':
-//         //     changeEncKey(message.payload).then(data => response(data));
-//         //     break;
-//         // case 'UNLOCK-EXT':
-//         //     unlockExt().then(data => response(data));
-//         //     break;
-//         // case 'ENCRYPT-PAT':
-//         //     encryptPat(message.payload).then(data => response(data));
-//         //     break;
-//         case 'SET_LOCK_DELAY':
-//             setLockDelay(message.payload).then(data => response(data));
-//             break;
-//         // case 'RESET-EXT':
-//         //     resetExt().then(data => response(data));
-//         //     break;
-//         case 'SET_DEBUG':
-//             enable_debug = message.payload === 'ON';
-//             browser.storage.local.set({ [DEBUG_STORE_KEY]: enable_debug }).then(() => {
-//                 response({ status: true, debug_mode: enable_debug })
-//             })
-//             break
-//     }
-
-//     return true
-// }
 // /**
 //  * Background logging
 //  *
@@ -156,6 +111,7 @@ async function bglog(log) {
 
 /**
  * Detect all browser windows closing and lock extension if required
+ * MARK:On browser close
  *
  * TODO: Needs testing without dev-tools windows open to see if it still triggers ( hint: it doesn't seem to :/ )
  */
@@ -166,40 +122,43 @@ function handleBrowserClosed(window_id) {
             if (state.kickAfter !== null) {
                 lockNow('handleBrowserClosed()')
             } else {
-                storeState();
+                storeState()
             }
         }
-    });
+    })
 }
 
 
 /**
  * Handle the lock timeout alarm
+ * MARK: On alarm
  */
-// function handleAlarms(alarm) {
-//     if (alarm.name === 'lock-extension') {
-//         if (state.loaded) {
-//             lockNow();
-//         } else {
-//             loadState().then(() => {
-//                 lockNow();
-//             });
-//         }
-//     }
-// }
+function handleAlarms(alarm) {
+    if (alarm.name === 'lock-extension') {
+        if (state.loadedFromStore) {
+            lockNow('handleAlarms()')
+        } else {
+            loadState().then(() => {
+                lockNow('handleAlarms() after state loading')
+            })
+        }
+    }
+}
 
 /**
  * Handle the extension connecting/disconnecting
+ * MARK: On connect
  */
 function handleOnConnect(externalPort) {
-    if (state.loaded === false) {
-        handleStartup();
+    if (state.loadedFromStore === false) {
+        handleStartup()
     }
-    externalPort.onDisconnect.addListener(handleClose);
+    externalPort.onDisconnect.addListener(handleClose)
 }
 
 /**
  * Detect the system state change
+ * MARK: On sys change
  */
 function handleSystemStateChange(new_state) {
     function checkLockState() {
@@ -209,67 +168,73 @@ function handleSystemStateChange(new_state) {
     }
 
     if (new_state === 'locked') {
-        if (state.loaded) {
+        if (state.loadedFromStore) {
             checkLockState()
         } else {
             loadState().then(() => {
                 checkLockState()
-            });
+            })
         }
     }
 }
 
 /**
  * Handle startup tasks
+ * MARK: On startup
  */
 function handleStartup() {
     loadState().then(() => {
-        // if (state.kickAfter !== null) {
-        //     lockNow();
-        // }
-    });
+        if (state.kickAfter !== null) {
+            lockNow('handleStartup()')
+        }
+    })
 }
 
 /**
  * Handle update tasks
+ * MARK: On update
  */
 async function handleUpdates(details) {
-    if (details.reason === 'update') {
-        const prev_version = parseInt(details.previousVersion.replace('.', ''));
-        // if (prev_version === 202450) {
-            // Remove the now unused '2fauth-enc-key' storage item.
-            console.log("Removing old 2fauth-enc-key stored value...");
-            await browser.storage.local.remove('2fauth-enc-key');
-        // }
-    }
-    handleStartup();
+    // if (details.reason === 'update') {
+    // }
+    handleStartup()
 }
 
 /**
  * Handle close events
+ * MARK: On close
  */
 function handleClose() {
     storeState().then(() => {
-        // setLockTimer()
-    });
+        startLockTimer()
+    })
 }
 
 /**
  * Save the workers state in storage
+ * MARK: storeState()
  *
  * @param update_active
  * @returns {Promise<boolean>}
  */
 function storeState(update_active = true) {
     if (update_active) {
-        state.lastActiveAt = Date.now()
+        updateLastActivity()
     }
 
     return browser.storage.local.set({ [EXTSTATE_STORE]: state }).then(() => true, () => false)
 }
 
 /**
+ * Update the last activity time in the worker state
+ */
+function updateLastActivity() {
+    state.lastActiveAt = Date.now()
+}
+
+/**
  * Load the workers state from storage or populate default values
+ * MARK: loadState()
  *
  * @returns {Promise<{[p: string]: any} | *>}
  */
@@ -278,49 +243,60 @@ function loadState() {
     /**
      * Check if the current state warrants manually locking
      */
-    // function _checkLock() {
-    //     if (state.kickAfter > 0 && state.lastActiveAt !== null && ((Date.now() - state.lastActiveAt) / 60000) > state.kickAfter) {
-    //         state.pat = '';
-    //         state.locked = true;
-    //     }
-    // }
+    function _checkLock() {
+        if (state.kickAfter > 0 && state.lastActiveAt !== null && ((Date.now() - state.lastActiveAt) / 60000) > state.kickAfter) {
+            state.pat = ''
+            state.locked = true
+        }
+    }
 
-    return browser.storage.local.get({ [EXTSTATE_STORE]: null }).then(
-        state_data => {
-            state = state_data[EXTSTATE_STORE]
+    return browser.storage.local.get({ [EXTSTATE_STORE]: null }).then(stores => {
+        state = stores[EXTSTATE_STORE]
 
-            if (state !== null) {
-                state.loaded = true
-                
-                if (state.kickAfter === false) {
-                    // This code should not be possible to run but something is causing the kickAfter to reset to its default state sometimes.
-                    return browser.storage.local.get({ [PREFERENCE_STORE]: null }).then(preferences => {
-                        //preferences = data.preferences
-                        
-                        if (preferences !== null) {
-                            state.kickAfter = preferences.kickUserAfter
-                        }
-                        // _checkLock()
-
-                        return true
-                    }, () => false)
-                } else {
-                    // _checkLock()
-
-                    return true
-                }
-            } else {
-                return loadDefaultState()
-            }
-        },
-        () => {
+        if (state !== null) {
+            state.loadedFromStore = true
+            swlog('🚥   State loaded from store')
+            
+            // We force reload the kickAfter delay from the preferences store
+            return getKickAfterFromPreferences().then(() => {
+                _checkLock()
+            })
+        } else {
             return loadDefaultState()
         }
-    )
+    },
+    () => {
+        return loadDefaultState()
+    })
+}
+
+/**
+ * 
+ */
+function getKickAfterFromPreferences() {
+    return browser.storage.local.get({ [PREFERENCE_STORE]: null }).then(stores => {
+        const preferencesStore = stores[PREFERENCE_STORE]
+
+        if (preferencesStore !== null) {
+            const preferences = JSON.parse(preferencesStore)
+
+            if (preferences !== null) {
+                state.kickAfter = (preferences.kickUserAfter !== null && preferences.kickUserAfter !== 'null') ? parseInt(preferences.kickUserAfter) : null
+                swlog('🚥   state.kickAfter set from preferences to ' + state.kickAfter)
+            }
+            return true
+        }
+        else {
+            state.kickAfter = 15 // default value in case the preference store is not yet created
+            swlog('🚥   state.kickAfter set to default value (15)')
+            return true
+        }
+    }, () => false)
 }
 
 /**
  * Populate the workers state with default values
+ * MARK: loadDefaultState()
  *
  * @returns {Promise<boolean>}
  */
@@ -328,30 +304,45 @@ function loadDefaultState() {
     state = { ...default_state }
     state.kickAfter = null
 
-    return browser.storage.local.get({ [PREFERENCE_STORE]: null }).then(preferences => {
-        preferences = preferences[PREFERENCE_STORE]
-
-        if (preferences !== null) {
-            state.kickAfter = (preferences.kickUserAfter !== null && preferences.kickUserAfter !== 'null') ? parseInt(preferences.kickUserAfter) : null
-
-            // if (state.kickAfter !== null) {
-            //     state.locked = true
-            // }
+    return getKickAfterFromPreferences().then(() => {
+        if (state.kickAfter !== null) {
+            swlog('🔒 Locked by loadDefaultState()')
+            state.locked = true
         }
 
         return storeState(false).then(() => {
             return false
         })
-    },
-    () => {
-        return storeState(false).then(() => {
-            return false
-        })
     })
+
+    // return browser.storage.local.get({ [PREFERENCE_STORE]: null }).then(stores => {
+    //     const preferences = stores[PREFERENCE_STORE]
+
+    //     if (preferences !== null) {
+    //         swlog(preferences)
+    //         state.kickAfter = (preferences.kickUserAfter !== null && preferences.kickUserAfter !== 'null') ? parseInt(preferences.kickUserAfter) : null
+
+    //         if (state.kickAfter !== null) {
+    //             swlog('🔒 locked by loadDefaultState()')
+    //             state.locked = true
+    //         }
+    //     }
+    //     swlog('>> Default state loaded')
+
+    //     return storeState(false).then(() => {
+    //         return false
+    //     })
+    // },
+    // () => {
+    //     return storeState(false).then(() => {
+    //         return false
+    //     })
+    // })
 }
 
 /**
  * Lock the extension
+ * MARK: lockNow()
  */
 function lockNow(by = 'unknown') {
     swlog('🔒 locked by ' + by)
@@ -359,25 +350,31 @@ function lockNow(by = 'unknown') {
     state.pat = ''
     storeState().then(() => {
         // Clear the encryption key
-        encryptionKey = null;
+        encryptionKey = null
         // Clear the alarm so it doesn't fire again
-        // browser.alarms.clear('lock-extension');
+        browser.alarms.clear('lock-extension')
     })
 }
 
 /**
  * Enable the lock timer
+ * MARK: startLockTimer()
  */
-// function setLockTimer() {
-//     if (state.kickAfter !== null && state.kickAfter !== 'null') {
-//         const kickAfter = parseInt(state.kickAfter);
-//         if (kickAfter > 0) {
-//             browser.alarms.create('lock-extension', { delayInMinutes: kickAfter });
-//         } else if (kickAfter === 0) {
-//             lockNow();
-//         }
-//     }
-// }
+function startLockTimer() {
+    bglog('⏰ Entering startLockTimer...')
+    if (state.kickAfter !== null && state.kickAfter !== 'null') {
+        const kickAfter = parseInt(state.kickAfter)
+        if (kickAfter > 0) {
+            browser.alarms.create('lock-extension', { delayInMinutes: kickAfter })
+            bglog('⏰ Lock timer started using lock-extension alarm')
+        }
+        else bglog('⏰ No need of lock timer (kickAfter = ' + state.kickAfter + ')')
+        // else if (kickAfter === 0) {
+        //     lockNow('startLockTimer()')
+        // }
+    }
+    bglog('⏰ state.kickAfter is null, exiting startLockTimer without creating an alarm')
+}
 
 // /**
 //  * Get the Personal Access Token
@@ -386,7 +383,7 @@ function lockNow(by = 'unknown') {
 //  */
 function getPat() {
     // swlog(state.pat)
-    return Promise.resolve({ status: true, pat: state.pat });
+    return Promise.resolve({ status: true, pat: state.pat })
 }
 
 // /**
@@ -402,6 +399,7 @@ function getPartialPat() {
 
 /**
  * Check if the extension is currently or should be locked
+ * MARK: isLoaded()
  *
  * @returns {Promise<{[p: string]: any} | {locked: boolean}>}
  */
@@ -411,16 +409,16 @@ function isLocked() {
     return loadState().then(() => {
         return browser.storage.local.get({ [CRYPTO_STORE]: null }).then(stores => {
             if (stores && stores.hasOwnProperty(CRYPTO_STORE) && stores[CRYPTO_STORE]) {
-                encryptionParams.iv = new Uint8Array(stores[CRYPTO_STORE].iv);
-                encryptionParams.salt = new Uint8Array(stores[CRYPTO_STORE].salt);
-                encryptionParams.default = stores[CRYPTO_STORE].default ?? true;
+                encryptionParams.iv = new Uint8Array(stores[CRYPTO_STORE].iv)
+                encryptionParams.salt = new Uint8Array(stores[CRYPTO_STORE].salt)
+                encryptionParams.default = stores[CRYPTO_STORE].default ?? true
                 swlog('📢 Crypto params loaded from store')
                 return new Promise(resolve => resolve())
             } else {
-                return generateCryptoParams(true);
                 swlog('⚠️ No crypto store')
+                return generateCryptoParams(true)
             }
-        }, () => new Promise(resolve => resolve()));
+        }, () => new Promise(resolve => resolve()))
     }).then(() => {
         return browser.storage.local.get({ [CRYPTO_STORE]: {} }).then(stores => {
             let return_value = { locked: false }
@@ -448,6 +446,7 @@ function isLocked() {
 
 /**
  * Reset the extension
+ * MARK: resetExt()
  *
  * @returns {Promise<unknown>}
  */
@@ -477,6 +476,7 @@ function resetExt() {
 
 /**
  * Attempt to unlock the extension
+ * MARK: unlockExt()
  *
  * @returns {Promise<{[p: string]: any} | {status: boolean}>}
  */
@@ -496,19 +496,18 @@ function unlockExt() {
         return getEncKey().then(_encryptionKey => {
             return deriveKey(_encryptionKey, encryptionParams.salt).then(derivatedKey => {
                 return decryptPat(state.pat, derivatedKey).then(decipheredPat => {
-                    if (decipheredPat !== 'decryption error') {
+                    if (! decipheredPat.startsWith('🔃 ❌')) {
                         swlog('🔃 ✔️ Decrypted')
                         state.pat = decipheredPat
                         state.locked = false
-                        return  storeState().then(() => {
-                            return { status: true }
                         swlog('🔓 Extension is now unlocked (state.locked = ', state.locked + ')')
+                        return storeState().then(() => {
+                            return browser.alarms.clear('lock-extension').then(() => {
+                                return { status: true }
+                            }, () => {
+                                return { status: true }
+                            })
                         })
-                        // return browser.alarms.clear('lock-extension').then(() => {
-                        //     return { status: true }
-                        // }, () => {
-                        //     return { status: true }
-                        // })
                     } else {
                         swlog('  ❌ Cannot unlock: Decryption error')
                         return { status: false, reason: 'error.failed_to_decipher_pat' }
@@ -516,15 +515,15 @@ function unlockExt() {
                 }, () => {
                     swlog('  ❌ decryptPat() rejected: Decryption error')
                     return { status: false, reason: 'error.failed_to_decipher_pat' }
-                });
+                })
             }, () => {
                 swlog('  ❌ Cannot unlock: Couldn\'t derive key')
                 return { status: false, reason: 'error.failed_to_derive_key' }
-            });
+            })
         }, () => {
             swlog('  ❌ Cannot unlock: Couldn\'t get password')
             return { status: false, reason: 'error.failed_to_get_password' }
-        });
+        })
     }, () => {
         swlog('  ❌ Cannot unlock: Failed to load crypto params')
         return { status: false, reason: 'error.failed_to_load_settings' }
@@ -552,11 +551,12 @@ function setEncKey(key) {
  * @returns {Promise<{[p: string]: any}>}
  */
 function getEncKey() {
-    return Promise.resolve(encryptionKey);
+    return Promise.resolve(encryptionKey)
 }
 
 /**
  * Generate new encryption iv + salt
+ * MARK: generateCryptoParams()
  *
  * @param set_default
  * @returns {Promise<void>}
@@ -591,27 +591,29 @@ function generateCryptoParams(set_default = false) {
 
 /**
  * Set a new encryption key and re-encrypt PAT using the new key
+ * MARK: changeEncKey()
  *
  * @param key
  * @returns {Promise<* | {encryptedApiToken: null, status: boolean}>}
  */
 // function changeEncKey(key) {
-//     swlog('Changing the password');
+//     swlog('Changing the password')
 //     return generateCryptoParams().then(
 //         () => setEncKey(key)).then(
 //             () => {
-//                 swlog('  done (changing the password)');
+//                 swlog('  done (changing the password)')
 //                 return encryptPat(state.pat)
 //             },
 //             () => {
-//                 swlog('  failed (changing the password)');
+//                 swlog('  failed (changing the password)')
 //                 return { status: false, encryptedApiToken: null }
 //             }
-//         );
+//         )
 // }
 
 /**
  * Decrypt the PAT using the currently stored key
+ * MARK: decryptPat()
  *
  * @param cipherText
  * @param encryptionKey
@@ -620,7 +622,7 @@ function generateCryptoParams(set_default = false) {
 function decryptPat(cipherText, encryptionKey) {
     swlog('🔃 Decrypting PAT...')
 
-    const failedPromise = Promise.resolve('decryption error')
+    // const failedPromise = Promise.resolve('decryption error')
 
     if (encryptionKey && cipherText) {
         try {
@@ -632,20 +634,20 @@ function decryptPat(cipherText, encryptionKey) {
 
                     return decoded
                 } catch (e) {
-
-                    return failedPromise
+                    return Promise.resolve('🔃 ❌ Error during decode: ' + e.message)
                 }
-            }, () => failedPromise)
+            }, () => Promise.resolve('🔃 ❌ Decryption rejected: ' + e.message))
         } catch (e) {
-            return failedPromise
+            return Promise.resolve('🔃 ❌ Error during decrypt: ' + e.message)
         }
     }
 
-    return failedPromise
+    return Promise.resolve('🔃 ❌ Cannot decrypt: missing password or cipherText')
 }
 
 /**
  * Derive the encryption key from the users password
+ * MARK: deriveKey()
  *
  * @param key
  * @param salt
@@ -675,6 +677,7 @@ function deriveKey(key, salt) {
 
 /**
  * Encrypt the PAT using the currently stored encryption key
+ * MARK: encryptPat()
  *
  * @returns {Promise<{[p: string]: any}>}
  */
@@ -750,12 +753,13 @@ function encryptPat(apiToken) {
 }
 
 /**
- * Set the lock type
+ * Set the lock delay
+ * MARK: Set kickAfter
  */
-// function setLockDelay({ data }) {
-//     swlog('Request for new autolock delay')
-//     state.kickAfter = (data.delay !== null && data.delay !== 'null') ? parseInt(data.delay) : null
-//     swlog('New autolock delay successfully applied')
+function setAutolockDelay(delay) {
+    swlog('Request for new autolock delay')
+    state.kickAfter = (delay !== null && delay !== 'null') ? parseInt(delay) : null
+    swlog('New autolock delay successfully applied')
 
-//     return Promise.resolve({ status: true })
-// }
+    return Promise.resolve({ status: true })
+}
