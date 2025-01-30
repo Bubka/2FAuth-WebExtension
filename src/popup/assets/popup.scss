@@ -9,7 +9,7 @@ body, html {
   
 body, #popup {
   min-width:350px;
-  height :500px;
+  height :550px;
 }
 
 .main-section {
@@ -36,4 +36,10 @@ footer.main {
 
 .options-tabs {
   margin-top: 50px;
+}
+
+@media screen and (max-height: 700px) {
+  .modal-with-footer {
+    margin-bottom: 0;
+  }
 }
