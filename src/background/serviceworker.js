@@ -69,20 +69,33 @@ browser.runtime.onConnect.addListener(handleOnConnect)
 
 // MARK: Messages
 onMessage('SET_AUTOLOCK_DELAY', ({ data }) => {
+    swlog('📢 SET_AUTOLOCK_DELAY message received')
     return setAutolockDelay(data.kickAfter)
 })
 onMessage('ENCRYPT_PAT', ({ data }) => {
+    swlog('📢 ENCRYPT_PAT message received')
     return encryptPat(data.apiToken)
 })
 onMessage('SET_ENC_KEY', ({ data }) => {
+    swlog('📢 SET_ENC_KEY message received')
     return setEncKey(data.password)
 })
-onMessage('GET_PAT', getPat)
-onMessage('CHECK_LOCKED', isLocked)
+onMessage('GET_PAT', () => {
+    swlog('📢 GET_PAT message received')
+    return getPat()
+})
+onMessage('CHECK_LOCKED', () => {
+    swlog('📢 CHECK_LOCKED message received')
+    return isLocked()
+})
 onMessage('LOCK_EXTENSION', () => {
+    swlog('📢 LOCK_EXTENSION message received')
     return lockNow('popup request')
 })
-onMessage('UNLOCK', unlockExt)
+onMessage('UNLOCK', () => {
+    swlog('📢 UNLOCK message received')
+    return unlockExt()
+})
 onMessage('GET_PARTIAL_PAT', getPartialPat)
 onMessage('RESET_EXT', resetExt)
 
@@ -94,8 +107,16 @@ onMessage('RESET_EXT', resetExt)
 //  */
 async function swlog(...logs) {
     if (enable_debug) {
-        console.log('[2FAuth-SW]', ...logs)
+        console.log('[WORKER]', ...logs)
     }
+}
+
+/**
+ * Write a console log line formated as a title
+ * @param  {...any} logs 
+ */
+async function swlogTitle(...logs) {
+    swlog('### ' + logs + ' ###')
 }
 
 // /**
@@ -104,9 +125,12 @@ async function swlog(...logs) {
 //  * @param logs
 //  */
 async function bglog(log) {
+    console.log('log', log)
     let backgroundLog = (await browser.storage.local.get(BACKGROUND_LOG))[BACKGROUND_LOG] ?? []
+    console.log('backgroundLog', backgroundLog)
     backgroundLog.push(log)
-    browser.storage.local.set({ [BACKGROUND_LOG]: backgroundLog })
+    console.log('backgroundLog', backgroundLog)
+    await browser.storage.local.set({ [BACKGROUND_LOG]: backgroundLog })
 }
 
 /**
@@ -134,8 +158,10 @@ function handleBrowserClosed(window_id) {
  * MARK: On alarm
  */
 function handleAlarms(alarm) {
+    swlog('== ALARM HANDLING ==')
     if (alarm.name === 'lock-extension') {
         if (state.loadedFromStore) {
+        swlog('⏰ lock-extension alarm triggered after ' + (Date.now() - state.lastActiveAt) / 1000 + ' seconds')
             lockNow('handleAlarms()')
         } else {
             loadState().then(() => {
@@ -151,6 +177,7 @@ function handleAlarms(alarm) {
  */
 function handleOnConnect(externalPort) {
     if (state.loadedFromStore === false) {
+    swlogTitle('ON CONNECT HANDLING')
         handleStartup()
     }
     externalPort.onDisconnect.addListener(handleClose)
@@ -161,12 +188,14 @@ function handleOnConnect(externalPort) {
  * MARK: On sys change
  */
 function handleSystemStateChange(new_state) {
+    swlogTitle('SYSTEM CHANGE HANDLING')
     function checkLockState() {
         if (state.kickAfter !== null && state.kickAfter !== -1) {
-            lockNow('handleSystemStateChange() => new state: ' + new_state)
+            lockNow('handleSystemStateChange()')
         }
     }
 
+    swlog('System switched to ' + new_state)
     if (new_state === 'locked') {
         if (state.loadedFromStore) {
             checkLockState()
@@ -183,6 +212,7 @@ function handleSystemStateChange(new_state) {
  * MARK: On startup
  */
 function handleStartup() {
+    swlogTitle('STARTUP HANDLING')
     loadState().then(() => {
         if (state.kickAfter !== null) {
             lockNow('handleStartup()')
@@ -195,6 +225,7 @@ function handleStartup() {
  * MARK: On update
  */
 async function handleUpdates(details) {
+    swlogTitle('UPDATES HANDLING')
     // if (details.reason === 'update') {
     // }
     handleStartup()
@@ -205,6 +236,7 @@ async function handleUpdates(details) {
  * MARK: On close
  */
 function handleClose() {
+    swlogTitle('CLOSE HANDLING')
     storeState().then(() => {
         startLockTimer()
     })
@@ -218,6 +250,7 @@ function handleClose() {
  * @returns {Promise<boolean>}
  */
 function storeState(update_active = true) {
+    swlog('🖫 Storing state')
     if (update_active) {
         updateLastActivity()
     }
@@ -239,7 +272,6 @@ function updateLastActivity() {
  * @returns {Promise<{[p: string]: any} | *>}
  */
 function loadState() {
-    swlog('🚥 Loading state...')
     /**
      * Check if the current state warrants manually locking
      */
@@ -255,7 +287,7 @@ function loadState() {
 
         if (state !== null) {
             state.loadedFromStore = true
-            swlog('🚥   State loaded from store')
+            swlog('State loaded (from store)')
             
             // We force reload the kickAfter delay from the preferences store
             return getKickAfterFromPreferences().then(() => {
@@ -282,7 +314,7 @@ function getKickAfterFromPreferences() {
 
             if (preferences !== null) {
                 state.kickAfter = (preferences.kickUserAfter !== null && preferences.kickUserAfter !== 'null') ? parseInt(preferences.kickUserAfter) : null
-                swlog('🚥   state.kickAfter set from preferences to ' + state.kickAfter)
+                swlog('kickAfter set from preferences to ' + state.kickAfter)
             }
             return true
         }
@@ -352,7 +384,9 @@ function lockNow(by = 'unknown') {
         // Clear the encryption key
         encryptionKey = null
         // Clear the alarm so it doesn't fire again
-        browser.alarms.clear('lock-extension')
+        browser.alarms.clear('lock-extension').then((cleared) => {
+            if (cleared) swlog('⏰ lock-extension alarm cleared by lockNow()')
+        })
     })
 }
 
@@ -361,19 +395,23 @@ function lockNow(by = 'unknown') {
  * MARK: startLockTimer()
  */
 function startLockTimer() {
-    bglog('⏰ Entering startLockTimer...')
-    if (state.kickAfter !== null && state.kickAfter !== 'null') {
+    swlog('⏰ Entering startLockTimer')
+    
+    if (state.locked) {
+        swlog('⏰ No need of lock timer: Extension already locked')
+    }
+    else if (state.kickAfter !== null && state.kickAfter !== 'null') {
         const kickAfter = parseInt(state.kickAfter)
         if (kickAfter > 0) {
             browser.alarms.create('lock-extension', { delayInMinutes: kickAfter })
-            bglog('⏰ Lock timer started using lock-extension alarm')
+            swlog('⏰ lock-extension alarm started for ' + kickAfter + ' minutes from ' + state.lastActiveAt)
         }
-        else bglog('⏰ No need of lock timer (kickAfter = ' + state.kickAfter + ')')
+        else swlog('⏰ No need of lock timer (kickAfter = ' + state.kickAfter + ')')
         // else if (kickAfter === 0) {
         //     lockNow('startLockTimer()')
         // }
     }
-    bglog('⏰ state.kickAfter is null, exiting startLockTimer without creating an alarm')
+    else swlog('⏰ kickAfter is null, exiting startLockTimer without creating a lock timer')
 }
 
 // /**
@@ -399,12 +437,12 @@ function getPartialPat() {
 
 /**
  * Check if the extension is currently or should be locked
- * MARK: isLoaded()
+ * MARK: isLocked()
  *
  * @returns {Promise<{[p: string]: any} | {locked: boolean}>}
  */
 function isLocked() {
-    swlog('[CHECKING LOCK STATE]')
+    swlogTitle('CHECKING LOCK STATE')
     // This is triggered each time the extension loads, so we will use it as a point to load/generate the salt and iv for encryption
     return loadState().then(() => {
         return browser.storage.local.get({ [CRYPTO_STORE]: null }).then(stores => {
@@ -412,10 +450,10 @@ function isLocked() {
                 encryptionParams.iv = new Uint8Array(stores[CRYPTO_STORE].iv)
                 encryptionParams.salt = new Uint8Array(stores[CRYPTO_STORE].salt)
                 encryptionParams.default = stores[CRYPTO_STORE].default ?? true
-                swlog('📢 Crypto params loaded from store')
+                swlog('Crypto params loaded from store')
                 return new Promise(resolve => resolve())
             } else {
-                swlog('⚠️ No crypto store')
+                swlog('No crypto store')
                 return generateCryptoParams(true)
             }
         }, () => new Promise(resolve => resolve()))
@@ -431,11 +469,11 @@ function isLocked() {
             if (return_value.locked === true && encryptionParams.default === true) {
                 return unlockExt().then(status => {
                     return_value.locked = false
-                    swlog('📢 Extension identified as locked')
+                    swlog('Extension identified as locked 🔒 (with default encryption params)')
                     return return_value
                 })
             } else {
-                swlog('📢 Extension identified as unlocked ')
+                swlog('Extension identified as ' + (return_value.locked ? 'locked 🔒' : 'unlocked 🔓'))
                 return return_value
             }
         }, () => {
@@ -481,11 +519,11 @@ function resetExt() {
  * @returns {Promise<{[p: string]: any} | {status: boolean}>}
  */
 function unlockExt() {
-    swlog('[UNLOCKING EXTENSION]')
+    swlogTitle('UNLOCKING EXTENSION')
 
     return browser.storage.local.get({ [CRYPTO_STORE]: {} }).then(stores => {
         if (!stores || stores.hasOwnProperty(CRYPTO_STORE) === false) {
-            swlog('  ❌ Cannot unlock: Crypto store is missing')
+            swlog('❌ Cannot unlock: Crypto store is missing')
             return { status: true, reason: 'error.failed_to_get_encryption_parameters' }
         }
         
@@ -496,36 +534,32 @@ function unlockExt() {
         return getEncKey().then(_encryptionKey => {
             return deriveKey(_encryptionKey, encryptionParams.salt).then(derivatedKey => {
                 return decryptPat(state.pat, derivatedKey).then(decipheredPat => {
-                    if (! decipheredPat.startsWith('🔃 ❌')) {
-                        swlog('🔃 ✔️ Decrypted')
-                        state.pat = decipheredPat
-                        state.locked = false
-                        swlog('🔓 Extension is now unlocked (state.locked = ', state.locked + ')')
-                        return storeState().then(() => {
-                            return browser.alarms.clear('lock-extension').then(() => {
-                                return { status: true }
-                            }, () => {
-                                return { status: true }
-                            })
+                    swlog('🔃 ✔️ Decrypted')
+                    state.pat = decipheredPat
+                    state.locked = false
+                    swlog('🔓 Extension is now unlocked')
+                    return storeState().then(() => {
+                        return browser.alarms.clear('lock-extension').then((cleared) => {
+                            if (cleared) swlog('⏰ lock-extension alarm cleared by UnlockExt() at ' + state.lastActiveAt)
+                            return { status: true }
+                        }, () => {
+                            return { status: true }
                         })
-                    } else {
-                        swlog('  ❌ Cannot unlock: Decryption error')
-                        return { status: false, reason: 'error.failed_to_decipher_pat' }
-                    }
-                }, () => {
-                    swlog('  ❌ decryptPat() rejected: Decryption error')
+                    })
+                }, (result) => {
+                    swlog('🔃 ❌ decryptPat() rejected: ' + result)
                     return { status: false, reason: 'error.failed_to_decipher_pat' }
                 })
             }, () => {
-                swlog('  ❌ Cannot unlock: Couldn\'t derive key')
+                swlog('🔀 ❌ Cannot unlock: Couldn\'t derive key')
                 return { status: false, reason: 'error.failed_to_derive_key' }
             })
         }, () => {
-            swlog('  ❌ Cannot unlock: Couldn\'t get password')
+            swlog('🔑 ❌ Cannot unlock: Couldn\'t get encryption key')
             return { status: false, reason: 'error.failed_to_get_password' }
         })
     }, () => {
-        swlog('  ❌ Cannot unlock: Failed to load crypto params')
+        swlog('♻️ ❌ Cannot unlock: Failed to load crypto params')
         return { status: false, reason: 'error.failed_to_load_settings' }
     })
 }
@@ -537,11 +571,12 @@ function unlockExt() {
  * @returns {Promise<{status: boolean}>}
  */
 function setEncKey(key) {
+    swlogTitle('SETTING ENC KEY')
     // swlog('Setting enc key')
     // swlog('  incoming key length = ' + key?.length)
     encryptionKey = key
     // swlog('  stored key length = ' + encryptionKey?.length)
-    swlog('🔑 Encryption key set')
+    swlog('🔑 ✔️ Encryption key set')
     return Promise.resolve({ status: true })
 }
 
@@ -634,15 +669,15 @@ function decryptPat(cipherText, encryptionKey) {
 
                     return decoded
                 } catch (e) {
-                    return Promise.resolve('🔃 ❌ Error during decode: ' + e.message)
+                    return Promise.reject('Error during decoder.decode(): ' + e.message)
                 }
-            }, () => Promise.resolve('🔃 ❌ Decryption rejected: ' + e.message))
+            }, (ex) => Promise.reject('Error during subtle.decrypt(): ' + ex))
         } catch (e) {
-            return Promise.resolve('🔃 ❌ Error during decrypt: ' + e.message)
+            return Promise.reject('Error during decrypt: ' + e.message)
         }
     }
 
-    return Promise.resolve('🔃 ❌ Cannot decrypt: missing password or cipherText')
+    return Promise.reject('Cannot decrypt: missing password or cipherText')
 }
 
 /**
@@ -683,12 +718,11 @@ function deriveKey(key, salt) {
  */
 function encryptPat(apiToken) {
     let reason = 'error.unknown_error_during_pat_encryption'
+    swlogTitle('ENCRYPTING PAT')
 
     try {
-        swlog('Encrypting PAT')
-
         return deriveKey(encryptionKey, encryptionParams.salt).then(derivatedKey => {
-            swlog('  Regenerating encryption iv...')
+            swlog('🔃 Regenerating encryption iv...')
 
             try {
                 encryptionParams.iv = _crypto.getRandomValues(new Uint8Array(12))
@@ -703,7 +737,7 @@ function encryptPat(apiToken) {
                     default: encryptionParams.default
                 }
             } catch (err) {
-                swlog('  failed (encrypting)')
+                swlog('🔃 ❌ Failure')
                 return { status: false, encryptedApiToken: null, reason: 'error.failed_to_set_encryption_parameters' }
             }
 
@@ -714,13 +748,13 @@ function encryptPat(apiToken) {
             //         default: encryptionParams.default
             //     }
             // }).then(() => {
-                swlog('  done (regenerating encryption iv)')
-                swlog('  Encrypting...')
+                swlog('🔃 ✔️ iv regenerated')
+                swlog('🔃 Encrypting PAT...')
 
                 return _crypto.subtle.encrypt({
                     name: "AES-GCM", iv: encryptionParams.iv
                 }, derivatedKey, encoder.encode(apiToken).buffer).then(ciphertext => {
-                    swlog('  done (encrypting)')
+                    swlog('🔃 ✔️ PAT encrypted')
 
                     _cryptoParams.encryptedApiToken = Array(...new Uint8Array(ciphertext))
 
@@ -729,12 +763,12 @@ function encryptPat(apiToken) {
                     }).then(() => {
                         return { status: true, encryptedApiToken: _cryptoParams.encryptedApiToken }
                     }, () => {
-                        swlog('  failed (saving encrypted PAT)')
+                        swlog('🔃 ❌ Saving encrypted PAT failed)')
     
                         return { status: false, encryptedApiToken: null, reason: 'error.failed_to_store_encrypted_pat' }
                     })
                 }, () => {
-                    swlog('  failed (encrypting)')
+                    swlog('🔃 ❌ Encrypting failed')
 
                     return { status: false, encryptedApiToken: null, reason: 'error.failed_to_encrypt_pat' }
                 })
@@ -745,7 +779,7 @@ function encryptPat(apiToken) {
             // })
         })
     } catch (e) {
-        swlog('  failed (regenerating encryption iv)', e)
+        swlog('🔃 ❌ Regenerating encryption iv failed', e)
         reason = 'error.failed_to_regenerate_iv'
     }
 
@@ -757,9 +791,9 @@ function encryptPat(apiToken) {
  * MARK: Set kickAfter
  */
 function setAutolockDelay(delay) {
-    swlog('Request for new autolock delay')
+    swlogTitle('SETTING NEW AUTOLOCK DELAY')
     state.kickAfter = (delay !== null && delay !== 'null') ? parseInt(delay) : null
-    swlog('New autolock delay successfully applied')
+    swlog('✔️ New autolock delay successfully applied')
 
     return Promise.resolve({ status: true })
 }
