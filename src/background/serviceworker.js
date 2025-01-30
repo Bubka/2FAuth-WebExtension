@@ -10,7 +10,7 @@ const encoder = new TextEncoder()
 const _crypto = (typeof window === "undefined") ? crypto : window.crypto
 
 const default_state = {
-    loadedFromStore: false,
+    isLoaded: false,
     locked: false,
     lastActiveAt: null,
     kickAfter: null,
@@ -160,8 +160,8 @@ function handleBrowserClosed(window_id) {
 function handleAlarms(alarm) {
     swlog('== ALARM HANDLING ==')
     if (alarm.name === 'lock-extension') {
-        if (state.loadedFromStore) {
         swlog('⏰ lock-extension alarm triggered after ' + (Date.now() - state.lastActiveAt) / 1000 + ' seconds')
+        if (state.isLoaded) {
             lockNow('handleAlarms()')
         } else {
             loadState().then(() => {
@@ -176,8 +176,8 @@ function handleAlarms(alarm) {
  * MARK: On connect
  */
 function handleOnConnect(externalPort) {
-    if (state.loadedFromStore === false) {
     swlogTitle('ON CONNECT HANDLING')
+    if (state.isLoaded === false) {
         handleStartup()
     }
     externalPort.onDisconnect.addListener(handleClose)
@@ -197,7 +197,7 @@ function handleSystemStateChange(new_state) {
 
     swlog('System switched to ' + new_state)
     if (new_state === 'locked') {
-        if (state.loadedFromStore) {
+        if (state.isLoaded) {
             checkLockState()
         } else {
             loadState().then(() => {
@@ -286,7 +286,7 @@ function loadState() {
         state = stores[EXTSTATE_STORE]
 
         if (state !== null) {
-            state.loadedFromStore = true
+            state.isLoaded = true
             swlog('State loaded (from store)')
             
             // We force reload the kickAfter delay from the preferences store
