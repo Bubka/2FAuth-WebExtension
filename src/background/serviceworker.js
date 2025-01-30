@@ -180,6 +180,18 @@ function handleOnConnect(externalPort) {
     if (state.isLoaded === false) {
         handleStartup()
     }
+    else {
+        if (state.locked) {
+            lockNow('handleStartup()')
+        }
+        else {
+            storeState().then(() => {
+                browser.alarms.clear('lock-extension').then((cleared) => {
+                    if (cleared) swlog('⏰ lock-extension alarm cleared by handleOnConnect()')
+                })
+            })
+        }
+    }
     externalPort.onDisconnect.addListener(handleClose)
 }
 
@@ -214,8 +226,15 @@ function handleSystemStateChange(new_state) {
 function handleStartup() {
     swlogTitle('STARTUP HANDLING')
     loadState().then(() => {
-        if (state.kickAfter !== null) {
+        if (state.locked) {
             lockNow('handleStartup()')
+        }
+        else {
+            storeState().then(() => {
+                browser.alarms.clear('lock-extension').then((cleared) => {
+                    if (cleared) swlog('⏰ lock-extension alarm cleared by handleStartup()')
+                })
+            })
         }
     })
 }
@@ -303,6 +322,26 @@ function loadState() {
 }
 
 /**
+ * Populate the workers state with default values
+ * MARK: loadDefaultState()
+ *
+ * @returns {Promise<boolean>}
+ */
+function loadDefaultState() {
+    state = { ...default_state }
+    swlog('State loaded (from defaults)')
+
+    return getKickAfterFromPreferences().then(() => {
+        // if (state.kickAfter !== null) {
+        //     state.locked = true
+        // }
+        return storeState(false).then(() => {
+            return false
+        })
+    })
+}
+
+/**
  * 
  */
 function getKickAfterFromPreferences() {
@@ -319,57 +358,17 @@ function getKickAfterFromPreferences() {
             return true
         }
         else {
-            state.kickAfter = 15 // default value in case the preference store is not yet created
-            swlog('🚥   state.kickAfter set to default value (15)')
+            if (state.pat) {
+                state.kickAfter = 15
+                swlog('kickAfter defaulting to 15')
+            }
+            else {
+                // state.kickAfter = null
+                swlog('kickAfter unchanged (= ' + state.kickAfter + ')')
+            }
             return true
         }
     }, () => false)
-}
-
-/**
- * Populate the workers state with default values
- * MARK: loadDefaultState()
- *
- * @returns {Promise<boolean>}
- */
-function loadDefaultState() {
-    state = { ...default_state }
-    state.kickAfter = null
-
-    return getKickAfterFromPreferences().then(() => {
-        if (state.kickAfter !== null) {
-            swlog('🔒 Locked by loadDefaultState()')
-            state.locked = true
-        }
-
-        return storeState(false).then(() => {
-            return false
-        })
-    })
-
-    // return browser.storage.local.get({ [PREFERENCE_STORE]: null }).then(stores => {
-    //     const preferences = stores[PREFERENCE_STORE]
-
-    //     if (preferences !== null) {
-    //         swlog(preferences)
-    //         state.kickAfter = (preferences.kickUserAfter !== null && preferences.kickUserAfter !== 'null') ? parseInt(preferences.kickUserAfter) : null
-
-    //         if (state.kickAfter !== null) {
-    //             swlog('🔒 locked by loadDefaultState()')
-    //             state.locked = true
-    //         }
-    //     }
-    //     swlog('>> Default state loaded')
-
-    //     return storeState(false).then(() => {
-    //         return false
-    //     })
-    // },
-    // () => {
-    //     return storeState(false).then(() => {
-    //         return false
-    //     })
-    // })
 }
 
 /**
