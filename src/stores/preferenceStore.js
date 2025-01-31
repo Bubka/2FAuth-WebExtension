@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import userService from '@popup/services/userService'
 
 export const usePreferenceStore = defineStore('preferences', {
 
