@@ -80,6 +80,14 @@ onMessage('SET_ENC_KEY', ({ data }) => {
     swlog('📢 SET_ENC_KEY message received')
     return setEncKey(data.password)
 })
+onMessage('CHANGE_ENC_KEY', ({ data }) => {
+    swlog('📢 CHANGE_ENC_KEY message received')
+    return changeEncKey(data.password)
+})
+onMessage('CHECK_ENC_KEY', ({ data }) => {
+    swlog('📢 CHECK_ENC_KEY message received')
+    return checkEncKey(data.password)
+})
 onMessage('GET_PAT', () => {
     swlog('📢 GET_PAT message received')
     return getPat()
@@ -96,8 +104,14 @@ onMessage('UNLOCK', () => {
     swlog('📢 UNLOCK message received')
     return unlockExt()
 })
-onMessage('GET_PARTIAL_PAT', getPartialPat)
-onMessage('RESET_EXT', resetExt)
+onMessage('GET_PARTIAL_PAT', () => {
+    swlog('📢 GET_PARTIAL_PAT message received')
+    return getPartialPat()
+})
+onMessage('RESET_EXT', () => {
+    swlog('📢 RESET_EXT message received')
+    return resetExt()
+})
 
 //  MARK: Loggers
 // /**
@@ -394,8 +408,6 @@ function lockNow(by = 'unknown') {
  * MARK: startLockTimer()
  */
 function startLockTimer() {
-    swlog('⏰ Entering startLockTimer')
-    
     if (state.locked) {
         swlog('⏰ No need of lock timer: Extension already locked')
     }
@@ -430,7 +442,7 @@ function getPat() {
 //  */
 function getPartialPat() {
     // swlog(state.pat)
-    return Promise.resolve({ status: true, partialPat: state.pat.substring(0, 10) + ' ... ' + state.pat.slice(-10) })
+    return Promise.resolve({ status: true, partialPat: state.pat.substring(0, 16) + ' ... ' + state.pat.slice(-16) })
 }
 
 
@@ -488,7 +500,7 @@ function isLocked() {
  * @returns {Promise<unknown>}
  */
 function resetExt() {
-    swlog('~~~ Resetting extension ~~~')
+    swlogTitle('RESETTING EXTENSION')
 
     encryptionParams = {
         salt: null,
@@ -497,13 +509,13 @@ function resetExt() {
     }
     state.locked = false
     state.lastActiveAt = null
-    state.kickAfter = false
+    state.kickAfter = null
     state.pat = ''
 
     browser.storage.local.clear().then(() => {
         return generateCryptoParams(true).then(() => {
                 return storeState().then(() => {
-                    swlog('  Extension reset done')
+                    swlog('✔️ Extension reset done')
                     return new Promise(resolve => resolve())
                 
             })
@@ -523,7 +535,7 @@ function unlockExt() {
     return browser.storage.local.get({ [CRYPTO_STORE]: {} }).then(stores => {
         if (!stores || stores.hasOwnProperty(CRYPTO_STORE) === false) {
             swlog('❌ Cannot unlock: Crypto store is missing')
-            return { status: true, reason: 'error.failed_to_get_encryption_parameters' }
+            return { status: false, reason: 'error.failed_to_get_encryption_parameters' }
         }
         
         // settings = JSON.parse(settings[CRYPTO_STORE])
@@ -560,6 +572,35 @@ function unlockExt() {
     }, () => {
         swlog('♻️ ❌ Cannot unlock: Failed to load crypto params')
         return { status: false, reason: 'error.failed_to_load_settings' }
+    })
+}
+/**
+ * Check the given password is the current encryption key
+ * MARK: checkEncKey()
+ *
+ * @param key
+ * @returns {Promise<{[p: string]: any} | {status: boolean}>}
+ */
+function checkEncKey(key) {
+    return browser.storage.local.get({ [CRYPTO_STORE]: {} }).then(stores => {
+        if (!stores || stores.hasOwnProperty(CRYPTO_STORE) === false) {
+            swlog('❌ Cannot unlock: Crypto store is missing')
+            return { status: false, reason: 'error.failed_to_get_encryption_parameters' }
+        }
+        
+        const _pat = stores[CRYPTO_STORE]['encryptedApiToken'] || ''
+
+        return deriveKey(key, encryptionParams.salt).then(derivatedKey => {
+            return decryptPat(_pat, derivatedKey).then(() => {
+                return { status: true }
+            }, () => {
+                return { status: false }
+            })
+        }, () => {
+            return { status: false }
+        })
+    }, () => {
+        return { status: false }
     })
 }
 
@@ -630,20 +671,21 @@ function generateCryptoParams(set_default = false) {
  * @param key
  * @returns {Promise<* | {encryptedApiToken: null, status: boolean}>}
  */
-// function changeEncKey(key) {
-//     swlog('Changing the password')
-//     return generateCryptoParams().then(
-//         () => setEncKey(key)).then(
-//             () => {
-//                 swlog('  done (changing the password)')
-//                 return encryptPat(state.pat)
-//             },
-//             () => {
-//                 swlog('  failed (changing the password)')
-//                 return { status: false, encryptedApiToken: null }
-//             }
-//         )
-// }
+function changeEncKey(key) {
+    swlogTitle('CHANGING ENCRYPTION KEY')
+    return generateCryptoParams().then(
+        () => setEncKey(key)
+    ).then(
+        () => {
+            swlog('🔑 ✔️ Encryption key changed')
+            return encryptPat(state.pat)
+        },
+        () => {
+            swlog('🔑 ❌ Failed to set encryption key')
+            return { status: false, encryptedApiToken: null, reason: 'error.failed_to_set_enc_key' }
+        }
+    )
+}
 
 /**
  * Decrypt the PAT using the currently stored key

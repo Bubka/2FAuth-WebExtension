@@ -87,12 +87,13 @@ const en = {
         unlock: 'Unlock',
         unlock_description: 'The extension is locked to protect its data. Enter the extension password to access your 2FAs.',
         reset_extension: 'Reset extension',
-        reset_extension_description: 'The extension will be stripped of its current configuration and 2FA data. It will be available again for rebinding to a 2FAuth user account.',
+        reset_extension_description: 'The extension will be stripped of its current configuration and 2FAuth data. It will be available again for rebinding to a 2FAuth user account.',
         reset_extension_description_bis: 'Use this option if you forgot the extension password.',
         token_remains_valid: 'This action does not revoke the personal access token in use.',
         reset: 'Reset',
         danger_zone: 'Danger zone',
         are_you_sure: 'Are you sure?',
+        password_changed: 'Password changed',
     },
     error: {
         cannot_create_otp_without_secret: 'Cannot create an OTP without a secret',
@@ -101,6 +102,7 @@ const en = {
         encryption_key_generation_failed: 'Generation of encryption key failed',
         failed_to_decipher_pat: 'Failed to decipher PAT',
         failed_to_derive_key: 'Failed to derive key',
+        failed_to_set_enc_key: 'Failed to set encryption key',
         failed_to_get_password: 'Failed to get password',
         failed_to_load_settings: 'Failed to load settings from the store',
         failed_to_set_encryption_parameters: 'Failed to set encryption parameters',
@@ -111,6 +113,7 @@ const en = {
         invalid_or_unknown_token: 'Invalid or unknown personal access token',
         failed_to_get_encryption_parameters: 'Failed to get encryption parameters',
         wrong_password: 'Wrong password',
+        wrong_current_password: 'Wrong current password',
         reset_extension: 'Reset extension',
         failed_to_connect_with_host: 'Connection failed',
         failed_to_set_autolock_delay: 'Failed to set the auto-lock delay',
@@ -127,6 +130,14 @@ const en = {
         extPassword: {
             label: 'Password',
             help: 'The password that will be used to lock this extension and encrypt sensitive data when needed'
+        },
+        extCurrentPassword: {
+            label: 'Current password',
+            help: 'The password currently used to unlock the extension'
+        },
+        extNewPassword: {
+            label: 'New password',
+            help: 'The new password that will be used to lock this extension and encrypt sensitive data when needed'
         },
         password_format: {
             label: 'Password formatting',
