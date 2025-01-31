@@ -3,6 +3,7 @@
     import { useSettingStore } from '@/stores/settingStore'
     import { useNotifyStore }  from '@popup/stores/notify'
     import { sendMessage } from 'webext-bridge/popup'
+    import { isFilled, isHttpUrl } from '@popup/composables/validators'
     import userService from '@popup/services/userService'
     import FormButtons from '@popup/components/formElements/FormButtons.vue'
     
@@ -142,9 +143,6 @@
 
         return true
     }
-
-    function isFilled(value) { return value?.toString().length > 0 }
-    function isHttpUrl(value) { return value?.toString().startsWith('http://') || value.startsWith('https://') }
 
 </script>
 
