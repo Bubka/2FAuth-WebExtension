@@ -9,7 +9,12 @@ body, html {
   
 body, #popup {
   min-width:350px;
-  height :550px;
+  min-height :300px;
+  max-height :550px;
+}
+
+a.button.is-main {
+  box-shadow: $button-focus-box-shadow-size $button-focus-box-shadow-color;
 }
 
 .main-section {
@@ -17,10 +22,8 @@ body, #popup {
 }
 
 .tfa-list {
-  text-align: inherit;
-  border-bottom: 1px solid $grey-lighter;
-  margin: 0;
-  padding: 0 0 0.5rem 0;
+  margin: 0 1%;
+  padding: 0.25rem 0.25rem 0.25rem 0.25rem;
   width: auto !important;
   border-radius: unset;
 }
