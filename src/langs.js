@@ -94,6 +94,9 @@ const en = {
         danger_zone: 'Danger zone',
         are_you_sure: 'Are you sure?',
         password_changed: 'Password changed',
+        no_account_here: 'No 2FA here!',
+        registration_not_supported_visit_tour_instance: '2FA registraton from the extension is not supported yet. Visit your 2FAuth app to add your first 2FA.',
+        go_to_2fauth_host: 'Go to 2FAuth'
     },
     error: {
         cannot_create_otp_without_secret: 'Cannot create an OTP without a secret',

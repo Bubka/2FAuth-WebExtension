@@ -201,6 +201,9 @@
                 // if (twofaccounts.backendWasNewer) {
                 //     notify.info({ text: trans('commons.data_refreshed_to_reflect_server_changes'), duration: 10000 })
                 // }
+                if (twofaccounts.isEmpty) {
+                    router.push({ name: 'start'})
+                }
             })
         }
         groups.fetch()
@@ -323,11 +326,8 @@
                 </span>
             </div>
             <VueFooter>
-                <router-link id="lnkLanding" :to="{ name: 'landing' }" class="has-text-grey">
-                    {{ $t('link.landing') }}
-                </router-link>
                 <router-link id="lnkLanding" :to="{ name: 'settings.options' }" class="has-text-grey">
-                    - {{ $t('link.settings') }}
+                    {{ $t('link.settings') }}
                 </router-link>
             </VueFooter>
         </div>
