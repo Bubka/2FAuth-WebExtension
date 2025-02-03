@@ -16,7 +16,7 @@
             </div>
         </div>
         <!-- sub-links -->
-        <div v-else class="content has-text-centered is-size-7">
+        <div v-else class="content has-text-centered">
             <slot></slot>
         </div>
     </footer>
