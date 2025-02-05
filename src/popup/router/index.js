@@ -19,9 +19,9 @@ const router = createRouter({
         { path: '/settings/extension', name: 'settings.extension', component: () => import('../views/settings/Extension.vue'), meta: { middlewares: [mustBeConfigured, checkLock], watchedByKicker: true } },
         { path: '/settings/about', name: 'settings.about', component: () => import('../views/settings/About.vue'), meta: { middlewares: [mustBeConfigured, checkLock], watchedByKicker: true } },
         
-        { path: '/error', name: 'genericError', component: () => import('../views/Error.vue'), meta: { middlewares: [mustBeConfigured], watchedByKicker: true } },
-        { path: '/404', name: '404', component: () => import('../views/Error.vue'), meta: { middlewares: [mustBeConfigured], watchedByKicker: true }, props: true },
-        { path: '/:pathMatch(.*)*', name: 'notFound', component: () => import('../views/Error.vue'), meta: { middlewares: [mustBeConfigured], watchedByKicker: true }, props: true },
+        { path: '/error', name: 'genericError', component: () => import('../views/Error.vue') },
+        { path: '/404', name: '404', component: () => import('../views/Error.vue'), props: true },
+        { path: '/:pathMatch(.*)*', name: 'notFound', component: () => import('../views/Error.vue'), props: true },
 	]
 })
 
