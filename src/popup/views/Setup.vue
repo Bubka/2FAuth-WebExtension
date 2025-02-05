@@ -20,6 +20,7 @@
         hostUrl: '',
         apiToken: '',
         extPassword: '',
+        connexion: '',
     })
     const isTesting = ref(false)
     const isSaving = ref(false)
@@ -30,6 +31,7 @@
      * Get user based on provided token
      */
      function checkConnection() {
+        errors.value.connexion = ''
         const hasValidHostUrl = validateHostUrl()
         const hasValidApiToken = validateApiToken()
 
@@ -49,6 +51,12 @@
             })
             .catch((error) => {
                 isConnected.value = false
+                if (error.hasOwnProperty('status') && error.status == 401) {
+                    errors.value.connexion = t('error.failed_to_authenticate_with_host')
+                }
+                else {
+                    errors.value.connexion = t('error.failed_to_contact_host')
+                }
             })
             .finally(() => {
                 isTesting.value = false
@@ -60,12 +68,13 @@
      * Save setting to webext storage
      */
     function saveSetup() {
+        notify.clear()
+        isConnected.value = null
         const hasValidHostUrl = validateHostUrl()
         const hasValidApiToken = validateApiToken()
         const hasValidPassword = validatePassword()
 
         if (hasValidHostUrl && hasValidApiToken && hasValidPassword) {
-
             isSaving.value = true
 
             userService.get({
@@ -99,10 +108,18 @@
                 }
                 else {
                     notify.alert({ text: t(failedUnlockReason) })
-                }               
+                }
             })
             .catch(error => {
-                notify.error(error)
+                if (error.code == 'ERR_NETWORK') {
+                    notify.alert({ text: t('error.failed_to_contact_host') })
+                }
+                else if (error.hasOwnProperty('status') && error.status == 401) {
+                    notify.alert({ text: t('error.failed_to_authenticate_with_host') })
+                }
+                else {
+                    notify.error(error)
+                }
             })
             .finally(() => {
                 isSaving.value = false
@@ -157,8 +174,8 @@
                     <VueButton :isLoading="isTesting" class="tag mr-2" nativeType="button" @click="checkConnection">
                         {{  $t('message.test') }}
                     </VueButton>
-                    <span v-if="isConnected == true" class="has-text-success-dark">{{ $t('message.hi_x_its_all_good', { username: username }) }} <FontAwesomeIcon :icon="['fas', 'check']" size="xs" /></span>
-                    <span v-else-if="isConnected == false" class="has-text-danger">{{  $t('error.failed_to_connect_with_host') }} <FontAwesomeIcon :icon="['fas', 'ban']" size="xs" /></span>
+                    <span v-if="isConnected == true" class="has-text-success-dark is-size-7">{{ $t('message.hi_x_its_all_good', { username: username }) }} <FontAwesomeIcon :icon="['fas', 'check']" size="xs" /></span>
+                    <span v-else-if="isConnected == false" class="has-text-danger is-size-7">{{  errors.connexion }}</span>
                 </div>
             </div>
             <FormPasswordField v-model="_extPassword" fieldName="extPassword" :fieldError="errors.extPassword" :showRules="true" label="field.extPassword.label"  help="field.extPassword.help" autocomplete="new-password" />

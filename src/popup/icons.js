@@ -54,7 +54,6 @@ import {
     faDisplay,
     faArrowUpLong,
     faArrowUpRightFromSquare,
-    faBan,
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
@@ -126,7 +125,6 @@ library.add(
     faCalendar,
     faArrowUpLong,
     faArrowUpRightFromSquare,
-    faBan,
 );
 
 export default FontAwesomeIcon
