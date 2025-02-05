@@ -1,7 +1,7 @@
 {
     "name": "2fauth-browser-extension",
     "displayName": "2FAuth",
-    "version": "0.0.0",
+    "version": "1.0.0",
     "description": "Official 2FAuth web extension",
     "private": true,
     "type": "module",

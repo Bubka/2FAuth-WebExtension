@@ -1,9 +1,9 @@
 {
     "{{chrome}}.manifest_version": 3,
     "{{firefox}}.manifest_version": 3,
-    "name": "2FAuth WebExtension",
-    "version": "0.0.0",
-    "description": "Official 2FAuth browser extension",
+    "name": "2FAuth (beta)",
+    "description": "Access your 2FAuth details and generate 2FA passwords directly from your browser toolbar",
+    "version": "1.0.0",
     "{{chrome}}.action": {
         "default_popup": "src/popup/index.html"
     },
