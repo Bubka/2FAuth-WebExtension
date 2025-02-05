@@ -280,7 +280,7 @@
                 <span id="dv" class="columns is-multiline">
                     <div class="tfa-list column is-narrow" v-for="account in twofaccounts.filtered" :key="account.id">
                         <div class="tfa-container">
-                            <div tabindex="0" class="tfa-cell tfa-content is-size-5" @click.exact="showOrCopy(account)" @keyup.enter="showOrCopy(account)" @click.ctrl="getAndCopyOTP(account)" role="button">  
+                            <div tabindex="0" class="tfa-cell tfa-content is-size-4" @click.exact="showOrCopy(account)" @keyup.enter="showOrCopy(account)" @click.ctrl="getAndCopyOTP(account)" role="button">  
                                 <div class="tfa-text has-ellipsis">
                                     <img v-if="account.icon && preferenceStore.showAccountsIcons" role="presentation" class="tfa-icon" :src="settingStore.hostUrl + '/storage/icons/' + account.icon" alt="">
                                     <img v-else-if="account.icon == null && preferenceStore.showAccountsIcons" role="presentation" class="tfa-icon" :src="settingStore.hostUrl + '/storage/noicon.svg'" alt="">
