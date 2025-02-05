@@ -17,8 +17,7 @@ const router = createRouter({
         { path: '/accounts', name: 'accounts', component: () => import('../views/Accounts.vue'), meta: { middlewares: [mustBeConfigured, checkLock], watchedByKicker: true }, alias: '/' },
         { path: '/settings/options', name: 'settings.options', component: () => import('../views/settings/Options.vue'), meta: { middlewares: [mustBeConfigured, checkLock], watchedByKicker: true } },
         { path: '/settings/extension', name: 'settings.extension', component: () => import('../views/settings/Extension.vue'), meta: { middlewares: [mustBeConfigured, checkLock], watchedByKicker: true } },
-        
-        { path: '/about', name: 'about', component: () => import('../views/About.vue'), meta: { middlewares: [mustBeConfigured] } },
+        { path: '/settings/about', name: 'settings.about', component: () => import('../views/settings/About.vue'), meta: { middlewares: [mustBeConfigured, checkLock], watchedByKicker: true } },
         
         { path: '/error', name: 'genericError', component: () => import('../views/Error.vue'), meta: { middlewares: [mustBeConfigured], watchedByKicker: true } },
         { path: '/404', name: '404', component: () => import('../views/Error.vue'), meta: { middlewares: [mustBeConfigured], watchedByKicker: true }, props: true },

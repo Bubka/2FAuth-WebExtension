@@ -10,6 +10,11 @@
             'view' : 'settings.extension',
             'id'   : 'lnkTabExtSetup'
         },
+        {
+            'name' : 'message.about',
+            'view' : 'settings.about',
+            'id'   : 'lnkTabAbout'
+        },
     ])
 
     const props = defineProps({
