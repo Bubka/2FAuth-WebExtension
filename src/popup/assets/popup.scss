@@ -1,13 +1,11 @@
-@import 'bulma/bulma.sass';
-@import 'bulma-checkradio/dist/css/bulma-checkradio.min.css';
 @import '2fauth.scss';
 
-body, html {
-  height: 0 !important;
-  min-height: 0 !important;
-}
+// body, html {
+//   height: 0 !important;
+//   min-height: 0 !important;
+// }
   
-body, #popup {
+#popup {
   min-width:350px;
   min-height :350px;
   max-height :550px;
@@ -44,5 +42,31 @@ footer.main {
 @media screen and (max-height: 700px) {
   .modal-with-footer {
     margin-bottom: 0;
+    // min-height:350px !important;
+    max-height: calc(100vh - 134px) !important;
   }
+}
+
+.error-404,
+.error-generic,
+.too-bad {
+  height: 140px;
+  background-position: top left 50%;
+  background-size: 50%;
+}
+
+.modal .field.is-grouped:last-child {
+  padding-top: 0;
+}
+
+.modal-error {
+  min-height: 350px;
+}
+
+.error-message {
+  overflow-x: clip;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
 }
