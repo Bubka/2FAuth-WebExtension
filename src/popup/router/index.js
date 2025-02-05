@@ -1,11 +1,11 @@
-import { createRouter, createMemoryHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import middlewarePipeline  from '@popup/router/middlewarePipeline'
 import { useSettingStore } from '@/stores/settingStore'
 import mustBeConfigured    from './middlewares/mustBeConfigured'
 import checkLock    from './middlewares/checkLock'
 
 const router = createRouter({
-	history: createMemoryHistory('/'),
+	history: createWebHashHistory(),
 	routes: [
         { path: '/landing', name: 'landing', component: () => import('../views/Landing.vue'), meta: { middlewares: [checkLock] } },
         { path: '/setup', name: 'setup', component: () => import('../views/Setup.vue'), meta: { middlewares: [checkLock] } },
