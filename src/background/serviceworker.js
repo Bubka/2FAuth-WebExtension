@@ -3,7 +3,6 @@ import { onMessage } from 'webext-bridge/background'
 const CRYPTO_STORE = 'cryptoStore'
 const EXTSTATE_STORE = 'extstateStore'
 const PREFERENCE_STORE = 'preferences'
-const BACKGROUND_LOG = 'backgroundLog'
 
 const decoder = new TextDecoder()
 const encoder = new TextEncoder()
@@ -33,7 +32,7 @@ let encryptionParams = {
     iv: null
 }
 let state = { ...default_state }
-let enable_debug = true
+let enable_debug = 'development' == process.env.NODE_ENV
 let encryptionKey = null
 
 //  MARK: Listeners
@@ -131,20 +130,6 @@ async function swlog(...logs) {
  */
 async function swlogTitle(...logs) {
     swlog('### ' + logs + ' ###')
-}
-
-// /**
-//  * Background logging
-//  *
-//  * @param logs
-//  */
-async function bglog(log) {
-    console.log('log', log)
-    let backgroundLog = (await browser.storage.local.get(BACKGROUND_LOG))[BACKGROUND_LOG] ?? []
-    console.log('backgroundLog', backgroundLog)
-    backgroundLog.push(log)
-    console.log('backgroundLog', backgroundLog)
-    await browser.storage.local.set({ [BACKGROUND_LOG]: backgroundLog })
 }
 
 /**
