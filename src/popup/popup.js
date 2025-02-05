@@ -7,7 +7,7 @@ import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2'
 import { storage } from 'webextension-polyfill'
 import Popup from './Popup.vue'
 import router from './router'
-import i18n from '../i18n'
+import i18n from './i18n'
 
 const popup = createApp(Popup)
 
@@ -37,6 +37,7 @@ const persistedStatePlugin = createPersistedStatePlugin({
     // deserialize: (value) => JSON.parse(value),
 })
 pinia.use((context) => {
+    context.store.$i18n = i18n
     if (['settings', 'preferences'].includes(context.store.$id)) {
         persistedStatePlugin(context)
     }

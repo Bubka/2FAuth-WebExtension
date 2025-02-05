@@ -52,22 +52,22 @@
         { text: 'message.otp_generation_on_home', value: false, legend: 'message.otp_generation_on_home_legend', title: 'message.otp_generation_on_home_title' },
     ]
 
-    // const langs = computed(() => {
-    //     let locales = [{
-    //         text: 'lang.browser_preference',
-    //         value: 'browser'
-    //     }];
+    const langs = computed(() => {
+        let locales = [{
+            text: 'lang.browser_preference',
+            value: 'browser'
+        }];
 
-    //     let availableLocales = ['en', 'fr', 'de', 'es', 'zh', 'ru', 'bg', 'ja', 'hi', 'tr']
+        let availableLocales = ['en', 'fr']
 
-    //     for (const locale of availableLocales) {
-    //         locales.push({
-    //             text: 'lang.' + locale,
-    //             value: locale
-    //         })
-    //     }
-    //     return locales
-    // })
+        for (const locale of availableLocales) {
+            locales.push({
+                text: 'lang.' + locale,
+                value: locale
+            })
+        }
+        return locales
+    })
 
     onMounted(() => {
         groups.items.forEach((group) => {
@@ -105,16 +105,13 @@
     /**
      * Applies language
      */
-    // function applyLanguage() {
-    //     const { isSupported, language } = useNavigatorLanguage()
-
-    //     if (isSupported) {
-    //         loadLanguageAsync(preferenceStore.lang == 'browser' ? language.value.slice(0, 2)  : preferenceStore.lang)
-    //     }
-    //     else loadLanguageAsync('en')
-
-    //     notifySuccess()
-    // }
+    function applyLanguage(lang) {
+        console.log('lang', lang)
+        
+        preferenceStore.lang = lang
+        preferenceStore.applyLanguage()
+        notifySuccess()
+    }
 
     /**
      * Applies theme
@@ -148,14 +145,14 @@
                 <div class="block">
                     <h4 class="title is-4 has-text-grey-light">{{ $t('message.general') }}</h4>
                     <!-- Language -->
-                    <!-- <FormSelect v-model="preferenceStore.lang" @update:model-value="val => applyLanguage(val)" :options="langs" fieldName="lang" label="field.language.label" help="field.language.help" />
+                    <FormSelect v-model="preferenceStore.lang" @update:model-value="val => applyLanguage(val)" :options="langs" fieldName="lang" label="field.language.label" help="field.language.help" />
                     <div class="field help">
                         {{ $t('message.some_translation_are_missing') }}
                         <a class="ml-2" @click="openUrlInNewTab('https://crowdin.com/project/2fauth')">
                             {{ $t('message.help_translate_2fauth') }}
                             <FontAwesomeIcon :icon="['fas', 'external-link-alt']" size="xs" />
                         </a>
-                    </div> -->
+                    </div>
                     <!-- theme -->
                     <FormToggle v-model="preferenceStore.theme" @update:model-value="applyTheme()" :choices="themes" fieldName="theme" label="field.theme.label" help="field.theme.help"/>
                     <!-- show icon -->

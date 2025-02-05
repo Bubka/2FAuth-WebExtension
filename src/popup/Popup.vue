@@ -17,6 +17,7 @@
     )
 
     onBeforeMount(async () => {
+        const { language } = useNavigatorLanguage()
         await preferenceStore.$persistedState.isReady()
 
         kickUser.value = preferenceStore.kickUserAfter !== null && preferenceStore.kickUserAfter !== 'null'
@@ -29,9 +30,21 @@
                 kickUserAfter.value = parseInt(preferenceStore.kickUserAfter)
             }
         )
+        watch(language, () => {
+            preferenceStore.applyLanguage()
+        })
 
         preferenceStore.applyTheme()
         preferenceStore.resetGroupFilter()
+    })
+
+    onMounted(() => {
+        if ('development' == process.env.NODE_ENV) {
+            let vueDevToolScript = document.createElement('script')
+            vueDevToolScript.setAttribute('src', 'http://localhost:8098')
+
+            document.head.appendChild(vueDevToolScript)
+        }
     })
 
 </script>

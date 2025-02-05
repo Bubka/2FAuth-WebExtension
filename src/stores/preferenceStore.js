@@ -67,6 +67,25 @@ export const usePreferenceStore = defineStore('preferences', {
         },
 
         /**
+         * Applies language
+         */
+        async applyLanguage() {
+            console.log('this.$i18n.global.locale', this.$i18n.global.locale)
+
+            await this.$persistedState.isReady()
+            const { isSupported, language } = useNavigatorLanguage()
+
+            console.log('language', language)
+
+            if (isSupported) {
+                this.$i18n.global.locale = this.lang == 'browser' ? language.value.slice(0, 2)  : this.lang
+            }
+            else this.$i18n.global.locale = this.$i18n.fallbackLocale
+
+            console.log('this.$i18n', this.$i18n)
+        },
+
+        /**
          * Resets the group filter to default
          */
         async resetGroupFilter() {
