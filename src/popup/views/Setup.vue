@@ -2,6 +2,7 @@
     import { useI18n } from 'vue-i18n'
     import { useSettingStore } from '@/stores/settingStore'
     import { useNotifyStore }  from '@popup/stores/notify'
+    import { usePreferenceStore } from '@/stores/preferenceStore'
     import { sendMessage } from 'webext-bridge/popup'
     import { isFilled, isHttpUrl } from '@popup/composables/validators'
     import userService from '@popup/services/userService'
@@ -9,6 +10,7 @@
     
     const { t } = useI18n({ useScope: "global" })
     const settingStore = useSettingStore()
+    const preferenceStore = usePreferenceStore()
     const router = useRouter()
     const notify = useNotifyStore()
 
@@ -77,12 +79,13 @@
         if (hasValidHostUrl && hasValidApiToken && hasValidPassword) {
             isSaving.value = true
 
-            userService.get({
+            userService.getPreferences({
                 baseURL: _hostUrl.value + '/api/v1',
                 headers: { 'Authorization': 'Bearer ' + _apiToken.value , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' },
                 returnError: true,
                 ignoreRequestInterceptor: true,
-            }).then(async () => {
+            }).then(async ({ data: tfauthPreferences }) => {
+                // Setting enc key
                 const { status: setEncKeyStatus } = await sendMessage('SET_ENC_KEY', { password: _extPassword.value }, 'background')
 
                 if (! setEncKeyStatus) {
@@ -90,6 +93,7 @@
                     return
                 }
 
+                // Encrypt the PAT
                 const { status: tokenEncryptionStatus, reason: failedEncReason } = await sendMessage('ENCRYPT_PAT', { apiToken: _apiToken.value }, 'background')
 
                 if (! tokenEncryptionStatus) {
@@ -97,11 +101,20 @@
                     return
                 }
 
+                // Store settings
                 settingStore.$patch({
                     hostUrl: _hostUrl.value,
                 })
 
                 const { status: unlockingStatus, reason: failedUnlockReason } = await sendMessage('UNLOCK', { }, 'background')
+
+                // User preferences
+                await preferenceStore.$persistedState.isReady()
+                tfauthPreferences.forEach(preference => {
+                    if (preferenceStore.$state.hasOwnProperty(preference.key)) {
+                        preferenceStore[preference.key] = preference.value
+                    }
+                })
 
                 if (unlockingStatus) {
                     router.push({ name: 'accounts' })
