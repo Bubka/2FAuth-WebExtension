@@ -12,9 +12,9 @@
     "scripts": {
         "dev": "vite",
         "devv": "vite build --watch --mode development",
-        "build": "vite build",
-        "build-chrome": "TARGET=chrome vite build",
-        "build-ff": "cross-env TARGET=firefox vite build",
+        "build": "npm run build:chrome && npm run build:firefox",
+        "build:chrome": "TARGET=chrome vite build",
+        "build:firefox": "cross-env TARGET=firefox vite build",
         "lint": "eslint . --fix"
     },
     "devDependencies": {
