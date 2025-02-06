@@ -7,6 +7,7 @@
     import { isFilled, isHttpUrl } from '@popup/composables/validators'
     import userService from '@popup/services/userService'
     import FormButtons from '@popup/components/formElements/FormButtons.vue'
+    import { LucideCheck } from 'lucide-vue-next'
     
     const { t } = useI18n({ useScope: "global" })
     const settingStore = useSettingStore()
@@ -187,7 +188,13 @@
                     <VueButton :isLoading="isTesting" class="tag mr-2" nativeType="button" @click="checkConnection">
                         {{  $t('message.test') }}
                     </VueButton>
-                    <span v-if="isConnected == true" class="has-text-success-dark is-size-7">{{ $t('message.hi_x_its_all_good', { username: username }) }} <FontAwesomeIcon :icon="['fas', 'check']" size="xs" /></span>
+                    <!-- <span v-if="isConnected == true" class="has-text-success-dark is-size-7">{{ $t('message.hi_x_its_all_good', { username: username }) }}
+                         <LucideUserRoundCheck />
+                    </span> -->
+                    <span v-if="isConnected == true" class="icon-text has-text-success-dark is-size-7">
+                        <span>{{ $t('message.hi_x_its_all_good', { username: username }) }}</span>
+                        <span class="icon"><LucideCheck class="icon-size-1"/></span>
+                    </span>
                     <span v-else-if="isConnected == false" class="has-text-danger is-size-7">{{  errors.connexion }}</span>
                 </div>
             </div>

@@ -51,7 +51,6 @@ popup.use(router)
 popup.use(Notifications)
 
 // Global components registration
-import FontAwesomeIcon   from './icons'
 import Modal             from '@popup/layouts/Modal.vue'
 import FormField         from '@popup/components/formElements/FormField.vue'
 import FormPasswordField from '@popup/components/formElements/FormPasswordField.vue'
@@ -62,7 +61,6 @@ import Footer            from '@popup/layouts/Footer.vue'
 import VueButton         from '@popup/components/formElements/Button.vue'
 
 popup
-    .component('FontAwesomeIcon', FontAwesomeIcon)
     .component('Modal', Modal)
     .component('FormField', FormField)
     .component('FormPasswordField', FormPasswordField)

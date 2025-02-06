@@ -1,5 +1,6 @@
 <script setup>
     import { openUrlInNewTab } from '@popup/composables/helpers'
+    import { LucideExternalLink } from 'lucide-vue-next'
     
 </script>
 
@@ -14,7 +15,10 @@
         </p>
         <p class="block">
             <a @click="openUrlInNewTab('https://docs.2fauth.app/api/#creating-an-access-token')">
-                {{ $t('message.docs_how_to_create_a_pat') }} <FontAwesomeIcon :icon="['fas', 'arrow-up-right-from-square']" size="xs" />
+                <span class="icon-text">
+                    <span>{{ $t('message.docs_how_to_create_a_pat') }}</span>
+                    <span class="icon"><LucideExternalLink class="icon-size-1"/></span>
+                </span>
             </a>
         </p>
     </div>

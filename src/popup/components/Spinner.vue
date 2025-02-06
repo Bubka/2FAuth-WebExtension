@@ -1,4 +1,6 @@
 <script setup>
+    import { LucideLoaderCircle } from 'lucide-vue-next';
+
     const props = defineProps({
         isVisible: Boolean,
         type: {
@@ -8,7 +10,11 @@
         message: {
             type: String,
             default: 'message.generating_otp'
-        }
+        },
+        rawSize: {
+            type: Number,
+            default: 24
+        },
     })
 </script>
 
@@ -17,7 +23,7 @@
         <div v-if="type == 'fullscreen'" class="spinner-container">
             <div class="spinner-wrapper">
                 <span id="icnSpinnerFull" class="is-size-1 spinner">
-                    <FontAwesomeIcon :icon="['fas', 'spinner']" spin />
+                     <LucideLoaderCircle class="spinning icon-size-3" />
                 </span>
                 <span>{{ $t(message) }}</span>
             </div>
@@ -25,15 +31,15 @@
         <div v-if="type == 'fullscreen-overlay'" class="spinner-overlay-container">
             <div class="spinner-wrapper">
                 <span id="icnSpinnerFull" class="is-size-1 spinner">
-                    <FontAwesomeIcon :icon="['fas', 'spinner']" spin />
+                    <LucideLoaderCircle class="spinning icon-size-3"  />
                 </span>
                 <span>{{ $t(message) }}</span>
             </div>
         </div>
-        <FontAwesomeIcon v-else-if="type == 'raw'" :icon="['fas', 'spinner']" spin />
+        <LucideLoaderCircle v-else-if="type == 'raw'" class="spinning lucide-default-size" :size="rawSize"  />
         <div v-else class="has-text-centered mt-6">
             <span id="icnSpinner" class="is-size-4">
-                <FontAwesomeIcon :icon="['fas', 'spinner']" spin />
+                <LucideLoaderCircle class="spinning" />
             </span>
         </div>
     </div>

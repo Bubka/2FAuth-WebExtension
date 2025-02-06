@@ -1,6 +1,7 @@
 <script setup>
     import { ref } from 'vue'
     import { useIdGenerator, useValidationErrorIdGenerator } from '@popup/composables/helpers'
+    import { LucideChevronRight } from 'lucide-vue-next'
 
     const props = defineProps({
         modelValue: [String, Number, Boolean],
@@ -38,8 +39,8 @@
 
 <template>
     <div class="field is-flex">
-        <div v-if="isIndented" class="mx-2 pr-1" :style="{ 'opacity': isDisabled ? '0.5' : '1' }">
-            <FontAwesomeIcon class="has-text-grey" :icon="['fas', 'chevron-right']" transform="rotate-135"/>
+        <div v-if="isIndented" class="pr-1" :style="{ 'opacity': isDisabled ? '0.5' : '1' }">
+            <LucideChevronRight class="has-text-grey rotated-chevron" />
         </div>
         <div>
             <label :for="inputId" class="label" v-html="$t(label)" :style="{ 'opacity': isDisabled ? '0.5' : '1' }"></label>

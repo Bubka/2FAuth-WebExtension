@@ -9,6 +9,7 @@
     import { UseColorMode } from '@vueuse/components'
     import { useDisplayablePassword } from '@popup/composables/helpers'
     import { sendMessage } from 'webext-bridge/popup'
+    import { LucideLoaderCircle, LucideEye, LucideEyeOff, LucideCircleAlert, LucideChevronsDownUp, LucideChevronsUpDown } from 'lucide-vue-next'
     import SearchBox from '@popup/components/SearchBox.vue'
     import GroupSwitch from '@popup/components/GroupSwitch.vue'
     import Spinner from '@popup/components/Spinner.vue'
@@ -241,8 +242,8 @@
                             <div class="column">
                                 <button type="button" id="btnShowGroupSwitch" :title="$t('message.show_group_selector')" tabindex="1" class="button is-text is-like-text" :class="{'has-text-grey' : mode != 'dark'}" @click.stop="showGroupSwitch = !showGroupSwitch">
                                     {{ groups.current }} ({{ twofaccounts.filteredCount }})&nbsp;
-                                    <FontAwesomeIcon v-if="showGroupSwitch" :icon="['fas', 'caret-up']" />
-                                    <FontAwesomeIcon v-else :icon="['fas', 'caret-down']" />
+                                     <LucideChevronsDownUp v-if="showGroupSwitch" />
+                                     <LucideChevronsUpDown v-else />
                                 </button>
                             </div>
                         </div>
@@ -284,7 +285,8 @@
                                 <div class="tfa-text has-ellipsis">
                                     <img v-if="account.icon && preferenceStore.showAccountsIcons" role="presentation" class="tfa-icon" :src="settingStore.hostUrl + '/storage/icons/' + account.icon" alt="">
                                     <img v-else-if="account.icon == null && preferenceStore.showAccountsIcons" role="presentation" class="tfa-icon" :src="settingStore.hostUrl + '/storage/noicon.svg'" alt="">
-                                    {{ account.service ? account.service : $t('message.no_service') }}<FontAwesomeIcon class="has-text-danger is-size-5 ml-2" v-if="account.account === $t('message.indecipherable')" :icon="['fas', 'exclamation-circle']" />
+                                    {{ account.service ? account.service : $t('message.no_service') }}
+                                    <LucideCircleAlert class="has-text-danger ml-2" v-if="account.account === $t('message.indecipherable')" />
                                     <span class="has-ellipsis is-family-primary is-size-6 is-size-7-mobile has-text-grey ">{{ account.account }}</span>
                                 </div>
                             </div>
@@ -292,7 +294,7 @@
                                 <div v-show="preferenceStore.getOtpOnRequest == false" class="has-text-right">
                                     <span v-if="account.otp != undefined">
                                         <span v-if="isRenewingOTPs == true && (renewedPeriod == -1 || renewedPeriod == account.period)" class="has-nowrap has-text-grey has-text-centered is-size-5">
-                                            <FontAwesomeIcon :icon="['fas', 'circle-notch']" spin />
+                                            <LucideLoaderCircle class="spinning" />
                                         </span>
                                         <span v-else class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('message.copy_to_clipboard')">
                                             {{ useDisplayablePassword(account.otp.password, preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP && revealPassword == account.id) }}
@@ -314,10 +316,10 @@
                             <transition name="popLater" v-if="preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP">
                                 <div v-show="preferenceStore.getOtpOnRequest == false" class="has-text-right">
                                     <button v-if="revealPassword == account.id" type="button" class="pr-0 button is-ghost has-text-grey-dark" @click.stop="revealPassword = null">
-                                        <font-awesome-icon :icon="['fas', 'eye']" />
+                                        <LucideEye class="lucide-icon" />
                                     </button>
                                     <button v-else type="button" class="pr-0 button is-ghost has-text-grey-dark" @click.stop="revealPassword = account.id">
-                                        <font-awesome-icon :icon="['fas', 'eye-slash']" />
+                                        <LucideEyeOff />
                                     </button>
                                 </div>
                             </transition>

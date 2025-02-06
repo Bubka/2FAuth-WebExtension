@@ -5,6 +5,7 @@
     import { useGroups } from '@popup/stores/groups'
     import { useNotifyStore } from '@popup/stores/notify'
     import { openUrlInNewTab } from '@popup/composables/helpers'
+    import { LucideExternalLink } from 'lucide-vue-next'
     import SettingTabs from '@popup/layouts/SettingTabs.vue'
     import FormCheckbox from '@popup/components/formElements/FormCheckbox.vue'
     import FormToggle from '@popup/components/formElements/FormToggle.vue'
@@ -17,9 +18,9 @@
     const kickAfter = ref(preferenceStore.kickUserAfter)
 
     const themes = [
-        { text: 'message.light', value: 'light', icon: 'sun' },
-        { text: 'message.dark', value: 'dark', icon: 'moon' },
-        { text: 'message.automatic', value: 'system', icon: 'desktop' },
+        { text: 'message.light', value: 'light', icon: 'Sun' },
+        { text: 'message.dark', value: 'dark', icon: 'Moon' },
+        { text: 'message.automatic', value: 'system', icon: 'MonitorCheck' },
     ]
     const passwordFormats = [
         { text: 'message.pair_label', value: 2, legend: 'message.pair', title: 'message.pair_legend' },
@@ -149,8 +150,10 @@
                     <div class="field help">
                         {{ $t('message.some_translation_are_missing') }}
                         <a class="ml-2" @click="openUrlInNewTab('https://crowdin.com/project/2fauth')">
-                            {{ $t('message.help_translate_2fauth') }}
-                            <FontAwesomeIcon :icon="['fas', 'external-link-alt']" size="xs" />
+                            <span class="icon-text" style="line-height: inherit">
+                                <span>{{ $t('message.help_translate_2fauth') }}</span>
+                                <span class="icon is-small"><LucideExternalLink /></span>
+                            </span>
                         </a>
                     </div>
                     <!-- theme -->

@@ -10,6 +10,7 @@
     import TotpLooper from '@popup/components/TotpLooper.vue'
     import Dots from '@popup/components/Dots.vue'
     import twofaccountService from '@popup/services/twofaccountService'
+    import { LucideEye, LucideEyeOff } from 'lucide-vue-next'
 
     const preferenceStore = usePreferenceStore()
     const settingStore = useSettingStore()
@@ -331,7 +332,7 @@
                     {{ useDisplayablePassword(password, preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP && revealPassword) }}
                 </span>
                 <span v-else tabindex="0" class="otp is-size-1">
-                    <Spinner :isVisible="showInlineSpinner" :type="'raw'" />
+                    <Spinner :isVisible="showInlineSpinner" :type="'raw'" :rawSize="40" />
                 </span>
             </p>
         </UseColorMode>
@@ -341,8 +342,8 @@
         </p>
         <p v-if="preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP" class="mt-3">
             <button type="button" class="button is-ghost has-text-grey-dark" @click.stop="revealPassword = !revealPassword">
-                <font-awesome-icon v-if="revealPassword" :icon="['fas', 'eye']" />
-                <font-awesome-icon v-else :icon="['fas', 'eye-slash']" />
+                 <LucideEye v-if="revealPassword" />
+                 <LucideEyeOff v-else />
             </button>
         </p>
         <TotpLooper 

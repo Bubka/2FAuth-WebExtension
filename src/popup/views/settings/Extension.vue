@@ -119,8 +119,6 @@
                         <VueButton :isLoading="isRunning" class="button mr-2" nativeType="button" @click="changePassword">
                             {{  $t('message.change_password') }}
                         </VueButton>
-                        <!-- <span v-if="isConnected == true" class="has-text-success-dark">{{ $t('message.hi_x_its_all_good', { username: username }) }} <FontAwesomeIcon :icon="['fas', 'check']" size="xs" /></span>
-                        <span v-else-if="isConnected == false" class="has-text-danger">Nop <FontAwesomeIcon :icon="['fas', 'times']" size="xs" /></span> -->
                     </div>
                 </div>
             </form>

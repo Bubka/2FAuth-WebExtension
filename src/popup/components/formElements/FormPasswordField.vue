@@ -1,5 +1,6 @@
 <script setup>
     import { useIdGenerator, useValidationErrorIdGenerator } from '@popup/composables/helpers'
+    import { LucideEye, LucideEyeOff } from 'lucide-vue-next'
 
     defineOptions({
         inheritAttrs: true
@@ -101,10 +102,10 @@
                 :aria-errormessage="fieldError != undefined ? valErrorId : undefined" 
             />
             <span v-if="currentType == 'password'" role="button" id="btnTogglePassword" tabindex="0" class="icon is-small is-right is-clickable" @keyup.enter="setFieldType('text')" @click="setFieldType('text')" :title="$t('message.reveal_password')">
-                <font-awesome-icon :icon="['fas', 'eye-slash']" />
+                <LucideEyeOff />
             </span>
             <span v-else role="button" id="btnTogglePassword" tabindex="0" class="icon is-small is-right is-clickable" @keyup.enter="setFieldType('password')" @click="setFieldType('password')" :title="$t('message.hide_password')">
-                <font-awesome-icon :icon="['fas', 'eye']" />
+                <LucideEye />
             </span>
         </div>
         <p class="help is-warning" v-if="hasCapsLockOn" v-html="$t('message.caps_lock_is_on')" />

@@ -75,10 +75,10 @@
                     :aria-errormessage="fieldError != undefined ? valErrorId : undefined" 
                 />
                 <span v-if="leftIcon" class="icon is-small is-left">
-                    <FontAwesomeIcon :icon="['fas', leftIcon]" transform="rotate-75" size="xs" />
+                    <!-- TODO: Add Lucide generic icon -->
                 </span>
                 <span v-if="rightIcon" class="icon is-small is-right">
-                    <FontAwesomeIcon :icon="['fas', rightIcon]" transform="rotate-75" size="xs" />
+                    <!-- TODO: Add Lucide generic icon -->
                 </span>
             </div>
             <FieldError v-if="fieldError != undefined" :error="fieldError" :field="fieldName" />

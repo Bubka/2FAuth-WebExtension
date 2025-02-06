@@ -1,6 +1,7 @@
 <script setup>
     import { useAttrs, computed } from 'vue'
     import { useIdGenerator } from '@popup/composables/helpers'
+    import { LucideChevronRight } from 'lucide-vue-next'
 
     defineOptions({
         inheritAttrs: false
@@ -50,8 +51,8 @@
 
 <template>
     <div class="field is-flex">
-        <div v-if="isIndented" class="mx-2 pr-1" :style="{ 'opacity': isDisabled ? '0.5' : '1' }">
-            <FontAwesomeIcon class="has-text-grey" :icon="['fas', 'chevron-right']" transform="rotate-135"/>
+        <div v-if="isIndented" class="pr-1" :style="{ 'opacity': isDisabled ? '0.5' : '1' }">
+            <LucideChevronRight class="has-text-grey rotated-chevron" />
         </div>
         <div>
             <input :id="fieldName" type="checkbox" :name="fieldName" class="is-checkradio is-info" v-model="model" :disabled="isDisabled" :aria-describedby="help ? legendId : undefined" />

@@ -1,6 +1,7 @@
 <script setup>
     import { useIdGenerator, useValidationErrorIdGenerator } from '@popup/composables/helpers'
     import { UseColorMode } from '@vueuse/components'
+    import LucideGenericIcon from '@popup/components/LucideGenericIcon.vue'
 
     const props = defineProps({
         modelValue: [String, Number, Boolean],
@@ -72,7 +73,8 @@
                         :disabled="isDisabled"
                     />
                     <span v-if="choice.legend" v-html="$t(choice.legend)" class="is-block is-size-7" />
-                    <FontAwesomeIcon :icon="['fas',choice.icon]" v-if="choice.icon" class="mr-2" />
+                    <!-- <FontAwesomeIcon :icon="['fas',choice.icon]" v-if="choice.icon" class="mr-2" /> -->
+                     <LucideGenericIcon :name="choice.icon" v-if="choice.icon" class="mr-2" />
                     <label :for="useIdGenerator('button',fieldName+choice.value).inputId" class="is-clickable">
                         {{ $t(choice.text) }}
                     </label>

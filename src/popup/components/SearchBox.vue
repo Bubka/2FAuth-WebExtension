@@ -1,4 +1,6 @@
 <script setup>
+    import { LucideSearch } from 'lucide-vue-next'
+
     const props = defineProps({
         keyword: String,
         hasNoBackground: {
@@ -45,7 +47,7 @@
                 v-on:keyup="$emit('update:keyword', $event.target.value)">
             <span class="icon is-small is-right">
                 <button type="button" v-if="keyword != ''" id="btnClearSearch" tabindex="1" :title="$t('message.clear_search')" class="clear-selection delete" @click="$emit('update:keyword','')"></button>
-                <FontAwesomeIcon v-else :icon="['fas', 'search']" />
+                 <LucideSearch v-else class="mr-2 icon-size-1" />
             </span>
         </div>
     </div>
