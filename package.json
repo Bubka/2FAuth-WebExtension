@@ -1,8 +1,8 @@
 {
     "name": "2fauth-browser-extension",
-    "displayName": "2FAuth",
-    "version": "1.0.0",
-    "description": "Official 2FAuth web extension",
+    "displayName": "2FAuth (beta)",
+    "version": "1.0.0-beta",
+    "description": "Access your 2FAuth details and generate 2FA passwords directly from your browser toolbar",
     "private": true,
     "type": "module",
     "repository": {
@@ -13,7 +13,7 @@
         "dev": "vite",
         "devv": "vite build --watch --mode development",
         "build": "npm run build:chrome && npm run build:firefox",
-        "build:chrome": "TARGET=chrome vite build",
+        "build:chrome": "cross-env TARGET=chrome vite build",
         "build:firefox": "cross-env TARGET=firefox vite build",
         "lint": "eslint . --fix"
     },
