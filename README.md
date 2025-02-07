@@ -72,7 +72,7 @@ npm run build:firefox
 >
 You can contribute to 2FAuth and this web extension in many ways:
 
-- By [reporting bugs](https://github.com/Bubka/2FAuth/issues/new?template=bug_report.md), or even better, by submitting a fix with a pull request on the *dev* branch.
+- By [reporting bugs](https://github.com/Bubka/2FAuth/issues/new?template=bug_report.md), or even better, by submitting a fix with a pull request.
 - By [suggesting enhancement or new feature](https://github.com/Bubka/2FAuth/issues/new?template=feature_request.md). Please have a look to the [2FAuth development project](https://github.com/users/Bubka/projects/1), maybe your idea is already there.
 - By correcting or completing translations in a language you speak, using the [Crowdin platform](https://crowdin.com/project/2fauth). Ask for your language if this one is lacking.
 
