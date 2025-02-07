@@ -8,6 +8,10 @@ import { storage } from 'webextension-polyfill'
 import Popup from './Popup.vue'
 import router from './router'
 import i18n from './i18n'
+import { devtools } from '@vue/devtools'
+
+if ('development' == process.env.NODE_ENV)
+    devtools.connect() // default is 'http://localhost:8098'
 
 const popup = createApp(Popup)
 

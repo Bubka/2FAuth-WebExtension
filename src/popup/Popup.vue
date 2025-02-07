@@ -38,15 +38,6 @@
         preferenceStore.resetGroupFilter()
     })
 
-    onMounted(() => {
-        if ('development' == process.env.NODE_ENV) {
-            let vueDevToolScript = document.createElement('script')
-            vueDevToolScript.setAttribute('src', 'http://localhost:8098')
-
-            document.head.appendChild(vueDevToolScript)
-        }
-    })
-
 </script>
 
 <template>
