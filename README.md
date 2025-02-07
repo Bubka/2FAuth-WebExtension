@@ -48,6 +48,10 @@ It allows Hot Module Replacement (HMR) and a watch mode, cross-browser compatibi
 
 Simply run `npm run dev` in a terminal to launch a new browser and start working on the extension.
 
+#### Enable vue devTools
+
+The standalone [@vue/devtools](https://devtools.vuejs.org/) app comes as an npm dev dependency. Run `./node_modules/.bin/vue-devtools` in a terminal to start it. The app is configured to listen for the extension pop-up and automatically connect to it when it opens.
+
 ### Distribution builds
 
 ```shell
