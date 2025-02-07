@@ -147,7 +147,7 @@
                     <h4 class="title is-4 has-text-grey-light">{{ $t('message.general') }}</h4>
                     <!-- Language -->
                     <FormSelect v-model="preferenceStore.lang" @update:model-value="val => applyLanguage(val)" :options="langs" fieldName="lang" label="field.language.label" help="field.language.help" />
-                    <div class="field help">
+                    <!-- <div class="field help">
                         {{ $t('message.some_translation_are_missing') }}
                         <a class="ml-2" @click="openUrlInNewTab('https://crowdin.com/project/2fauth')">
                             <span class="icon-text" style="line-height: inherit">
@@ -155,7 +155,7 @@
                                 <span class="icon is-small"><LucideExternalLink /></span>
                             </span>
                         </a>
-                    </div>
+                    </div> -->
                     <!-- theme -->
                     <FormToggle v-model="preferenceStore.theme" @update:model-value="applyTheme()" :choices="themes" fieldName="theme" label="field.theme.label" help="field.theme.help"/>
                     <!-- show icon -->

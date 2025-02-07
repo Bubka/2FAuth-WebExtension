@@ -78,7 +78,7 @@
         errors.value.newPassword = ''
 
         if (! isFilled(extNewPassword.value)) {
-            errors.value.newPassword = 'The field is required'
+            errors.value.newPassword = t('message.field_is_required')
             return false
         }
 
@@ -92,7 +92,7 @@
         errors.value.currentPassword = ''
 
         if (! isFilled(extCurrentPassword.value)) {
-            errors.value.currentPassword = 'The field is required'
+            errors.value.currentPassword = t('message.field_is_required')
             return false
         }
 
@@ -117,7 +117,7 @@
                 <div class="field is-grouped">
                     <div class="control">
                         <VueButton :isLoading="isRunning" class="button mr-2" nativeType="button" @click="changePassword">
-                            {{  $t('message.change_password') }}
+                            {{  $t('message.save') }}
                         </VueButton>
                     </div>
                 </div>

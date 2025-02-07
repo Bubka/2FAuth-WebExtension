@@ -145,7 +145,7 @@
         errors.value.hostUrl = ''
 
         if (! isFilled(_hostUrl.value) || ! isHttpUrl(_hostUrl.value)) {
-            errors.value.hostUrl = 'The field is required and should be a valid url'
+            errors.value.hostUrl = t('message.field_is_required_and_valid_url')
             return false
         }
 
@@ -157,7 +157,7 @@
         errors.value.apiToken = ''
 
         if (! isFilled(_apiToken.value)) {
-            errors.value.apiToken = 'The field is required'
+            errors.value.apiToken = t('message.field_is_required')
             return false
         }
 
@@ -168,7 +168,7 @@
         errors.value.extPassword = ''
 
         if (! isFilled(_extPassword.value)) {
-            errors.value.extPassword = 'The field is required'
+            errors.value.extPassword = t('message.field_is_required')
             return false
         }
 

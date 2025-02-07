@@ -31,14 +31,14 @@
         "close": "Close",
         "configure": "Configure",
         "bind_2fauth_to_use_extension": "The perfect companion to your 2FAuth web application",
-        "twofauth_teaser": "2FAuth is a web app to manage your Two-Factor Authentication (2FA) accounts and generate their security codes",
+        "twofauth_teaser": "A browser extension to retrieve 2FA security codes generated from your 2FAuth server.",
         "resources": "Resources",
         "credits": "Credits",
         "made_with": "Made with",
         "ui_icons_by": "UI Icons by",
-        "docs_how_to_create_a_pat": "2FAuth docs: How to create a PAT",
-        "purpose_description": "This web extension is an add-on to the 2FAuth webapp. It lets you access the 2FA data of your 2FAuth user account and generate OTPs directly from your browser bar.",
-        "purpose_requirements": "You must have and bind a 2FAuth user account to the extension to use it. This requires a Personal Access Token (PAT).",
+        "docs_how_to_create_a_pat": "How to create a PAT",
+        "purpose_description": "This web extension is an add-on to the 2FAuth web application. It lets you access the 2FA data of your 2FAuth user account and generate OTPs directly from your browser bar.",
+        "purpose_requirements": "You must have a 2FAuth user account and bind it to the extension in order to use it. This is done by providing the 2FAuth server address and a Personal Access Token (PAT).",
         "test": "Test",
         "hi_x_its_all_good": "Hi {username}, it's all good",
         "save": "Save",
@@ -97,7 +97,10 @@
         "no_account_here": "No 2FA here!",
         "registration_not_supported_visit_tour_instance": "2FA registraton from the extension is not supported yet. Visit your 2FAuth app to add your first 2FA.",
         "go_to_2fauth_host": "Go to 2FAuth",
-        "about": "About"
+        "about": "About",
+        "help_colon": "Help: ",
+        "field_is_required": "The field is required",
+        "field_is_required_and_valid_url": "The field is required is must be a valid URL"
     },
     "error": {
         "cannot_create_otp_without_secret": "Cannot create an OTP without a secret",
@@ -125,12 +128,12 @@
     },
     "field": {
         "hostUrl": {
-            "label": "2FAuth URL",
+            "label": "2FAuth server URL",
             "help": "The web address of the 2FAuth instance where you signed up. For example: https://2fauth.mysite.me"
         },
         "apiToken": {
             "label": "API token",
-            "help": "Your Personal Access Token. You can generate one from the Settings > OAuth page of your 2FAuth user account"
+            "help": "The Personal Access Token (PAT) to authenticate the extension to the server. You can generate one from the Settings > OAuth page of your 2FAuth user account"
         },
         "extPassword": {
             "label": "Password",

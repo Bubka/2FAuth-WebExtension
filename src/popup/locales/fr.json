@@ -31,14 +31,14 @@
         "close": "Fermer",
         "configure": "Configurer",
         "bind_2fauth_to_use_extension": "Le compagnon idéal de votre application 2FAuth",
-        "twofauth_teaser": "Une web app pour gérer vos comptes avec double authentification (2FA) et générer leurs codes de sécurité",
+        "twofauth_teaser": "Une extension de navigateur pour obtenir des codes de sécurité 2FA générés par votre serveur 2FAuth.",
         "resources": "Ressources",
         "credits": "Crédits",
         "made_with": "Fabriqué avec",
         "ui_icons_by": "Icônes par",
-        "docs_how_to_create_a_pat": "Doc 2FAuth: Comment créer un PAT",
+        "docs_how_to_create_a_pat": "Comment créer un PAT",
         "purpose_description": "Cette extension est un complément à l'application web 2FAuth. Elle permet de générer des mots de passe 2FA directement depuis la barre d'outils du navigateur.",
-        "purpose_requirements": "Vous devez connecter un compte utilisateur 2FAuth à l'extension pour la rebndre opérationnelle. Cela se fait en enregistrant un jeton d'accès personnel (PAT)",
+        "purpose_requirements": "Vous devez posséder un compte utilisateur 2FAuth et le connecter à l'extension pour la rendre opérationnelle. Cela se fait en fournissant l'adresse du serveur 2FAuth et un jeton d'accès personnel (PAT).",
         "test": "Test",
         "hi_x_its_all_good": "Bonjour {username}, c'est tout bon",
         "save": "Enregistrer",
@@ -68,11 +68,11 @@
         "never": "Jamais",
         "on_otp_copy": "Après copie d'un mot de passe",
         "one_minutes": "Après 1 minute",
-        "two_minutes": "Après 2 minute",
-        "five_minutes": "Après 5 minute",
-        "ten_minutes": "Après 10 minute",
-        "fifteen_minutes": "Après 15 minute",
-        "thirty_minutes": "Après 30 minute",
+        "two_minutes": "Après 2 minutes",
+        "five_minutes": "Après 5 minutes",
+        "ten_minutes": "Après 10 minutes",
+        "fifteen_minutes": "Après 15 minutes",
+        "thirty_minutes": "Après 30 minutes",
         "one_hour": "Après 1 heure",
         "one_day": "Après 1 journée",
         "otp_generation_on_request": "Après un clic/tap",
@@ -87,7 +87,7 @@
         "unlock": "Déverouiller",
         "unlock_description": "L'extension est vérouillée afin de protéger ses données. Saisissez le mot de passe de l'extension pour la déverouiller.",
         "reset_extension": "Réinitialiser l'extension",
-        "reset_extension_description": "toutes les données de configuration et de double authentification seront supprimées. L'extension pourra être reconnecter à un compte utilisateur 2FAuth.",
+        "reset_extension_description": "Toutes les données de configuration et de double authentification seront supprimées. L'extension pourra être reconnecter à un compte utilisateur 2FAuth.",
         "reset_extension_description_bis": "Utiliser cette option si vous avez oublié votre mot de passe d'extension.",
         "token_remains_valid": "Cette action ne révoque pas le jeton d'accès actuellement utilisé.",
         "reset": "Réinitialiser",
@@ -95,9 +95,12 @@
         "are_you_sure": "Continuer ?",
         "password_changed": "Mot de passe modifié",
         "no_account_here": "Aucun compte 2FA !",
-        "registration_not_supported_visit_tour_instance": "L'enregistrement de compte 2FA depuis l'extension n'est pas supportée pour l'instant. Utiliser votre application web 2FAuth pour ajouter votre premier compte.",
+        "registration_not_supported_visit_tour_instance": "L'enregistrement de compte 2FA depuis l'extension n'est pas supportée pour l'instant. Utilisez votre application web 2FAuth pour ajouter votre premier compte.",
         "go_to_2fauth_host": "Visiter 2FAuth",
-        "about": "À propos"
+        "about": "À propos",
+        "help_colon": "Aide : ",
+        "field_is_required": "Le champ est obligatoire",
+        "field_is_required_and_valid_url": "Le champ est obligatoire et doit être une URL valide"
     },
     "error": {
         "cannot_create_otp_without_secret": "Impossible de créer un OTP sans un secret",
@@ -119,22 +122,22 @@
         "wrong_password": "Mauvais mot de passe",
         "wrong_current_password": "Mauvais mot de passe (actuel)",
         "reset_extension": "Réinitialiser l'extension",
-        "failed_to_contact_host": "Serveur 2FAuth introuvable, contrôler l'URL",
-        "failed_to_authenticate_with_host": "Échec de l'authentification, contrôler le PAT",
+        "failed_to_contact_host": "Serveur 2FAuth introuvable, contrôlez l'URL",
+        "failed_to_authenticate_with_host": "Échec de l'authentification, contrôlez le PAT",
         "failed_to_set_autolock_delay": "Impossible de définir le délai d'auto-lock"
     },
     "field": {
         "hostUrl": {
-            "label": "URL de 2FAuth",
-            "help": "L'adresse web de l'application web 2FAuth ou vous avez un compte. Par exemple: https://2fauth.mysite.me"
+            "label": "URL du serveur 2FAuth",
+            "help": "L'adresse de l'application web 2FAuth ou vous avez un compte. Par exemple: https://2fauth.mysite.me"
         },
         "apiToken": {
-            "label": "Jeton d'API",
-            "help": "Votre jeton d'accès personnel (PAT). Vous pouvez en générer un depuis la page Réglages > OAuth de votre application 2FAuth"
+            "label": "Jeton d'accès à l'API",
+            "help": "Le jeton d'accès personnel (PAT) pour authentifier l'extension auprès du serveur. Vous pouvez en générer un depuis la page Réglages > OAuth de votre application 2FAuth"
         },
         "extPassword": {
             "label": "Mot de passe",
-            "help": "Le mot de passe utilisé pour déverouiller cette extension et chiffrer certaines données sensibles"
+            "help": "Le mot de passe qui sera utilisé pour déverouiller cette extension et chiffrer certaines données sensibles"
         },
         "extCurrentPassword": {
             "label": "Mot de passe actuel",
@@ -162,7 +165,7 @@
         },
         "language": {
             "label": "Langue",
-            "help": "Langue utilisée pour traduire l'interface utilisateur de 2FAuth. Les langues proposées sont complètes, vous pouvez les utiliser pour remplacer la langue de référence de votre navigateur."
+            "help": "Langue utilisée pour traduire l'interface utilisateur de l'extension. Les langues proposées sont complètes, vous pouvez les utiliser pour remplacer la langue de référence de votre navigateur."
         },
         "theme": {
             "label": "Thème",
@@ -222,7 +225,7 @@
         "setup": "Configuration",
         "landing": "Accueil",
         "accounts": "comptes 2FA",
-        "why_this": "Pourquoi cela ?",
+        "why_this": "Pourquoi cette étape ?",
         "settings": "Réglages",
         "reset_extension": "Réinitialiser l'extension"
     },
