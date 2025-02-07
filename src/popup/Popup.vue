@@ -35,6 +35,7 @@
         })
 
         preferenceStore.applyTheme()
+        preferenceStore.applyLanguage()
         preferenceStore.resetGroupFilter()
     })
 
