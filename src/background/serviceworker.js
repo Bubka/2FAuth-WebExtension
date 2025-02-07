@@ -111,10 +111,10 @@ onMessage('RESET_EXT', () => {
     swlog('📢 RESET_EXT message received')
     return resetExt()
 })
-onMessage('GET_EXT_VERSION'), () => {
+onMessage('GET_EXT_VERSION', () => {
     swlog('📢 GET_EXT_VERSION message received')
-    return browser.runtime.getManifest().version;
-}
+    return browser.runtime.getManifest().version
+})
 
 //  MARK: Loggers
 // /**
