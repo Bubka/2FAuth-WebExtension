@@ -1,9 +1,11 @@
 import js from '@eslint/js'
 import pluginVue from 'eslint-plugin-vue'
 import globals from 'globals'
-import AutoImportGlobals from './.eslintrc-auto-import.json' with { type: 'json' }
+import autoImports from './.wxt/eslint-auto-imports.mjs'
+import { defineViteConfig as define } from './define.config.js'
 
 export default [
+    autoImports,
     {
         name: 'app/files-to-lint',
         files: ['**/*.{js,mjs,jsx,vue}']
@@ -11,7 +13,7 @@ export default [
 
     {
         name: 'app/files-to-ignore',
-        ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**', 'public'],
+        ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**', 'src/public'],
     },
 
     js.configs.recommended,
@@ -29,7 +31,8 @@ export default [
                 ...globals.browser,
                 ...globals.worker,
                 ...globals.webextensions,
-                ...AutoImportGlobals.globals,
+                ...define,
+                // ...autoImports.globals,
             }
         }
     }

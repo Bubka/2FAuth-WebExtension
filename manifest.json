@@ -1,17 +1,7 @@
 {
-    "{{chrome}}.manifest_version": 3,
-    "{{firefox}}.manifest_version": 3,
-    "name": "2FAuth",
     "description": "",
-    "version": "0.0.0",
-    "{{chrome}}.action": {
-        "default_popup": "src/popup/index.html",
-        "default_title": "2FAuth"
-    },
     "{{firefox}}.browser_action": {
-        "default_popup": "src/popup/index.html",
         "default_area": "navbar",
-        "default_title": "2FAuth",
         "default_icon": {
             "16": "icons/16.png",
             "32": "icons/32.png",
@@ -34,27 +24,5 @@
                 "size": 64
             }
         ]
-    },
-    "background": {
-        "type": "module",
-        "{{chrome}}.service_worker": "src/background/serviceworker.js",
-        "{{firefox}}.scripts": [
-            "src/background/serviceworker.js"
-        ],
-        "{{firefox}}.persistent": false
-    },
-    "permissions": [
-        "storage",
-        "unlimitedStorage",
-        "clipboardWrite",
-        "alarms",
-        "idle",
-        "tabs",
-        "{{chrome}}.background"
-    ],
-    "icons": {
-        "16": "icons/16.png",
-        "48": "icons/48.png",
-        "128": "icons/128.png"
     }
 }
