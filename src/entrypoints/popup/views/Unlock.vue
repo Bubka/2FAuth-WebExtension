@@ -1,6 +1,4 @@
 <script setup>
-    import { useI18n } from 'vue-i18n'
-    import { sendMessage } from 'webext-bridge/popup'
     import { useNotifyStore } from '@popup/stores/notify'
     import FormButtons from '@popup/components/formElements/FormButtons.vue'
     

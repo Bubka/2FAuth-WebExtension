@@ -1,6 +1,5 @@
 <script setup>
     import { UseColorMode } from '@vueuse/components'
-    import { sendMessage } from 'webext-bridge/popup'
     import { openUrlInNewTab } from '@popup/composables/helpers'
     import SettingTabs from '@popup/layouts/SettingTabs.vue'
     import { LucideGraduationCap, LucideFlaskConical } from 'lucide-vue-next';

@@ -1,25 +1,8 @@
 <script setup>
     import { openUrlInNewTab } from '@popup/composables/helpers'
     import { useSettingStore } from '@/stores/settingStore'
-    // import Form from '@/components/formElements/Form'
-    // import { useUserStore } from '@/stores/user'
-    // import { useBusStore } from '@/stores/bus'
-    // import { useNotifyStore } from '@/stores/notify'
-    // import { useTwofaccounts } from '@/stores/twofaccounts'
 
     const settingStore = useSettingStore()
-    // const router = useRouter()
-    // const user = useUserStore()
-    // const bus = useBusStore()
-    // const notify = useNotifyStore()
-    // const twofaccounts = useTwofaccounts()
-
-    // const qrcodeInput = ref(null)
-    // const qrcodeInputLabel = ref(null)
-    // const form = reactive(new Form({
-    //     qrcode: null,
-    //     inputFormat: 'fileUpload',
-    // }))
     
 </script>
 

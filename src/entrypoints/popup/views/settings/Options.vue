@@ -1,6 +1,4 @@
 <script setup>
-    import { useI18n } from 'vue-i18n'
-    import { sendMessage } from 'webext-bridge/popup'
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useGroups } from '@popup/stores/groups'
     import { useNotifyStore } from '@popup/stores/notify'

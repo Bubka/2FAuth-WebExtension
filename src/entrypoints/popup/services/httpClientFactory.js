@@ -1,6 +1,5 @@
 import axios from "axios"
 import { useNotifyStore } from '@popup/stores/notify'
-import { sendMessage } from 'webext-bridge/popup'
 import { useSettingStore } from '@/stores/settingStore'
 
 export const httpClientFactory = () => {

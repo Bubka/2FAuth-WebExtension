@@ -1,6 +1,4 @@
 import { defineStore } from 'pinia'
-import { useNotification } from '@kyvg/vue3-notification'
-import { useI18n } from 'vue-i18n'
 import router from '@popup/router'
 
 export const useNotifyStore = defineStore('notify', () => {

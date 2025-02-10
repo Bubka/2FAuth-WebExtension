@@ -1,5 +1,4 @@
 <script setup>
-    import { useI18n } from 'vue-i18n'
     import { useResetExtension } from '@popup/composables/resetter'
     const { t } = useI18n({ useScope: "global" })
 

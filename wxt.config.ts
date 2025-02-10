@@ -26,21 +26,26 @@ export default defineConfig({
         eslintrc: {
             enabled: 9,
         },
+        addons: {
+            vueDirectives: true,
+        },
         imports: [
-            // { name: '=', as: 'browser', from: 'webextension-polyfill' },
             { name: 'useNotification', from: '@kyvg/vue3-notification' },
+            { name: 'onMessage', from: 'webext-bridge/background' },
+            { name: 'sendMessage', from: 'webext-bridge/popup' },
         ],
         dirs: [
-            'src/entrypoints/stores/*',
-            'src/entrypoints/popup/composables/*',
-            'src/entrypoints/popup/components/*',
-            'src/entrypoints/popup/layouts/*',
-            'src/entrypoints/popup/services/*',
-            'src/entrypoints/popup/stores/*',
+            './src/stores/**/*',
+            './src/entrypoints/popup/composables/**/*',
+            './src/entrypoints/popup/components/**/*',
+            './src/entrypoints/popup/layouts/**/*',
+            './src/entrypoints/popup/services/**/*',
+            './src/entrypoints/popup/stores/**/*',
         ],
         presets: [
-            'vue',
+            // vue preset is automatically imported by @wxt-dev/module-vue
             'vue-router',
+            'vue-i18n',
             'pinia',
             '@vueuse/core',
         ],

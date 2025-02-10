@@ -1,8 +1,6 @@
 <script setup>
-    import { useI18n } from 'vue-i18n'
     import { useSettingStore } from '@/stores/settingStore'
     import { useNotifyStore } from '@popup/stores/notify'
-    import { sendMessage } from 'webext-bridge/popup'
     import SettingTabs from '@popup/layouts/SettingTabs.vue'
     import { useResetExtension } from '@popup/composables/resetter'
     import { isFilled } from '@popup/composables/validators'

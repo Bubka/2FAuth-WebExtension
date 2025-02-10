@@ -1,9 +1,7 @@
 <script setup>
-    import { useI18n } from 'vue-i18n'
     import { useSettingStore } from '@/stores/settingStore'
     import { useNotifyStore }  from '@popup/stores/notify'
     import { usePreferenceStore } from '@/stores/preferenceStore'
-    import { sendMessage } from 'webext-bridge/popup'
     import { isFilled, isHttpUrl } from '@popup/composables/validators'
     import userService from '@popup/services/userService'
     import FormButtons from '@popup/components/formElements/FormButtons.vue'

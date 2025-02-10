@@ -1,5 +1,4 @@
 <script setup>
-    import { useI18n } from 'vue-i18n'
     import twofaccountService from '@popup/services/twofaccountService'
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useSettingStore } from '@/stores/settingStore'
@@ -8,7 +7,6 @@
     import { useGroups } from '@popup/stores/groups'
     import { UseColorMode } from '@vueuse/components'
     import { useDisplayablePassword } from '@popup/composables/helpers'
-    import { sendMessage } from 'webext-bridge/popup'
     import { LucideLoaderCircle, LucideEye, LucideEyeOff, LucideCircleAlert, LucideChevronsDownUp, LucideChevronsUpDown } from 'lucide-vue-next'
     import SearchBox from '@popup/components/SearchBox.vue'
     import GroupSwitch from '@popup/components/GroupSwitch.vue'

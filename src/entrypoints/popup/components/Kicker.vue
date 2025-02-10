@@ -1,6 +1,4 @@
 <script setup>
-    import { sendMessage } from 'webext-bridge/popup'
-
     const events = ref(['mousedown', 'scroll', 'keypress'])
     const logoutTimer = ref(null)
     const router = useRouter()

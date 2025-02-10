@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { usePreferenceStore } from '@/stores/preferenceStore'
-import { useI18n } from 'vue-i18n'
 import groupService from '@popup/services/groupService'
 
 export const useGroups = defineStore('groups', () => {
