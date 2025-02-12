@@ -1,0 +1,14 @@
+import { resolve } from 'node:path'
+import { defineRunnerConfig } from 'wxt'
+
+export default defineRunnerConfig({
+    binaries: {
+        chrome: '/path/to/chrome-beta', // Use Chrome Beta instead of regular Chrome
+        firefox: 'firefoxdeveloperedition', // Use Firefox Developer Edition instead of regular Firefox
+        edge: '/path/to/edge', // Open MS Edge when running "wxt -b edge"
+    },
+
+    // On Windows, the path must be absolute
+    chromiumProfile: resolve('/.wxt/chrome-data'),
+    keepProfileChanges: true,
+})
