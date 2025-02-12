@@ -10,17 +10,45 @@ export default defineConfig({
     modules: [
         '@wxt-dev/module-vue'
     ],
-    manifest: {
-        name: '2FAuth (beta)',
-        permissions: [
+    manifest: ({ browser, manifestVersion, mode, command }) => {
+        const permissions = [
             'storage',
             'unlimitedStorage',
             'clipboardWrite',
             'alarms',
             'idle',
             'tabs',
-            'background'
-        ],
+        ]
+
+        if (browser === 'chrome' || browser === 'edge' ) {
+            permissions.push('background')
+            permissions.push('offscreen')
+        }
+
+        const action = {
+            default_popup: 'src/entrypoints/popup/index.html',
+            default_title: '2FAuth',
+            default_icon: {
+                16: 'icon-16.png',
+                32: 'icon-32.png',
+                64: 'icon-64.png',
+            },
+        }
+
+        const manifest = {
+            name: '2FAuth (beta)',
+            permissions: permissions,
+            icons: {
+                16: 'icon-16.png',
+                32: 'icon-32.png',
+                48: 'icon-48.png',
+                96: 'icon-96.png',
+                128: 'icon-128.png',
+            },
+            action: action,
+        }
+
+        return manifest
     },
     imports: {
         eslintrc: {
