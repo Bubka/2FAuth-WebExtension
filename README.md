@@ -56,7 +56,7 @@ You can specify the browser binaries to run during dev. Rename `web-ext.config.t
 
 The standalone [@vue/devtools](https://devtools.vuejs.org/) app comes as an npm dev dependency. Run `./node_modules/.bin/vue-devtools` in a terminal to start it. The app is configured to listen for the extension pop-up and automatically connect to it when it opens.
 
-### Build
+### Build commands
 
 ```shell
 # Build Chrome distribution version
