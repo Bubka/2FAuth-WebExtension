@@ -104,9 +104,7 @@
     /**
      * Applies language
      */
-    function applyLanguage(lang) {
-        console.log('lang', lang)
-        
+    function applyLanguage(lang) {        
         preferenceStore.lang = lang
         preferenceStore.applyLanguage()
         notifySuccess()

@@ -81,7 +81,6 @@
         copy(password)
 
         if (copied) {
-            console.log('preferenceStore.kickUserAfter', preferenceStore.kickUserAfter)
             if (preferenceStore.kickUserAfter == -1) {
                 sendMessage('LOCK_EXTENSION', { }, 'background').then(() => {
                     router.push('unlock')

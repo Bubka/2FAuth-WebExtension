@@ -40,29 +40,16 @@ export const usePreferenceStore = defineStore('preferences', {
     },
 
     actions: {
-
-        /**
-         * Fetches the user preferences
-         */
-        // isBound() {
-        //     userService.get({
-        //         returnError: true,
-        //     }).then(response => {
-        //         return true
-        //     })
-        //     .catch(error => {
-        //         return false
-        //     })
-        // },
-
         /**
          * Applies the theme persisted in the store
          */
         async applyTheme() {
             await this.$persistedState.isReady()
+
             const mode = useColorMode({
                 attribute: 'data-theme',
             })
+
             mode.value = this.theme == 'system' ? 'auto' : this.theme
         },
 
@@ -70,19 +57,13 @@ export const usePreferenceStore = defineStore('preferences', {
          * Applies language
          */
         async applyLanguage() {
-            console.log('this.$i18n.global.locale', this.$i18n.global.locale)
-
             await this.$persistedState.isReady()
             const { isSupported, language } = useNavigatorLanguage()
-
-            console.log('language', language)
 
             if (isSupported) {
                 this.$i18n.global.locale = this.lang == 'browser' ? language.value.slice(0, 2)  : this.lang
             }
             else this.$i18n.global.locale = this.$i18n.fallbackLocale
-
-            console.log('this.$i18n', this.$i18n)
         },
 
         /**

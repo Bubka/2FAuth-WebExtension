@@ -10,7 +10,6 @@
     const errors = ref(null)
 
     async function unlock() {
-        console.log('Entering unlock function')
         // if (pwd.value && pwd.value.length > 0) {
             isBusy.value = true
 
@@ -29,7 +28,7 @@
                 router.push({ name: 'accounts' })
             }
             else {
-                console.log('💀 Cannot unlock: ', t(reason))
+                console.log('[EXT:VIEW] 💀 Cannot unlock: ', t(reason))
                 notify.alert({ text: t('error.wrong_password') })
             }
         // }

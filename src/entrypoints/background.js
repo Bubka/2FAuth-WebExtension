@@ -24,7 +24,7 @@ export default defineBackground({
         }
 
         browser.runtime.onInstalled.addListener((details) => {
-            console.log('Extension installed:', details)
+            swlog('Extension installed:', details)
         })
 
         self.onerror = function (message, source, lineno, colno, error) {
