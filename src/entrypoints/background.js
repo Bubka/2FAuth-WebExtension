@@ -23,6 +23,13 @@ export default defineBackground({
             pat: ''
         }
 
+        // Detection of system color scheme 
+        if (import.meta.env.MANIFEST_VERSION === 2) {
+            // FF & Safari only for now
+            const media = window.matchMedia('(prefers-color-scheme: dark)')
+            media.addEventListener('change', setPopupIcon)
+        }
+
         browser.runtime.onInstalled.addListener((details) => {
             swlog('Extension installed:', details)
         })
@@ -144,6 +151,60 @@ export default defineBackground({
         }
 
         /**
+         * Init the popup icon based on active color scheme
+         */
+        function setPopupIcon() {
+            detectDarkScheme().then((isDark) => {    
+                const scheme = isDark ? 'dark' : 'light'
+                const iconRes = {
+                    path: {
+                        16: `icon-16-${scheme}.png`,
+                        32: `icon-32-${scheme}.png`,
+                        64: `icon-64-${scheme}.png`,
+                    }
+                }
+
+                if (import.meta.env.MANIFEST_VERSION === 2) {
+                    browser.browserAction.setIcon(iconRes)
+                }
+                else {
+                    browser.action.setIcon(iconRes)
+                }
+            })
+        }
+
+        /**
+         * Tells if dark color scheme is On
+         * 
+         * @returns {boolean}
+         */
+        async function detectDarkScheme() {
+            if (import.meta.env.MANIFEST_VERSION === 2) {
+                // FF & Safari
+                return Promise.resolve(window.matchMedia('(prefers-color-scheme: dark)').matches)
+            }
+            else {
+                // Chrome, Edge, Opera
+                if (browser.offscreen != null) {
+                    await browser.offscreen.createDocument({
+                        url: 'offscreen.html',
+                        reasons: ['MATCH_MEDIA'],
+                        justification: 'get media color scheme',
+                    }).catch(() => {})
+    
+                    const isDark = await browser.runtime.sendMessage('checkDarkTheme')
+                    browser.offscreen.closeDocument()
+    
+                    return isDark
+                }
+                else {
+                    // fallback
+                    return Promise.resolve(true)
+                }
+            }
+        }
+
+        /**
          * Detect all browser windows closing and lock extension if required
          * MARK:On browser close
          *
@@ -235,6 +296,7 @@ export default defineBackground({
          */
         function handleStartup() {
             swlogTitle('STARTUP HANDLING')
+            setPopupIcon()
             loadState().then(() => {
                 if (state.locked) {
                     lockNow('handleStartup()')
