@@ -47,6 +47,7 @@ export default defineBackground({
         }
         let state = { ...default_state }
         let enable_debug = 'development' == process.env.NODE_ENV
+        // let enable_debug = true
         let encryptionKey = null
 
         //  MARK: Listeners
@@ -164,12 +165,7 @@ export default defineBackground({
                     }
                 }
 
-                if (import.meta.env.MANIFEST_VERSION === 2) {
-                    browser.browserAction.setIcon(iconRes)
-                }
-                else {
-                    browser.action.setIcon(iconRes)
-                }
+                (browser.action ?? browser.browserAction).setIcon(iconRes)
             })
         }
 
