@@ -165,7 +165,12 @@ export default defineBackground({
                     }
                 }
 
-                (browser.action ?? browser.browserAction).setIcon(iconRes)
+                if (import.meta.env.MANIFEST_VERSION === 2) {
+                    browser.browserAction.setIcon(iconRes)
+                }
+                else {
+                    browser.action.setIcon(iconRes)
+                }
             })
         }
 
