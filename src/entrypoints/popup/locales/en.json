@@ -118,7 +118,7 @@
         "failed_to_store_encrypted_pat": "Failed to store encrypted PAT",
         "unknown_error_during_pat_encryption": "Unknown error during PAT encryption",
         "invalid_or_unknown_token": "Invalid or unknown personal access token",
-        "failed_to_get_encryption_parameters": "Failed to get encryption parameters",
+        "failed_to_retrieve_encryption_store_data": "Failed to retrieve encryption store data",
         "wrong_password": "Wrong password",
         "wrong_current_password": "Wrong current password",
         "reset_extension": "Reset extension",

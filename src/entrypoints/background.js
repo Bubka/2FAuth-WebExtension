@@ -524,7 +524,7 @@ export default defineBackground({
                         return new Promise(resolve => resolve())
                     } else {
                         swlog('No crypto store')
-                        return generateCryptoParams(true)
+                        return generateNewCryptoParams(true)
                     }
                 }, () => new Promise(resolve => resolve()))
             }).then(() => {
@@ -572,7 +572,7 @@ export default defineBackground({
             state.pat = ''
 
             browser.storage.local.clear().then(() => {
-                return generateCryptoParams(true).then(() => {
+                return generateNewCryptoParams(true).then(() => {
                         return storeState().then(() => {
                             swlog('✔️ Extension reset done')
                             return new Promise(resolve => resolve())
@@ -597,8 +597,6 @@ export default defineBackground({
                     return { status: false, reason: 'error.failed_to_get_encryption_parameters' }
                 }
                 
-                // settings = JSON.parse(settings[CRYPTO_STORE])
-                // state.pat = settings['encryptedApiToken'] || ''
                 state.pat = stores[CRYPTO_STORE]['encryptedApiToken'] || ''
 
                 return getEncKey().then(_encryptionKey => {
@@ -641,10 +639,12 @@ export default defineBackground({
          * @returns {Promise<{[p: string]: any} | {status: boolean}>}
          */
         function checkEncKey(key) {
+            swlogTitle('CHECKING ENCRYPTION KEY')
+
             return browser.storage.local.get({ [CRYPTO_STORE]: {} }).then(stores => {
                 if (!stores || stores.hasOwnProperty(CRYPTO_STORE) === false) {
-                    swlog('❌ Cannot unlock: Crypto store is missing')
-                    return { status: false, reason: 'error.failed_to_get_encryption_parameters' }
+                    swlog('❌ Cannot check enc key: Failed to retrieve crypto store data')
+                    return { status: false, reason: 'error.failed_to_retrieve_encryption_store_data' }
                 }
                 
                 const _pat = stores[CRYPTO_STORE]['encryptedApiToken'] || ''
@@ -665,6 +665,7 @@ export default defineBackground({
 
         /**
          * Set the encryption key to be used by unlockExt
+         * MARK: setEncKey()
          *
          * @param key
          * @returns {Promise<{status: boolean}>}
@@ -681,6 +682,7 @@ export default defineBackground({
 
         /**
          * Get the currently stored encryption key
+         * MARK: getEncKey()
          *
          * @returns {Promise<{[p: string]: any}>}
          */
@@ -690,12 +692,12 @@ export default defineBackground({
 
         /**
          * Generate new encryption iv + salt
-         * MARK: generateCryptoParams()
+         * MARK: generateNewCryptoParams()
          *
          * @param set_default
          * @returns {Promise<void>}
          */
-        function generateCryptoParams(set_default = false) {
+        function generateNewCryptoParams(set_default = false) {
             swlog('♻️ Generating new crypto params...')
 
             encryptionParams.iv = _crypto.getRandomValues(new Uint8Array(12))
@@ -732,7 +734,7 @@ export default defineBackground({
          */
         function changeEncKey(key) {
             swlogTitle('CHANGING ENCRYPTION KEY')
-            return generateCryptoParams().then(
+            return generateNewCryptoParams().then(
                 () => setEncKey(key)
             ).then(
                 () => {
