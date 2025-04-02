@@ -1,16 +1,21 @@
 <script setup>
     import { useNotifyStore } from '@popup/stores/notify'
     import FormButtons from '@popup/components/formElements/FormButtons.vue'
+    import { isFilled } from '@popup/composables/validators'
     
     const { t } = useI18n({ useScope: "global" })
     const notify = useNotifyStore()
     const router = useRouter()
     const isBusy = ref(false)
     const pwd = ref(null)
-    const errors = ref(null)
+    const errors = ref({
+        pwd: '',
+    })
 
     async function unlock() {
-        // if (pwd.value && pwd.value.length > 0) {
+        const hasValidPassword = validatePassword()
+
+        if (hasValidPassword) {
             isBusy.value = true
 
             const { status: setEncKeyStatus } = await sendMessage('SET_ENC_KEY', { password: pwd.value }, 'background')
@@ -31,7 +36,18 @@
                 console.log('[EXT:VIEW] 💀 Cannot unlock: ', t(reason))
                 notify.alert({ text: t('error.wrong_password') })
             }
-        // }
+        }
+    }
+
+    function validatePassword() {
+        errors.value.pwd = ''
+
+        if (! isFilled(pwd.value)) {
+            errors.value.pwd = t('message.field_is_required')
+            return false
+        }
+
+        return true
     }
 
 </script>
@@ -43,7 +59,7 @@
             {{ $t('message.unlock_description') }}
         </p>
         <form id="frmUnlock" @submit.prevent="unlock">
-            <FormPasswordField v-model="pwd" fieldName="password" :fieldError="errors" label="field.extPassword.label" autocomplete="current-password" />
+            <FormPasswordField v-model="pwd" fieldName="password" :fieldError="errors.pwd" label="field.extPassword.label" autocomplete="current-password" />
             <FormButtons :isBusy="isBusy" caption="message.unlock" submitId="btnUnlock"/>
         </form>
     </div>
