@@ -100,7 +100,9 @@
         "about": "À propos",
         "help_colon": "Aide : ",
         "field_is_required": "Le champ est obligatoire",
-        "field_is_required_and_valid_url": "Le champ est obligatoire et doit être une URL valide"
+        "field_is_required_and_valid_url": "Le champ est obligatoire et doit être une URL valide",
+        "copy_next_password" : "Copier le prochain code OTP dans le presse-papiers",
+        "settings_managed_by_administrator" : "Certains réglages sont gérés par votre administrateur"
     },
     "error": {
         "cannot_create_otp_without_secret": "Impossible de créer un OTP sans un secret",
@@ -210,6 +212,10 @@
         "reveal_dotted_otp": {
             "label": "Révéler les OTPs masqués",
             "help": "Permet à l'utilisateur de réveler temporairement les mots de passe masqués derrière des ●●●"
+        },
+        "show_next_otp" : {
+            "label" : "Afficher le prochain code OTP",
+            "help" : "Prévisualiser le prochain code OTP, c'est-à-dire le code qui remplacera le code actuel après son expiration. Les préférences définies pour le code OTP actuel s'appliquent également au prochain code (mise en forme, affichage en point)"
         }
     },
     "title": {

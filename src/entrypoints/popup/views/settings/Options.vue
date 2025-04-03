@@ -2,8 +2,6 @@
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useGroups } from '@popup/stores/groups'
     import { useNotifyStore } from '@popup/stores/notify'
-    import { openUrlInNewTab } from '@popup/composables/helpers'
-    import { LucideExternalLink } from 'lucide-vue-next'
     import SettingTabs from '@popup/layouts/SettingTabs.vue'
     import FormCheckbox from '@popup/components/formElements/FormCheckbox.vue'
     import FormToggle from '@popup/components/formElements/FormToggle.vue'
@@ -78,15 +76,6 @@
             }
         })
     })
-
-    /**
-     * Saves a preference
-     * @param {string} preference 
-     * @param {any} value 
-     */
-    function savePreference(preference, value) {
-        preferenceStore[preference] = value
-    }
 
     onBeforeRouteLeave((to) => {
         if (! to.name.startsWith('settings.')) {
@@ -184,7 +173,9 @@
                     <!-- otp as dot -->
                     <FormCheckbox v-model="preferenceStore.showOtpAsDot" @update:model-value="notifySuccess" fieldName="showOtpAsDot" label="field.show_otp_as_dot.label" help="field.show_otp_as_dot.help" />
                         <!-- reveal dotted OTPs -->
-                        <FormCheckbox v-model="preferenceStore.revealDottedOTP" @update:model-value="notifySuccess" fieldName="revealDottedOTP" label="field.reveal_dotted_otp.label" help="field.reveal_dotted_otp.help" :isDisabled="!preferenceStore.showOtpAsDot" :isIndented="true" />                                            
+                        <FormCheckbox v-model="preferenceStore.revealDottedOTP" @update:model-value="notifySuccess" fieldName="revealDottedOTP" label="field.reveal_dotted_otp.label" help="field.reveal_dotted_otp.help" :isDisabled="!preferenceStore.showOtpAsDot" :isIndented="true" />
+                    <!-- show next OTP -->
+                    <FormCheckbox v-model="preferenceStore.showNextOtp" @update:model-value="notifySuccess" fieldName="showNextOtp" label="field.show_next_otp.label" help="field.show_next_otp.help" />
                 </div>
             </form>
         </div>

@@ -100,7 +100,8 @@
         "about": "About",
         "help_colon": "Help: ",
         "field_is_required": "The field is required",
-        "field_is_required_and_valid_url": "The field is required is must be a valid URL"
+        "field_is_required_and_valid_url": "The field is required is must be a valid URL",
+        "copy_next_password" : "Copy next password to clipboard"
     },
     "error": {
         "cannot_create_otp_without_secret": "Cannot create an OTP without a secret",
@@ -210,6 +211,10 @@
         "reveal_dotted_otp": {
             "label": "Reveal obscured OTP",
             "help": "Let the ability to temporarily reveal Dot-Obscured passwords"
+        },
+        "show_next_otp" : {
+            "label" : "Show next OTP",
+            "help" : "Preview the next password, i.e. the password that will replace the current password when it expires. Preferences set for the current OTP also apply to the next one (formatting, show as dot)"
         }
     },
     "title": {

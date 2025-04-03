@@ -25,8 +25,8 @@
     const groups = useGroups()
     const showGroupSwitch = ref(false)
     const showOtpInModal = ref(false)
-    const isRenewingOTPs = ref(false)
     const renewedPeriod = ref(null)
+    const opacities = ref({})
     
     const otpDisplay = ref(null)
     const otpDisplayProps = ref({
@@ -95,7 +95,7 @@
                 : preferenceStore.defaultGroup
             }
             
-            notify.success({ text: t('commons.copied_to_clipboard') })
+            notify.success({ text: t('message.copied_to_clipboard') })
         }
     }
 
@@ -127,6 +127,10 @@
             .forEach((dot) => {
                 dot.turnOn(stepIndex)
         })
+
+        // The is-opacity-* classes are defined from 0 to 10 only.
+        // TODO: Make the opacity refiner support variable number of steps (not only 10, see step_count)
+        opacities.value[period] = 'is-opacity-' + stepIndex
     }
 
     /**
@@ -144,8 +148,6 @@
      * Updates "Always On" OTPs for all TOTP accounts and (re)starts loopers
      */
     async function updateTotps(period) {
-        isRenewingOTPs.value = true
-        turnDotsOff(period)
         let fetchPromise
 
         if (period == undefined) {
@@ -154,6 +156,22 @@
         } else {
             renewedPeriod.value = period
             fetchPromise = twofaccountService.getByIds(twofaccounts.accountIdsWithPeriod(period).join(','), true)
+        }
+        
+        turnDotsOff(period)
+
+        // We replace the current on screen passwords with the next_password to avoid having loaders.
+        // The next_password will be confirmed with a new request to be synced with the backend no matter what.
+        const totpAccountsWithNextPasswordInThePeriod = twofaccounts.items.filter((account) => account.otp_type === 'totp'&& account.period == period && account.otp.next_password)
+        
+        if (totpAccountsWithNextPasswordInThePeriod.length > 0) {
+            totpAccountsWithNextPasswordInThePeriod.forEach((account) => {
+                const index = twofaccounts.items.findIndex(acc => acc.id === account.id)
+                if (twofaccounts.items[index].otp.next_password) {
+                    twofaccounts.items[index].otp.password = twofaccounts.items[index].otp.next_password
+                }
+            })
+            turnDotsOn(period, 0)
         }
 
         fetchPromise.then(response => {
@@ -181,7 +199,6 @@
             })
         })
         .finally(() => {
-            isRenewingOTPs.value = false
             renewedPeriod.value = null
         })
     }
@@ -284,30 +301,32 @@
                                     <img v-else-if="account.icon == null && preferenceStore.showAccountsIcons" role="presentation" class="tfa-icon" :src="settingStore.hostUrl + '/storage/noicon.svg'" alt="">
                                     {{ account.service ? account.service : $t('message.no_service') }}
                                     <LucideCircleAlert class="has-text-danger ml-2" v-if="account.account === $t('message.indecipherable')" />
-                                    <span class="has-ellipsis is-family-primary is-size-6 is-size-7-mobile has-text-grey ">{{ account.account }}</span>
+                                    <span class="is-block has-ellipsis is-family-primary is-size-6 is-size-7-mobile has-text-grey ">{{ account.account }}</span>
                                 </div>
                             </div>
                             <transition name="popLater">
                                 <div v-show="preferenceStore.getOtpOnRequest == false" class="has-text-right">
-                                    <span v-if="account.otp != undefined">
-                                        <span v-if="isRenewingOTPs == true && (renewedPeriod == -1 || renewedPeriod == account.period)" class="has-nowrap has-text-grey has-text-centered is-size-5">
-                                            <LucideLoaderCircle class="spinning" />
-                                        </span>
-                                        <span v-else class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('message.copy_to_clipboard')">
+                                    <div v-if="account.otp != undefined">
+                                        <div class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('message.copy_to_clipboard')">
                                             {{ useDisplayablePassword(account.otp.password, preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP && revealPassword == account.id) }}
-                                        </span>
-                                        <Dots
-                                            v-if="account.otp_type.includes('totp')"
-                                            :class="'condensed'"
-                                            ref="dotsRefs"
-                                            :period="account.period" />
-                                    </span>
-                                    <span v-else>
+                                        </div>
+                                        <div class="has-nowrap" style="line-height: 0.9;">
+                                            <span v-if="preferenceStore.showNextOtp" class="always-on-otp is-clickable has-nowrap has-text-grey is-size-7 mr-2" :class="opacities[account.period]" @click="copyToClipboard(account.otp.next_password)" @keyup.enter="copyToClipboard(account.otp.next_password)" :title="$t('message.copy_next_password')">
+                                                {{ useDisplayablePassword(account.otp.next_password, preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP && revealPassword == account.id) }}
+                                            </span>
+                                            <Dots
+                                                v-if="account.otp_type.includes('totp')"
+                                                :class="'condensed is-inline-block'"
+                                                ref="dotsRefs"
+                                                :period="account.period" />
+                                        </div>
+                                    </div>
+                                    <div v-else>
                                         <!-- get hotp button -->
                                         <button type="button" class="button tag" :class="mode == 'dark' ? 'is-dark' : 'is-white'" @click="showOTP(account)" :title="$t('message.import_this_account')">
                                             {{ $t('message.generate') }}
                                         </button>
-                                    </span>
+                                    </div>
                                 </div>
                             </transition>
                             <transition name="popLater" v-if="preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP">

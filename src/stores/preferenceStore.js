@@ -33,6 +33,7 @@ export const usePreferenceStore = defineStore('preferences', {
             autoCloseTimeout: 2,
             AutoSaveQrcodedAccount: false,
             showEmailInFooter: true,
+            showNextOtp: true,
         }
     },
 

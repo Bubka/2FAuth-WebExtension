@@ -50,10 +50,12 @@
         image : ''
     })
     const password = ref('')
+    const next_password = ref('')
     const generated_at = ref(null)
     const hasTOTP = ref(false)
-    const showInlineSpinner = ref(false)
+    const showMainSpinner = ref(false)
     const revealPassword = ref(false)
+    const opacity = ref('0')
 
     const dots = ref()
     const totpLooper = ref()
@@ -141,11 +143,22 @@
      * Requests and handles a fresh OTP
      */
     async function getOtp() {
-        setLoadingState()
+        // We replace the current on screen password with the next_password to avoid having a loader.
+        // The next_password will be confirmed with a new request to be synced with the backend no matter what.
+        if (next_password.value) {
+            password.value = next_password.value
+            next_password.value = ''
+            dots.value.turnOff()
+            turnDotOn(0)
+        }
+        else {
+            setLoadingState()
+        }
 
         await getOtpPromise().then(response => {
             let otp = response.data
             password.value = otp.password
+            next_password.value = otp.next_password
 
             if(preferenceStore.copyOtpOnDisplay) {
                 copyOTP(otp.password)
@@ -174,7 +187,7 @@
             //throw error
         })
         .finally(() => {
-            showInlineSpinner.value = false
+            showMainSpinner.value = false
         })
     }
 
@@ -182,7 +195,7 @@
      * Shows blacked dots and a loading spinner
      */
     function setLoadingState() {
-        showInlineSpinner.value = true
+        showMainSpinner.value = true
         dots.value.turnOff()
     }
 
@@ -217,6 +230,7 @@
         id.value = otpauthParams.value.counter = generated_at.value = null
         otpauthParams.value.service = otpauthParams.value.account = otpauthParams.value.icon = otpauthParams.value.otp_type = otpauthParams.value.secret = ''
         password.value = '... ...'
+        next_password.value = ''
         hasTOTP.value = false
         clearTimeout(autoCloseTimeout.value)
 
@@ -286,6 +300,7 @@
      */
     function turnDotOn(dotIndex) {
         dots.value.turnOn(dotIndex)
+        opacity.value = 'is-opacity-' + dotIndex
     }
 
     defineExpose({
@@ -308,7 +323,7 @@
 
 <template>
     <div>
-        <figure class="image is-64x64" :class="{ 'no-icon': !otpauthParams.icon }" style="display: inline-block">
+        <figure class="image is-64x64" :class="{ 'no-icon': !otpauthParams.icon }" style="display: inline-flex">
             <img :src="settingStore.hostUrl + '/storage/icons/' + otpauthParams.icon" v-if="otpauthParams.icon" :alt="$t('alt.icon_to_illustrate_the_account')">
         </figure>
         <UseColorMode v-slot="{ mode }">
@@ -316,7 +331,7 @@
             <p class="is-size-6 has-ellipsis" :class="mode == 'dark' ? 'has-text-grey' : 'has-text-grey-light'">{{ otpauthParams.account }}</p>
             <p>
                 <span
-                    v-if="!showInlineSpinner"
+                    v-if="!showMainSpinner"
                     id="otp"
                     role="log"
                     ref="otpSpanTag"
@@ -330,13 +345,27 @@
                     {{ useDisplayablePassword(password, preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP && revealPassword) }}
                 </span>
                 <span v-else tabindex="0" class="otp is-size-1">
-                    <Spinner :isVisible="showInlineSpinner" :type="'raw'" :rawSize="40" />
+                    <Spinner :isVisible="showMainSpinner" :type="'raw'" />
                 </span>
             </p>
         </UseColorMode>
         <Dots v-show="isTimeBased(otpauthParams.otp_type)" ref="dots"></Dots>
         <p v-show="isHMacBased(otpauthParams.otp_type)">
             {{ $t('message.counter') }}: {{ otpauthParams.counter }}
+        </p>
+        <p v-if="preferenceStore.showNextOtp" class="mt-3 is-size-4">
+            <span
+                v-if="next_password"
+                class="is-clickable"
+                :class="opacity"
+                @click="copyOTP(next_password, true)"
+                @keyup.enter="copyOTP(next_password, true)"
+                :title="$t('message.copy_next_password')"
+            >
+                {{ useDisplayablePassword(next_password, preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP && revealPassword) }}
+            </span>
+            <!-- <Spinner v-else-if="!showMainSpinner" :isVisible="true" :type="'raw'" /> -->
+            <span v-else>&nbsp;</span>
         </p>
         <p v-if="preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP" class="mt-3">
             <button type="button" class="button is-ghost has-text-grey-dark" @click.stop="revealPassword = !revealPassword">
