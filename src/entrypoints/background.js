@@ -592,9 +592,17 @@ export default defineBackground({
             swlogTitle('UNLOCKING EXTENSION')
 
             return browser.storage.local.get({ [CRYPTO_STORE]: {} }).then(stores => {
-                if (!stores || stores.hasOwnProperty(CRYPTO_STORE) === false) {
-                    swlog('❌ Cannot unlock: Crypto store is missing')
-                    return { status: false, reason: 'error.failed_to_get_encryption_parameters' }
+                if (stores && stores.hasOwnProperty(CRYPTO_STORE) && stores[CRYPTO_STORE]) {
+                    // encryptionParams should already be fed during the popup opening but
+                    // it's not always true, for example under Vivaldi after the first lock.
+                    // So we enforce the parameters
+                    encryptionParams.iv = new Uint8Array(stores[CRYPTO_STORE].iv)
+                    encryptionParams.salt = new Uint8Array(stores[CRYPTO_STORE].salt)
+                    encryptionParams.default = stores[CRYPTO_STORE].default ?? true
+                    swlog('Crypto params loaded from store')
+                } else {
+                    swlog('❌ Cannot unlock: Failed to retrieve crypto store data')
+                    return { status: false, reason: 'error.failed_to_retrieve_encryption_store_data' }
                 }
                 
                 state.pat = stores[CRYPTO_STORE]['encryptedApiToken'] || ''
@@ -646,6 +654,15 @@ export default defineBackground({
                     swlog('❌ Cannot check enc key: Failed to retrieve crypto store data')
                     return { status: false, reason: 'error.failed_to_retrieve_encryption_store_data' }
                 }
+                // if (stores && stores.hasOwnProperty(CRYPTO_STORE) && stores[CRYPTO_STORE]) {
+                //     encryptionParams.iv = new Uint8Array(stores[CRYPTO_STORE].iv)
+                //     encryptionParams.salt = new Uint8Array(stores[CRYPTO_STORE].salt)
+                //     encryptionParams.default = stores[CRYPTO_STORE].default ?? true
+                //     swlog('Crypto params loaded from store')
+                // } else {
+                //     swlog('❌ Cannot check enc key: Crypto store is missing')
+                //     return { status: false, reason: 'error.failed_to_retrieve_encryption_store_data' }
+                // }
                 
                 const _pat = stores[CRYPTO_STORE]['encryptedApiToken'] || ''
 
@@ -700,24 +717,23 @@ export default defineBackground({
         function generateNewCryptoParams(set_default = false) {
             swlog('♻️ Generating new crypto params...')
 
-            encryptionParams.iv = _crypto.getRandomValues(new Uint8Array(12))
-            encryptionParams.salt = _crypto.getRandomValues(new Uint8Array(16))
-
-            if (set_default) {
-                encryptionParams.default = true
-                swlog('♻️ encryptionParams.default set to true')
-            }
+            let _iv = _crypto.getRandomValues(new Uint8Array(12))
+            let _salt = _crypto.getRandomValues(new Uint8Array(16))
 
             // Store the generated salt + iv (the iv is re-generated every time the pat is encrypted)
             return browser.storage.local.set({
                 [CRYPTO_STORE]: {
-                    iv: Array(...new Uint8Array(encryptionParams.iv)),
-                    salt: Array(...new Uint8Array(encryptionParams.salt)),
-                    default: encryptionParams.default,
+                    iv: Array(...new Uint8Array(_iv)),
+                    salt: Array(...new Uint8Array(_salt)),
+                    default: set_default,
                     encryptedApiToken: '',
                 }
             }).then(data => {
-                swlog('♻️ ✔️ Crypto params set and stored')
+                encryptionParams.iv = _iv
+                encryptionParams.salt = _salt
+                encryptionParams.default = set_default
+
+                swlog('♻️ ✔️ Crypto params set and stored (default = ' + set_default + ')')
                 return data
             }, data => {
                 swlog('♻️ ❌ Cannot store crypto params')
@@ -826,30 +842,21 @@ export default defineBackground({
                 return deriveKey(encryptionKey, encryptionParams.salt).then(derivatedKey => {
                     swlog('🔃 Regenerating encryption iv...')
 
-                    try {
-                        encryptionParams.iv = _crypto.getRandomValues(new Uint8Array(12))
-                        encryptionParams.default = derivatedKey === null
+                    encryptionParams.iv = _crypto.getRandomValues(new Uint8Array(12))
+                    encryptionParams.default = derivatedKey === null
+                    const ivArray = Array(...new Uint8Array(encryptionParams.iv))
+                    const saltArray = Array(...new Uint8Array(encryptionParams.salt))
 
-                        const ivArray = Array(...new Uint8Array(encryptionParams.iv))
-                        const saltArray = Array(...new Uint8Array(encryptionParams.salt))
-
-                        var _cryptoParams = {
-                            iv: ivArray,
-                            salt: saltArray,
-                            default: encryptionParams.default
-                        }
-                    } catch (err) {
-                        swlog('🔃 ❌ Failure')
-                        return { status: false, encryptedApiToken: null, reason: 'error.failed_to_set_encryption_parameters' }
+                    let _cryptoParams = {
+                        iv: ivArray,
+                        salt: saltArray,
+                        default: encryptionParams.default,
+                        encryptedApiToken: ''
                     }
 
-                    // return browser.storage.local.set({
-                    //     [CRYPTO_STORE]: {
-                    //         iv: ivArray,
-                    //         salt: saltArray,
-                    //         default: encryptionParams.default
-                    //     }
-                    // }).then(() => {
+                    return browser.storage.local.set({
+                        [CRYPTO_STORE]: _cryptoParams
+                    }).then(() => {
                         swlog('🔃 ✔️ iv regenerated')
                         swlog('🔃 Encrypting PAT...')
 
@@ -866,19 +873,16 @@ export default defineBackground({
                                 return { status: true, encryptedApiToken: _cryptoParams.encryptedApiToken }
                             }, () => {
                                 swlog('🔃 ❌ Saving encrypted PAT failed)')
-            
                                 return { status: false, encryptedApiToken: null, reason: 'error.failed_to_store_encrypted_pat' }
                             })
                         }, () => {
                             swlog('🔃 ❌ Encrypting failed')
-
                             return { status: false, encryptedApiToken: null, reason: 'error.failed_to_encrypt_pat' }
                         })
-                    // }, () => {
-                    //     swlog('  failed (encrypting)')
-
-                    //     return { status: false, encryptedApiToken: null, reason: 'error.failed_to_set_encryption_parameters' }
-                    // })
+                    }, () => {
+                        swlog('  failed (encrypting)')
+                        return { status: false, encryptedApiToken: null, reason: 'error.failed_to_set_encryption_parameters' }
+                    })
                 })
             } catch (e) {
                 swlog('🔃 ❌ Regenerating encryption iv failed', e)
