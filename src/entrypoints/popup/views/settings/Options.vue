@@ -1,5 +1,6 @@
 <script setup>
     import { usePreferenceStore } from '@/stores/preferenceStore'
+    import { useSettingStore } from '@/stores/settingStore'
     import { useGroups } from '@popup/stores/groups'
     import { useNotifyStore } from '@popup/stores/notify'
     import SettingTabs from '@popup/layouts/SettingTabs.vue'
@@ -10,6 +11,7 @@
     const groups = useGroups()
     const notify = useNotifyStore()
     const preferenceStore = usePreferenceStore()
+    const settingStore = useSettingStore()
     const { t } = useI18n({ useScope: "global" })
     const kickAfter = ref(preferenceStore.kickUserAfter)
 
@@ -75,6 +77,8 @@
                 })
             }
         })
+
+        preferenceStore.syncWithServer()
     })
 
     onBeforeRouteLeave((to) => {
@@ -130,8 +134,11 @@
                 <!-- user preferences -->
                 <div class="block">
                     <h4 class="title is-4 has-text-grey-light">{{ $t('message.general') }}</h4>
+                    <div v-if="settingStore.lockedPreferences.length > 0" class="notification is-warning is-size-7">
+                        {{ $t('message.settings_managed_by_administrator') }}
+                    </div>
                     <!-- Language -->
-                    <FormSelect v-model="preferenceStore.lang" @update:model-value="val => applyLanguage(val)" :options="langs" fieldName="lang" label="field.language.label" help="field.language.help" />
+                    <FormSelect v-model="preferenceStore.lang" @update:model-value="val => applyLanguage(val)" :options="langs" fieldName="lang" :isLocked="settingStore.lockedPreferences.includes('lang')" label="field.language.label" help="field.language.help" />
                     <!-- <div class="field help">
                         {{ $t('message.some_translation_are_missing') }}
                         <a class="ml-2" @click="openUrlInNewTab('https://crowdin.com/project/2fauth')">
@@ -142,40 +149,40 @@
                         </a>
                     </div> -->
                     <!-- theme -->
-                    <FormToggle v-model="preferenceStore.theme" @update:model-value="applyTheme()" :choices="themes" fieldName="theme" label="field.theme.label" help="field.theme.help"/>
+                    <FormToggle v-model="preferenceStore.theme" @update:model-value="applyTheme()" :choices="themes" fieldName="theme" :isLocked="settingStore.lockedPreferences.includes('theme')" label="field.theme.label" help="field.theme.help"/>
                     <!-- show icon -->
-                    <FormCheckbox v-model="preferenceStore.showAccountsIcons" @update:model-value="notifySuccess" fieldName="showAccountsIcons" label="field.show_accounts_icons.label" help="field.show_accounts_icons.help" />
+                    <FormCheckbox v-model="preferenceStore.showAccountsIcons" @update:model-value="notifySuccess" fieldName="showAccountsIcons" :isLocked="settingStore.lockedPreferences.includes('showAccountsIcons')" label="field.show_accounts_icons.label" help="field.show_accounts_icons.help" />
                     <!-- password format -->
-                    <FormCheckbox v-model="preferenceStore.formatPassword" @update:model-value="notifySuccess" fieldName="formatPassword" label="field.password_format.label" help="field.password_format.help" />
-                    <FormToggle v-model="preferenceStore.formatPasswordBy" @update:model-value="notifySuccess" :choices="passwordFormats" fieldName="formatPasswordBy" :isDisabled="!preferenceStore.formatPassword" />
+                    <FormCheckbox v-model="preferenceStore.formatPassword" @update:model-value="notifySuccess" fieldName="formatPassword" :isLocked="settingStore.lockedPreferences.includes('formatPassword')" label="field.password_format.label" help="field.password_format.help" />
+                    <FormToggle v-model="preferenceStore.formatPasswordBy" @update:model-value="notifySuccess" :choices="passwordFormats" fieldName="formatPasswordBy" :isLocked="settingStore.lockedPreferences.includes('formatPasswordBy')" :isDisabled="!preferenceStore.formatPassword" />
                     <!-- clear search on copy -->
-                    <FormCheckbox v-model="preferenceStore.clearSearchOnCopy" @update:model-value="notifySuccess" fieldName="clearSearchOnCopy" label="field.clear_search_on_copy.label" help="field.clear_search_on_copy.help" />
+                    <FormCheckbox v-model="preferenceStore.clearSearchOnCopy" @update:model-value="notifySuccess" fieldName="clearSearchOnCopy" :isLocked="settingStore.lockedPreferences.includes('clearSearchOnCopy')" label="field.clear_search_on_copy.label" help="field.clear_search_on_copy.help" />
                     
                     <h4 class="title is-4 pt-4 has-text-grey-light">{{ $t('message.groups') }}</h4>
                     <!-- default group -->
                     <FormSelect v-model="preferenceStore.defaultGroup" @update:model-value="notifySuccess" :options="groupsList" fieldName="defaultGroup" label="field.default_group.label" help="field.default_group.help" />
                     <!-- retain active group -->
-                    <FormCheckbox v-model="preferenceStore.rememberActiveGroup" @update:model-value="notifySuccess" fieldName="rememberActiveGroup" label="field.remember_active_group.label" help="field.remember_active_group.help" />
+                    <FormCheckbox v-model="preferenceStore.rememberActiveGroup" @update:model-value="notifySuccess" fieldName="rememberActiveGroup" :isLocked="settingStore.lockedPreferences.includes('rememberActiveGroup')" label="field.remember_active_group.label" help="field.remember_active_group.help" />
                     <!-- always return to default group after copying -->
-                    <FormCheckbox v-model="preferenceStore.viewDefaultGroupOnCopy" @update:model-value="notifySuccess" fieldName="viewDefaultGroupOnCopy" label="field.view_default_group_on_copy.label" help="field.view_default_group_on_copy.help" />
+                    <FormCheckbox v-model="preferenceStore.viewDefaultGroupOnCopy" @update:model-value="notifySuccess" fieldName="viewDefaultGroupOnCopy" :isLocked="settingStore.lockedPreferences.includes('viewDefaultGroupOnCopy')" label="field.view_default_group_on_copy.label" help="field.view_default_group_on_copy.help" />
                     
                     <h4 class="title is-4 pt-4 has-text-grey-light">{{ $t('message.security') }}</h4>
                     <!-- auto lock -->
-                    <FormSelect v-model="kickAfter" @update:model-value="changeAutolockDelay()" :options="kickUserAfters" fieldName="kickUserAfter" label="field.auto_lock.label" help="field.auto_lock.help" />
+                    <FormSelect v-model="kickAfter" @update:model-value="changeAutolockDelay()" :options="kickUserAfters" fieldName="kickUserAfter" :isLocked="settingStore.lockedPreferences.includes('kickUserAfter')" label="field.auto_lock.label" help="field.auto_lock.help" />
                     <!-- get OTP on request -->
-                    <FormToggle v-model="preferenceStore.getOtpOnRequest" @update:model-value="notifySuccess" :choices="getOtpTriggers" fieldName="getOtpOnRequest" label="field.otp_generation.label" help="field.otp_generation.help"/>
+                    <FormToggle v-model="preferenceStore.getOtpOnRequest" @update:model-value="notifySuccess" :choices="getOtpTriggers" fieldName="getOtpOnRequest" :isLocked="settingStore.lockedPreferences.includes('getOtpOnRequest')" label="field.otp_generation.label" help="field.otp_generation.help"/>
                         <!-- close otp on copy -->
-                        <FormCheckbox v-model="preferenceStore.closeOtpOnCopy" @update:model-value="notifySuccess" fieldName="closeOtpOnCopy" label="field.close_otp_on_copy.label" help="field.close_otp_on_copy.help" :isDisabled="!preferenceStore.getOtpOnRequest" :isIndented="true" />
+                        <FormCheckbox v-model="preferenceStore.closeOtpOnCopy" @update:model-value="notifySuccess" fieldName="closeOtpOnCopy" :isLocked="settingStore.lockedPreferences.includes('closeOtpOnCopy')" :isDisabled="!preferenceStore.getOtpOnRequest" label="field.close_otp_on_copy.label" help="field.close_otp_on_copy.help" :isIndented="true" />
                         <!-- auto-close timeout -->
-                        <FormSelect v-model="preferenceStore.autoCloseTimeout" @update:model-value="notifySuccess" :options="autoCloseTimeout" fieldName="autoCloseTimeout" label="field.auto_close_timeout.label" help="field.auto_close_timeout.help"  :isDisabled="!preferenceStore.getOtpOnRequest" :isIndented="true" />
+                        <FormSelect v-model="preferenceStore.autoCloseTimeout" @update:model-value="notifySuccess" :options="autoCloseTimeout" :isLocked="settingStore.lockedPreferences.includes('autoCloseTimeout')" :isDisabled="!preferenceStore.getOtpOnRequest" fieldName="autoCloseTimeout" label="field.auto_close_timeout.label" help="field.auto_close_timeout.help" :isIndented="true" />
                         <!-- clear search on copy -->
-                        <FormCheckbox v-model="preferenceStore.copyOtpOnDisplay" @update:model-value="notifySuccess" fieldName="copyOtpOnDisplay" label="field.copy_otp_on_display.label" help="field.copy_otp_on_display.help" :isDisabled="!preferenceStore.getOtpOnRequest" :isIndented="true" />
+                        <FormCheckbox v-model="preferenceStore.copyOtpOnDisplay" @update:model-value="notifySuccess" fieldName="copyOtpOnDisplay" :isLocked="settingStore.lockedPreferences.includes('copyOtpOnDisplay')" :isDisabled="!preferenceStore.getOtpOnRequest" label="field.copy_otp_on_display.label" help="field.copy_otp_on_display.help" :isIndented="true" />
                     <!-- otp as dot -->
-                    <FormCheckbox v-model="preferenceStore.showOtpAsDot" @update:model-value="notifySuccess" fieldName="showOtpAsDot" label="field.show_otp_as_dot.label" help="field.show_otp_as_dot.help" />
+                    <FormCheckbox v-model="preferenceStore.showOtpAsDot" @update:model-value="notifySuccess" fieldName="showOtpAsDot" :isLocked="settingStore.lockedPreferences.includes('showOtpAsDot')" label="field.show_otp_as_dot.label" help="field.show_otp_as_dot.help" />
                         <!-- reveal dotted OTPs -->
-                        <FormCheckbox v-model="preferenceStore.revealDottedOTP" @update:model-value="notifySuccess" fieldName="revealDottedOTP" label="field.reveal_dotted_otp.label" help="field.reveal_dotted_otp.help" :isDisabled="!preferenceStore.showOtpAsDot" :isIndented="true" />
+                        <FormCheckbox v-model="preferenceStore.revealDottedOTP" @update:model-value="notifySuccess" fieldName="revealDottedOTP" :isLocked="settingStore.lockedPreferences.includes('revealDottedOTP')" :isDisabled="!preferenceStore.showOtpAsDot" label="field.reveal_dotted_otp.label" help="field.reveal_dotted_otp.help" :isIndented="true" />
                     <!-- show next OTP -->
-                    <FormCheckbox v-model="preferenceStore.showNextOtp" @update:model-value="notifySuccess" fieldName="showNextOtp" label="field.show_next_otp.label" help="field.show_next_otp.help" />
+                    <FormCheckbox v-model="preferenceStore.showNextOtp" @update:model-value="notifySuccess" fieldName="showNextOtp" :isLocked="settingStore.lockedPreferences.includes('showNextOtp')" label="field.show_next_otp.label" help="field.show_next_otp.help" />
                 </div>
             </form>
         </div>

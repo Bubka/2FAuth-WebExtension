@@ -1,7 +1,7 @@
 <script setup>
     import { ref } from 'vue'
     import { useIdGenerator, useValidationErrorIdGenerator } from '@popup/composables/helpers'
-    import { LucideChevronRight } from 'lucide-vue-next'
+    import { LucideChevronRight, LucideLock } from 'lucide-vue-next'
 
     const props = defineProps({
         modelValue: [String, Number, Boolean],
@@ -25,6 +25,7 @@
         },
         isIndented: Boolean,
         isDisabled: Boolean,
+        isLocked: Boolean,
         idSuffix: {
             type: String,
             default: ''
@@ -39,18 +40,20 @@
 
 <template>
     <div class="field is-flex">
-        <div v-if="isIndented" class="pr-1" :style="{ 'opacity': isDisabled ? '0.5' : '1' }">
+        <div v-if="isIndented" class="pr-1" :class="{ 'is-opacity-5' : isDisabled || isLocked }">
             <LucideChevronRight class="has-text-grey rotated-chevron" />
         </div>
         <div>
-            <label :for="inputId" class="label" v-html="$t(label)" :style="{ 'opacity': isDisabled ? '0.5' : '1' }"></label>
+            <label :for="inputId" class="label" :class="{ 'is-opacity-5' : isDisabled || isLocked }">
+                {{ $t(label) }}<LucideLock v-if="isLocked" class="ml-2 icon-size-1" />
+            </label>
             <div class="control">
                 <div class="select">
                     <select
                         :id="inputId"
                         v-model="selected"
                         v-on:change="$emit('update:modelValue', $event.target.value)"
-                        :disabled="isDisabled"
+                        :disabled="isDisabled || isLocked"
                         :aria-describedby="help ? legendId : undefined"
                         :aria-invalid="fieldError != undefined"
                         :aria-errormessage="fieldError != undefined ? valErrorId : undefined" 

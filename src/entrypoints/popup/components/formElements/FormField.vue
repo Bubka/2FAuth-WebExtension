@@ -1,5 +1,6 @@
 <script setup>
     import { useIdGenerator, useValidationErrorIdGenerator } from '@popup/composables/helpers'
+    import { LucideChevronRight, LucideLock } from 'lucide-vue-next'
 
     defineOptions({
         inheritAttrs: false
@@ -41,6 +42,8 @@
             type: Number,
             default: null
         },
+        isIndented: Boolean,
+        isLocked: Boolean,
         leftIcon: '',
         rightIcon: '',
         idSuffix: {
@@ -55,12 +58,17 @@
 </script>
 
 <template>
-    <div class="mb-3" :class="{ 'pt-3' : hasOffset }">
+    <div class="mb-3" :class="{ 'pt-3' : hasOffset, 'is-flex' : isIndented }">
+        <div v-if="isIndented" class="pr-1" :class="{ 'is-opacity-5' : isDisabled || isLocked }">
+            <LucideChevronRight class="has-text-grey rotated-chevron" />
+        </div>
         <div class="field">
-            <label :for="inputId" class="label" :style="{ 'opacity': isDisabled ? '0.5' : '1' }" v-html="$t(label)"></label>
+            <label :for="inputId" class="label" :class="{ 'is-opacity-5' : isDisabled || isLocked }">
+                {{ $t(label) }}<LucideLock v-if="isLocked" class="ml-2 icon-size-1" />
+            </label>
             <div class="control" :class="{ 'has-icons-left' : leftIcon, 'has-icons-right': rightIcon }">
                 <input 
-                    :disabled="isDisabled" 
+                    :disabled="isDisabled || isLocked" 
                     :id="inputId" 
                     :type="inputType" 
                     class="input" 

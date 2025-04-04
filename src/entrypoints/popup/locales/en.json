@@ -101,7 +101,8 @@
         "help_colon": "Help: ",
         "field_is_required": "The field is required",
         "field_is_required_and_valid_url": "The field is required is must be a valid URL",
-        "copy_next_password" : "Copy next password to clipboard"
+        "copy_next_password" : "Copy next password to clipboard",
+        "settings_managed_by_administrator" : "Some settings are being managed by your administrator"
     },
     "error": {
         "cannot_create_otp_without_secret": "Cannot create an OTP without a secret",
@@ -125,7 +126,8 @@
         "reset_extension": "Reset extension",
         "failed_to_contact_host": "2FAuth server unreachable, check the URL",
         "failed_to_authenticate_with_host": "Authentication failed, check your PAT",
-        "failed_to_set_autolock_delay": "Failed to set the auto-lock delay"
+        "failed_to_set_autolock_delay": "Failed to set the auto-lock delay",
+        "data_cannot_be_refreshed_from_server": "Data cannot be refreshed from server"
     },
     "field": {
         "hostUrl": {

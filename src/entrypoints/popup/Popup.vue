@@ -39,6 +39,10 @@
         preferenceStore.resetGroupFilter()
     })
 
+    onMounted(() => {
+        preferenceStore.syncWithServer()
+    })
+
 </script>
 
 <template>

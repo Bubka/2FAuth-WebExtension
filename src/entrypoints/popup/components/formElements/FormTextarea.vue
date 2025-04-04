@@ -1,6 +1,6 @@
 <script setup>
     import { useIdGenerator, useValidationErrorIdGenerator } from '@popup/composables/helpers'
-    import { LucideChevronRight } from 'lucide-vue-next'
+    import { LucideChevronRight, LucideLock } from 'lucide-vue-next'
 
     defineOptions({
         inheritAttrs: false
@@ -43,6 +43,7 @@
             default: null
         },
         isIndented: Boolean,
+        isLocked: Boolean,
         leftIcon: '',
         rightIcon: '',
         idSuffix: {
@@ -58,14 +59,16 @@
 
 <template>
     <div class="mb-3" :class="{ 'pt-3' : hasOffset, 'is-flex' : isIndented }">
-        <div v-if="isIndented" class="mx-2 pr-1" :style="{ 'opacity': isDisabled ? '0.5' : '1' }">
+        <div v-if="isIndented" class="mx-2 pr-1" :class="{ 'is-opacity-5' : isDisabled || isLocked }">
             <LucideChevronRight class="has-text-grey rotated-chevron" />
         </div>
         <div class="field" :class="{ 'is-flex-grow-5' : isIndented }">
-            <label v-if="label" :for="inputId" class="label" v-html="$t(label)"></label>
+            <label v-if="label" :for="inputId" class="label">
+                {{ $t(label) }}<LucideLock v-if="isLocked" class="ml-2 icon-size-1" />
+            </label>
             <div class="control" :class="{ 'has-icons-left' : leftIcon, 'has-icons-right': rightIcon }">
                 <textarea 
-                    :disabled="isDisabled" 
+                    :disabled="isDisabled || isLocked" 
                     :id="inputId"
                     class="textarea has-fixed-size" 
                     :class="size"

@@ -127,6 +127,7 @@
         "failed_to_contact_host": "Serveur 2FAuth introuvable, contrôlez l'URL",
         "failed_to_authenticate_with_host": "Échec de l'authentification, contrôlez le PAT",
         "failed_to_set_autolock_delay": "Impossible de définir le délai d'auto-lock"
+        "data_cannot_be_refreshed_from_server": "Les données ne peuvent être actualisées depuis le serveur"
     },
     "field": {
         "hostUrl": {

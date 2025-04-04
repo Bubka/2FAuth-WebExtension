@@ -1,6 +1,6 @@
 <script setup>
     import { useIdGenerator, useValidationErrorIdGenerator } from '@popup/composables/helpers'
-    import { LucideEye, LucideEyeOff } from 'lucide-vue-next'
+    import { LucideEye, LucideEyeOff, LucideLock } from 'lucide-vue-next'
 
     defineOptions({
         inheritAttrs: true
@@ -46,6 +46,7 @@
             type: String,
             default: ''
         },
+        isLocked: Boolean,
     })
 
     const { inputId } = useIdGenerator(props.inputType, props.fieldName + props.idSuffix)
@@ -85,10 +86,12 @@
 
 <template>
     <div class="field" :class="{ 'pt-3' : hasOffset }">
-        <label :for="inputId" class="label" v-html="$t(label)" />
+        <label :for="inputId" class="label">
+            {{ $t(label) }}<LucideLock v-if="isLocked" class="ml-2 icon-size-1" />
+        </label>
         <div class="control has-icons-right">
             <input
-                :disabled="isDisabled"
+                :disabled="isDisabled || isLocked"
                 :id="inputId"
                 :type="currentType" 
                 class="input" 

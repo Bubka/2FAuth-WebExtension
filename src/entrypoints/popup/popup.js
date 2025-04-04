@@ -21,7 +21,7 @@ popup.use(i18n)
 // Stores
 const pinia = createPinia()
 const persistedStatePlugin = createPersistedStatePlugin({
-    overwrite: true,
+    overwrite: false,
     storage: {
         getItem: async (key) => {
             return storage.local.get(key).then((result) => {

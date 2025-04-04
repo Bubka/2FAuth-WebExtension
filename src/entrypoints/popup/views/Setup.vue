@@ -83,7 +83,7 @@
                 headers: { 'Authorization': 'Bearer ' + _apiToken.value , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' },
                 returnError: true,
                 ignoreRequestInterceptor: true,
-            }).then(async ({ data: tfauthPreferences }) => {
+            }).then(async ({ data: backendPreferences }) => {
                 // Setting enc key
                 const { status: setEncKeyStatus } = await sendMessage('SET_ENC_KEY', { password: _extPassword.value }, 'background')
 
@@ -109,11 +109,7 @@
 
                 // User preferences
                 await preferenceStore.$persistedState.isReady()
-                tfauthPreferences.forEach(preference => {
-                    if (preferenceStore.$state.hasOwnProperty(preference.key)) {
-                        preferenceStore[preference.key] = preference.value
-                    }
-                })
+                preferenceStore.updateWith(backendPreferences, false)
 
                 if (unlockingStatus) {
                     router.push({ name: 'accounts' })
