@@ -208,7 +208,7 @@
         },
         "show_otp_as_dot": {
             "label": "Show generated OTP as dot",
-            "help": "Replace generated password caracters with *** to ensure confidentiality. Do not affect the copy/paste feature"
+            "help": "Replace generated password caracters with *** to ensure confidentiality. Does not affect the copy/paste feature"
         },
         "reveal_dotted_otp": {
             "label": "Reveal obscured OTP",
