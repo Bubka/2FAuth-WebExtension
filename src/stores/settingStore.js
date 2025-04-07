@@ -10,7 +10,7 @@ export const useSettingStore = defineStore('settings', {
     },
 
     getters: {
-
+        isConfigured: (state) => state.hostUrl.length > 0,
     },
 
     actions: {

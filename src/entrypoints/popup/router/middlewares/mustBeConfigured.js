@@ -4,7 +4,7 @@ export default async function mustBeConfigured({ to, next, nextMiddleware, store
 
     await settingStore.$persistedState.isReady()
 
-    if (! (settingStore.hostUrl.length > 0)) {
+    if (! (settingStore.isConfigured)) {
         console.log('[EXT:MW:mustBeConfigured] Extension not configured, moving to the Landing view')
         next({ name: 'landing' })
     } else {

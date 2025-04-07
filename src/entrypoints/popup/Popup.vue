@@ -1,9 +1,11 @@
 <script setup>
     import { RouterView, useRoute } from 'vue-router'
     import { usePreferenceStore } from '@/stores/preferenceStore'
+    import { useSettingStore } from '@/stores/settingStore'
     import Kicker from './components/Kicker.vue'
 
     const preferenceStore = usePreferenceStore()
+    const settingStore = useSettingStore()
     const route = useRoute()
     const kickUser = ref(null)
     const kickUserAfter = ref(null)
@@ -20,6 +22,12 @@
         const { language } = useNavigatorLanguage()
         await preferenceStore.$persistedState.isReady()
 
+        sendMessage('CHECK_LOCKED', { }, 'background').then(({locked}) => {
+            if (! locked && settingStore.isConfigured) {
+                preferenceStore.syncWithServer()
+            }
+        })
+        
         kickUser.value = preferenceStore.kickUserAfter !== null && preferenceStore.kickUserAfter !== 'null'
         kickUserAfter.value = parseInt(preferenceStore.kickUserAfter)
 
@@ -37,10 +45,6 @@
         preferenceStore.applyTheme()
         preferenceStore.applyLanguage()
         preferenceStore.resetGroupFilter()
-    })
-
-    onMounted(() => {
-        preferenceStore.syncWithServer()
     })
 
 </script>

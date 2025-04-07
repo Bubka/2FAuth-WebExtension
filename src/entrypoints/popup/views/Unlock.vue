@@ -1,10 +1,12 @@
 <script setup>
     import { useNotifyStore } from '@popup/stores/notify'
+    import { usePreferenceStore } from '@/stores/preferenceStore'
     import FormButtons from '@popup/components/formElements/FormButtons.vue'
     import { isFilled } from '@popup/composables/validators'
     
     const { t } = useI18n({ useScope: "global" })
     const notify = useNotifyStore()
+    const preferenceStore = usePreferenceStore()
     const router = useRouter()
     const isBusy = ref(false)
     const pwd = ref(null)
@@ -30,6 +32,7 @@
             isBusy.value = false
 
             if (unlockingStatus) {
+                preferenceStore.syncWithServer()
                 router.push({ name: 'accounts' })
             }
             else {

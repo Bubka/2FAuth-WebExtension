@@ -145,12 +145,14 @@ export default defineBackground({
 
         /**
          * Write a console log line formated as a title
+         * 
          * @param  {...any} logs 
          */
         async function swlogTitle(...logs) {
             swlog('### ' + logs + ' ###')
         }
 
+        //  MARK: Icon
         /**
          * Init the popup icon based on active color scheme
          */
@@ -174,6 +176,7 @@ export default defineBackground({
             })
         }
 
+        //  MARK: Theme
         /**
          * Tells if dark color scheme is On
          * 
@@ -205,6 +208,8 @@ export default defineBackground({
             }
         }
 
+        //  MARK: Events
+        
         /**
          * Detect all browser windows closing and lock extension if required
          * MARK:On browser close
