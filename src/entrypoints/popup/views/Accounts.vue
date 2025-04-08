@@ -7,7 +7,7 @@
     import { useGroups } from '@popup/stores/groups'
     import { UseColorMode } from '@vueuse/components'
     import { useDisplayablePassword } from '@popup/composables/helpers'
-    import { LucideEye, LucideEyeOff, LucideCircleAlert, LucideChevronsDownUp, LucideChevronsUpDown } from 'lucide-vue-next'
+    import { LucideLoaderCircle, LucideEye, LucideEyeOff, LucideCircleAlert, LucideChevronsDownUp, LucideChevronsUpDown } from 'lucide-vue-next'
     import SearchBox from '@popup/components/SearchBox.vue'
     import GroupSwitch from '@popup/components/GroupSwitch.vue'
     import Spinner from '@popup/components/Spinner.vue'
@@ -374,7 +374,7 @@
                 </router-link>
             </VueFooter>
         </div>
-        <Spinner :isVisible="twofaccounts.isFetching && ! showAccounts"  :type="'fullscreen-overlay'" message="message.fetching_data" />
+        <Spinner :isVisible="! showAccounts"  :type="'fullscreen-overlay'" message="message.fetching_data" />
     </div>
     </UseColorMode>
 </template>
