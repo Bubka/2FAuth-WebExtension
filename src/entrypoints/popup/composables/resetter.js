@@ -2,6 +2,7 @@ import { useSettingStore } from '@/stores/settingStore'
 import { usePreferenceStore } from '@/stores/preferenceStore'
 import { useTwofaccounts } from '@popup/stores/twofaccounts'
 import { useGroups } from '@popup/stores/groups'
+import router from '@popup/router'
 
 export function useResetExtension() {
    
@@ -11,6 +12,6 @@ export function useResetExtension() {
     useGroups().$reset()
 
     sendMessage('RESET_EXT', { }, 'background').then(() => {
-        useRouter().push({ name: 'landing' })
+        router.push({ name: 'landing' })
     })
 }
