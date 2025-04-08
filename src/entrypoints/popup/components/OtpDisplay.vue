@@ -145,7 +145,7 @@
     async function getOtp() {
         // We replace the current on screen password with the next_password to avoid having a loader.
         // The next_password will be confirmed with a new request to be synced with the backend no matter what.
-        if (next_password.value) {
+        if (settingStore.hasFeature_showNextOtp && next_password.value) {
             password.value = next_password.value
             next_password.value = ''
             dots.value.turnOff()
@@ -158,7 +158,7 @@
         await getOtpPromise().then(response => {
             let otp = response.data
             password.value = otp.password
-            next_password.value = otp.next_password
+            next_password.value = settingStore.hasFeature_showNextOtp && otp.hasOwnProperty('next_password') ? otp.next_password : ''
 
             if(preferenceStore.copyOtpOnDisplay) {
                 copyOTP(otp.password)
@@ -353,7 +353,7 @@
         <p v-show="isHMacBased(otpauthParams.otp_type)">
             {{ $t('message.counter') }}: {{ otpauthParams.counter }}
         </p>
-        <p v-if="preferenceStore.showNextOtp" class="mt-3 is-size-4">
+        <p v-if="settingStore.hasFeature_showNextOtp && preferenceStore.showNextOtp" class="mt-3 is-size-4">
             <span
                 v-if="next_password"
                 class="is-clickable"

@@ -4,13 +4,13 @@
 
 ### Added
 
-- A user preference to enable precalculation and display of the next OTP code.  
+- A user preference to enable precalculation and display of the next OTP code. __Requires 2FAuth `v5.5.0`__  
   Don't be surprised if you don't see the next code right after enabling this option, the code fades in slowly in order to maintain good readability of the current code.
 - The extension now starts searching as soon as the user starts typing, without having to explicitly give focus to the search field
 
 ### Changed
 
-- The user preferences enforced by the server administrator (thanks to 2FAuth v5.5.0) are now applied to the extension
+- The user preferences enforced by the server administrator are now applied. __Requires 2FAuth `v5.5.0`__
 
 ### Fixed
 

@@ -134,10 +134,11 @@ export const usePreferenceStore = defineStore('preferences', () => {
      */
     function updateWith(preferences, onlyLockedPreferences = true) {
         const settingStore = useSettingStore()
+        settingStore.hasLockedPreferences = preferences.length > 0 && preferences[0].hasOwnProperty('locked')
 
         preferences.forEach(preference => {
             if (this.$state.hasOwnProperty(preference.key)) {
-                if (!onlyLockedPreferences || preference.locked == true) {
+                if (! onlyLockedPreferences || (preference.hasOwnProperty('locked') && preference.locked == true)) {
                     this[preference.key] = preference.value
                 }
 
@@ -145,13 +146,16 @@ export const usePreferenceStore = defineStore('preferences', () => {
                 if (preference.key == 'lang') this.applyLanguage()
             }
 
-            let index = settingStore.lockedPreferences.indexOf(preference.key)
+            // The locked property exists since 2FAuth v5.5.O only
+            if (preference.hasOwnProperty('locked')) {
+                let index = settingStore.lockedPreferences.indexOf(preference.key)
 
-            if (preference.locked == true && index === -1) {
-                settingStore.lockedPreferences.push(preference.key)
-            }
-            else if (preference.locked == false && index > 0) {
-                settingStore.lockedPreferences.splice(index, 1)
+                if (preference.locked == true && index === -1) {
+                    settingStore.lockedPreferences.push(preference.key)
+                }
+                else if (preference.locked == false && index > 0) {
+                    settingStore.lockedPreferences.splice(index, 1)
+                }
             }
         })
     }

@@ -182,7 +182,7 @@
                         <!-- reveal dotted OTPs -->
                         <FormCheckbox v-model="preferenceStore.revealDottedOTP" @update:model-value="notifySuccess" fieldName="revealDottedOTP" :isLocked="settingStore.lockedPreferences.includes('revealDottedOTP')" :isDisabled="!preferenceStore.showOtpAsDot" label="field.reveal_dotted_otp.label" help="field.reveal_dotted_otp.help" :isIndented="true" />
                     <!-- show next OTP -->
-                    <FormCheckbox v-model="preferenceStore.showNextOtp" @update:model-value="notifySuccess" fieldName="showNextOtp" :isLocked="settingStore.lockedPreferences.includes('showNextOtp')" label="field.show_next_otp.label" help="field.show_next_otp.help" />
+                    <FormCheckbox v-if="settingStore.hasFeature_showNextOtp" v-model="preferenceStore.showNextOtp" @update:model-value="notifySuccess" fieldName="showNextOtp" :isLocked="settingStore.lockedPreferences.includes('showNextOtp')" label="field.show_next_otp.label" help="field.show_next_otp.help" />
                 </div>
             </form>
         </div>

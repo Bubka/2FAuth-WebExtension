@@ -25,6 +25,7 @@
     const groups = useGroups()
     const showGroupSwitch = ref(false)
     const showOtpInModal = ref(false)
+    const isRenewingOTPs = ref(false)
     const renewedPeriod = ref(null)
     const opacities = ref({})
     
@@ -148,6 +149,10 @@
      * Updates "Always On" OTPs for all TOTP accounts and (re)starts loopers
      */
     async function updateTotps(period) {
+        if (! settingStore.hasFeature_showNextOtp) {
+            isRenewingOTPs.value = true
+            turnDotsOff(period)
+        }
         let fetchPromise
 
         if (period == undefined) {
@@ -158,20 +163,22 @@
             fetchPromise = twofaccountService.getByIds(twofaccounts.accountIdsWithPeriod(period).join(','), true)
         }
         
-        turnDotsOff(period)
+        if (settingStore.hasFeature_showNextOtp) {
+            turnDotsOff(period)
 
-        // We replace the current on screen passwords with the next_password to avoid having loaders.
-        // The next_password will be confirmed with a new request to be synced with the backend no matter what.
-        const totpAccountsWithNextPasswordInThePeriod = twofaccounts.items.filter((account) => account.otp_type === 'totp'&& account.period == period && account.otp.next_password)
-        
-        if (totpAccountsWithNextPasswordInThePeriod.length > 0) {
-            totpAccountsWithNextPasswordInThePeriod.forEach((account) => {
-                const index = twofaccounts.items.findIndex(acc => acc.id === account.id)
-                if (twofaccounts.items[index].otp.next_password) {
-                    twofaccounts.items[index].otp.password = twofaccounts.items[index].otp.next_password
-                }
-            })
-            turnDotsOn(period, 0)
+            // We replace the current on screen passwords with the next_password to avoid having loaders.
+            // The next_password will be confirmed with a new request to be synced with the backend no matter what.
+            const totpAccountsWithNextPasswordInThePeriod = twofaccounts.items.filter((account) => account.otp_type === 'totp'&& account.period == period && account.otp.next_password)
+            
+            if (totpAccountsWithNextPasswordInThePeriod.length > 0) {
+                totpAccountsWithNextPasswordInThePeriod.forEach((account) => {
+                    const index = twofaccounts.items.findIndex(acc => acc.id === account.id)
+                    if (twofaccounts.items[index].otp.next_password) {
+                        twofaccounts.items[index].otp.password = twofaccounts.items[index].otp.next_password
+                    }
+                })
+                turnDotsOn(period, 0)
+            }
         }
 
         fetchPromise.then(response => {
@@ -199,6 +206,9 @@
             })
         })
         .finally(() => {
+            if (! settingStore.hasFeature_showNextOtp) {
+                isRenewingOTPs.value = false
+            }
             renewedPeriod.value = null
         })
     }
@@ -306,7 +316,8 @@
                             </div>
                             <transition name="popLater">
                                 <div v-show="preferenceStore.getOtpOnRequest == false" class="has-text-right">
-                                    <div v-if="account.otp != undefined">
+                                    <!-- POST SHOW-NEXT-OTP ( >= 2FAuth v5.5.0) -->
+                                    <div v-if="settingStore.hasFeature_showNextOtp && account.otp != undefined">
                                         <div class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('message.copy_to_clipboard')">
                                             {{ useDisplayablePassword(account.otp.password, preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP && revealPassword == account.id) }}
                                         </div>
@@ -321,6 +332,20 @@
                                                 :period="account.period" />
                                         </div>
                                     </div>
+                                    <!-- PRE SHOW-NEXT-OTP ( < 2FAuth v5.5.0) -->
+                                    <span v-if="account.otp != undefined">
+                                        <span v-if="isRenewingOTPs == true && (renewedPeriod == -1 || renewedPeriod == account.period)" class="has-nowrap has-text-grey has-text-centered is-size-5">
+                                            <LucideLoaderCircle class="spinning" />
+                                        </span>
+                                        <span v-else class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('message.copy_to_clipboard')">
+                                            {{ useDisplayablePassword(account.otp.password, preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP && revealPassword == account.id) }}
+                                        </span>
+                                        <Dots
+                                            v-if="account.otp_type.includes('totp')"
+                                            :class="'condensed'"
+                                            ref="dotsRefs"
+                                            :period="account.period" />
+                                    </span>
                                     <div v-else>
                                         <!-- get hotp button -->
                                         <button type="button" class="button tag" :class="mode == 'dark' ? 'is-dark' : 'is-white'" @click="showOTP(account)" :title="$t('message.import_this_account')">
