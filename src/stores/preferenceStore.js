@@ -147,7 +147,7 @@ export const usePreferenceStore = defineStore('preferences', () => {
                 if (preference.key == 'lang') this.applyLanguage()
             }
 
-            // The locked property exists since 2FAuth v5.5.O only
+            // The 'locked' property exists since 2FAuth v5.5.O only
             if (preference.hasOwnProperty('locked') && preference.locked == true) {
                 settingStore.lockedPreferences.push(preference.key)
             }

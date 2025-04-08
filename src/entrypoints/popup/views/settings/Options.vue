@@ -134,7 +134,7 @@
                 <!-- user preferences -->
                 <div class="block">
                     <h4 class="title is-4 has-text-grey-light">{{ $t('message.general') }}</h4>
-                    <div v-if="settingStore.lockedPreferences.length > 0" class="notification is-warning is-size-7">
+                    <div v-if="settingStore.hasLockedPreferences && settingStore.lockedPreferences.length > 0" class="notification is-warning is-size-7">
                         {{ $t('message.settings_managed_by_administrator') }}
                     </div>
                     <!-- Language -->
