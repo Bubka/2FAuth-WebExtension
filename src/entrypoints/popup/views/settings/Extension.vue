@@ -26,6 +26,7 @@
     async function changePassword() {
         const hasValidCurrentPassword = validateCurrentPassword()
         const hasValidNewPassword = validateNewPassword()
+        notify.clear()
 
         if (hasValidCurrentPassword && hasValidNewPassword) {
             const { status: checkPasswordStatus } = await sendMessage('CHECK_ENC_KEY', { password: extCurrentPassword.value }, 'background')
@@ -100,6 +101,13 @@
     onMounted(async () => {
         getPartialToken()
     })
+
+    onBeforeRouteLeave((to) => {
+        if (! to.name.startsWith('settings.')) {
+            notify.clear()
+        }
+    })
+    
 </script>
 
 <template>

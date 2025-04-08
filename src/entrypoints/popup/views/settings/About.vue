@@ -10,6 +10,13 @@
     onMounted(async () => {
         extensionVersion.value = await sendMessage('GET_EXT_VERSION',{}, 'background')
     })
+
+    onBeforeRouteLeave((to) => {
+        if (! to.name.startsWith('settings.')) {
+            notify.clear()
+        }
+    })
+    
 </script>
 
 <template>

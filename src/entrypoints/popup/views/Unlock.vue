@@ -16,6 +16,7 @@
 
     async function unlock() {
         const hasValidPassword = validatePassword()
+        notify.clear()
 
         if (hasValidPassword) {
             isBusy.value = true
