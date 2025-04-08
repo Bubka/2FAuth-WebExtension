@@ -374,7 +374,7 @@
                 </router-link>
             </VueFooter>
         </div>
-        <Spinner :isVisible="! showAccounts"  :type="'fullscreen-overlay'" message="message.fetching_data" />
+        <Spinner :isVisible="!showAccounts && !showGroupSwitch"  :type="'fullscreen-overlay'" message="message.fetching_data" />
     </div>
     </UseColorMode>
 </template>
