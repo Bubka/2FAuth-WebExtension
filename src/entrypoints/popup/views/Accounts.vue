@@ -333,7 +333,7 @@
                                         </div>
                                     </div>
                                     <!-- PRE SHOW-NEXT-OTP ( < 2FAuth v5.5.0) -->
-                                    <span v-if="account.otp != undefined">
+                                    <span v-else-if="account.otp != undefined">
                                         <span v-if="isRenewingOTPs == true && (renewedPeriod == -1 || renewedPeriod == account.period)" class="has-nowrap has-text-grey has-text-centered is-size-5">
                                             <LucideLoaderCircle class="spinning" />
                                         </span>
