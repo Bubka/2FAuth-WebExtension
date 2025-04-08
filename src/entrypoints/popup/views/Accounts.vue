@@ -197,12 +197,12 @@
             })
 
             // Loopers restart at new timestamp
-            looperRefs.value.forEach((looper) => {
-                if (looper.props.period == period || period == undefined) {
-                    nextTick().then(() => {
+            nextTick().then(() => {
+                looperRefs.value.forEach((looper) => {
+                    if (looper.props.period == period || period == undefined) {
                         looper.startLoop(generatedAt)
-                    })
-                }
+                    }
+                })
             })
         })
         .finally(() => {
