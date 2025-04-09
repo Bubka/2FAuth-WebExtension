@@ -15,6 +15,32 @@
     const { t } = useI18n({ useScope: "global" })
     const kickAfter = ref(preferenceStore.kickUserAfter)
 
+    /**
+     * List of preferences used in the extension that are locked on server side 
+     */
+    const lockedPreferences = computed(() => {
+        return [
+            'showOtpAsDot',
+            'revealDottedOTP',
+            'closeOtpOnCopy',
+            'copyOtpOnDisplay',
+            'clearSearchOnCopy',
+            'showAccountsIcons',
+            'activeGroup',
+            'kickUserAfter',
+            'rememberActiveGroup',
+            'viewDefaultGroupOnCopy',
+            'defaultGroup',
+            'theme',
+            'formatPassword',
+            'formatPasswordBy',
+            'lang',
+            'getOtpOnRequest',
+            'autoCloseTimeout',
+            'showNextOtp',
+        ].filter(pref => settingStore.lockedPreferences.includes(pref));
+    })
+
     const themes = [
         { text: 'message.light', value: 'light', icon: 'Sun' },
         { text: 'message.dark', value: 'dark', icon: 'Moon' },
@@ -140,7 +166,7 @@
                 <!-- user preferences -->
                 <div class="block">
                     <h4 class="title is-4 has-text-grey-light">{{ $t('message.general') }}</h4>
-                    <div v-if="settingStore.hasLockedPreferences && settingStore.lockedPreferences.length > 0" class="notification is-warning is-size-7">
+                    <div v-if="settingStore.hasLockedPreferences && lockedPreferences.length > 0" class="notification is-warning is-size-7">
                         {{ $t('message.settings_managed_by_administrator') }}
                     </div>
                     <!-- Language -->
