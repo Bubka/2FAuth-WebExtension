@@ -83,7 +83,7 @@
                 headers: { 'Authorization': 'Bearer ' + _apiToken.value , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' },
                 returnError: true,
                 ignoreRequestInterceptor: true,
-            }).then(async ({ data: backendPreferences }) => {
+            }).then(async ({ data: fetchedPreferences }) => {
                 // Setting enc key
                 const { status: setEncKeyStatus } = await sendMessage('SET_ENC_KEY', { password: _extPassword.value }, 'background')
 
@@ -97,25 +97,29 @@
 
                 if (! tokenEncryptionStatus) {
                     notify.alert({ text: t(failedEncReason) })
+                    sendMessage('RESET_EXT', { }, 'background')
                     return
                 }
 
-                // Store settings
-                settingStore.$patch({
-                    hostUrl: _hostUrl.value,
-                })
+                const { status: isUnlocked, reason: failedUnlockReason } = await sendMessage('UNLOCK', { }, 'background')
 
-                const { status: unlockingStatus, reason: failedUnlockReason } = await sendMessage('UNLOCK', { }, 'background')
+                if (isUnlocked) {
+                    // User preferences
+                    await preferenceStore.$persistedState.isReady()
+                    preferenceStore.updateWith(fetchedPreferences, false)
 
-                // User preferences
-                await preferenceStore.$persistedState.isReady()
-                preferenceStore.updateWith(backendPreferences, false)
+                    // Store settings
+                    // This must be the last thing done when everything is OK because
+                    // the mustBeConfigured middleware checks it every time navigation occurs
+                    settingStore.$patch({
+                        hostUrl: _hostUrl.value,
+                    })
 
-                if (unlockingStatus) {
                     router.push({ name: 'accounts' })
                 }
                 else {
                     notify.alert({ text: t(failedUnlockReason) })
+                    sendMessage('RESET_EXT', { }, 'background')
                 }
             })
             .catch(error => {

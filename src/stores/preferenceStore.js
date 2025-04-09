@@ -132,7 +132,7 @@ export const usePreferenceStore = defineStore('preferences', () => {
      * @param {Array<object>} preferences The values to use to update the store
      * @param {Boolean} onlyLockedPreferences Restrict the update to locked preferences only
      */
-    function updateWith(preferences, onlyLockedPreferences = true) {
+    function updateWith(preferences = [], onlyLockedPreferences = true) {
         const settingStore = useSettingStore()
         settingStore.hasLockedPreferences = preferences.length > 0 && preferences[0].hasOwnProperty('locked')
         settingStore.lockedPreferences.length = 0
