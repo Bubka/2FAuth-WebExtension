@@ -132,10 +132,25 @@ export const usePreferenceStore = defineStore('preferences', () => {
      * @param {Array<object>} preferences The values to use to update the store
      * @param {Boolean} onlyLockedPreferences Restrict the update to locked preferences only
      */
-    function updateWith(preferences = [], onlyLockedPreferences = true) {
+    function updateWith(preferences, onlyLockedPreferences = true) {
+        if (!preferences
+            || !Array.isArray(preferences)
+            || preferences.some(p => p == null || !p.hasOwnProperty('key') || !p.hasOwnProperty('value'))
+        )
+            return
+
         const settingStore = useSettingStore()
-        settingStore.hasLockedPreferences = preferences.length > 0 && preferences[0].hasOwnProperty('locked')
-        settingStore.lockedPreferences.length = 0
+        try {
+            // The hasLockedPreferences var indicates if at least one of the passed preferences
+            // have the '.locked' property. If true, it means we are working with a server that
+            // runs 2FAuth v5.5.0 or higher.
+            // It must not be used to check if some preferences are locked.
+            settingStore.hasLockedPreferences = preferences.some(p => p.hasOwnProperty('locked'))
+            settingStore.lockedPreferences.length = 0
+        }
+        catch(e) {
+            return
+        }
 
         preferences.forEach(preference => {
             if (this.$state.hasOwnProperty(preference.key)) {
