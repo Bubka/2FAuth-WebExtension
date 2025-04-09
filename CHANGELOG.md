@@ -1,5 +1,12 @@
 # Change log
 
+## [1.1.1] - 2025-04-09
+
+### Fixed
+
+- Possible lock-out if something goes wrong when the setup form is submitted
+- The banner informing about preferences being managed by the administrator is no longer visible if locked preferences are not used in the extension.
+
 ## [1.1.0] - 2025-04-07
 
 ### Added
