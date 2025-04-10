@@ -6,7 +6,6 @@ import { defineViteConfig as define } from './define.config.js'
 export default defineConfig({
     srcDir: 'src',
     outDir: 'dist',
-    extensionApi: 'chrome',
     modules: [
         '@wxt-dev/module-vue'
     ],

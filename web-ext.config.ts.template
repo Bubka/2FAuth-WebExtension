@@ -1,7 +1,7 @@
 import { resolve } from 'node:path'
-import { defineRunnerConfig } from 'wxt'
+import { defineWebExtConfig } from 'wxt'
 
-export default defineRunnerConfig({
+export default defineWebExtConfig({
     binaries: {
         chrome: '/path/to/chrome-beta', // Use Chrome Beta instead of regular Chrome
         firefox: 'firefoxdeveloperedition', // Use Firefox Developer Edition instead of regular Firefox
