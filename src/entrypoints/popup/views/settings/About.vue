@@ -2,10 +2,12 @@
     import { UseColorMode } from '@vueuse/components'
     import { openUrlInNewTab } from '@popup/composables/helpers'
     import SettingTabs from '@popup/layouts/SettingTabs.vue'
-    import { LucideGraduationCap, LucideFlaskConical } from 'lucide-vue-next';
+    import { LucideGraduationCap, LucideFlaskConical } from 'lucide-vue-next'
+    import { useNotifyStore } from '@popup/stores/notify'
 
     const extensionVersion = ref('')
     const version = __VERSION__
+    const notify = useNotifyStore()
 
     onMounted(async () => {
         extensionVersion.value = await sendMessage('GET_EXT_VERSION',{}, 'background')
