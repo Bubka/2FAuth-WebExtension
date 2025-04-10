@@ -5,7 +5,7 @@
     import { useResetExtension } from '@popup/composables/resetter'
     import { isFilled } from '@popup/composables/validators'
 
-    const { t } = useI18n({ useScope: "global" })
+    const { t } = useI18n()
     const settingStore = useSettingStore()
     const notify = useNotifyStore()
 

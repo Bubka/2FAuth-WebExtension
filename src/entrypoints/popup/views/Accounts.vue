@@ -15,7 +15,7 @@
     import TotpLooper from '@popup/components/TotpLooper.vue'
     import Dots from '@popup/components/Dots.vue'
 
-    const { t } = useI18n({ useScope: "global" })
+    const { t } = useI18n()
     const router = useRouter()
     const preferenceStore = usePreferenceStore()
     const settingStore = useSettingStore()

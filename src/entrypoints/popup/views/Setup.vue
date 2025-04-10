@@ -7,7 +7,7 @@
     import FormButtons from '@popup/components/formElements/FormButtons.vue'
     import { LucideCheck } from 'lucide-vue-next'
     
-    const { t } = useI18n({ useScope: "global" })
+    const { t } = useI18n()
     const settingStore = useSettingStore()
     const preferenceStore = usePreferenceStore()
     const router = useRouter()

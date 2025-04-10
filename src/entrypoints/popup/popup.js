@@ -7,7 +7,6 @@ import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2'
 import { storage } from 'webextension-polyfill'
 import Popup from './Popup.vue'
 import router from './router'
-import i18n from './i18n'
 import { devtools } from '@vue/devtools'
 
 if ('development' == process.env.NODE_ENV)

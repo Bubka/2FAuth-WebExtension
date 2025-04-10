@@ -12,7 +12,7 @@
 
     const preferenceStore = usePreferenceStore()
     const settingStore = useSettingStore()
-    const { t } = useI18n({ useScope: "global" })
+    const { t } = useI18n()
     const router = useRouter()
     const notify = useNotifyStore()
     const { copy, copied } = useClipboard({ legacy: true })

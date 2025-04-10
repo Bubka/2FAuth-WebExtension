@@ -12,7 +12,7 @@
     const notify = useNotifyStore()
     const preferenceStore = usePreferenceStore()
     const settingStore = useSettingStore()
-    const { t } = useI18n({ useScope: "global" })
+    const { t } = useI18n()
     const kickAfter = ref(preferenceStore.kickUserAfter)
 
     /**

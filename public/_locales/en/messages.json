@@ -1,0 +1,8 @@
+{
+    "extName": {
+      "message": "2FAuth (beta)"
+    },
+    "extDescription": {
+      "message": "Generate your 2FA passwords with 2FAuth directly from your browser"
+    }
+}

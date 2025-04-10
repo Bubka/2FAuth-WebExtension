@@ -21,6 +21,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.14.0",
+        "@intlify/unplugin-vue-i18n": "^6.0.5",
         "@kyvg/vue3-notification": "^3.0.2",
         "@types/chrome": "^0.0.304",
         "@vue/devtools": "^7.7.1",

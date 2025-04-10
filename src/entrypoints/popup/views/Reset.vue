@@ -1,6 +1,6 @@
 <script setup>
     import { useResetExtension } from '@popup/composables/resetter'
-    const { t } = useI18n({ useScope: "global" })
+    const { t } = useI18n()
 
     const isReseting = ref(false)
 

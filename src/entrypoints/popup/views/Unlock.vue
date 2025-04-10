@@ -4,7 +4,7 @@
     import FormButtons from '@popup/components/formElements/FormButtons.vue'
     import { isFilled } from '@popup/composables/validators'
     
-    const { t } = useI18n({ useScope: "global" })
+    const { t } = useI18n()
     const notify = useNotifyStore()
     const preferenceStore = usePreferenceStore()
     const router = useRouter()

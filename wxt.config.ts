@@ -1,5 +1,6 @@
 import { defineConfig } from 'wxt'
 import { defineViteConfig as define } from './define.config.js'
+import vueI18n from '@intlify/unplugin-vue-i18n/vite'
 // import vue from '@vitejs/plugin-vue'
 
 // See https://wxt.dev/api/config.html
@@ -34,8 +35,10 @@ export default defineConfig({
         }
 
         const manifest = {
-            name: '2FAuth (beta)',
+            name: '__MSG_extName__',
+            description: '__MSG_extDescription__',
             permissions: permissions,
+            default_locale: 'en',
             icons: {
                 16: 'icon-16.png',
                 32: 'icon-32.png',
@@ -65,8 +68,8 @@ export default defineConfig({
         // ],
         presets: [
             // vue preset is automatically imported by @wxt-dev/module-vue
+            // vue-i18n preset is automatically imported by @wxt-dev/i18n
             'vue-router',
-            'vue-i18n',
             'pinia',
             '@vueuse/core',
         ],
@@ -79,6 +82,9 @@ export default defineConfig({
         },
         plugins: [
             // vue(),
+            vueI18n({
+                include: 'src/assets/locales/*.json',
+            }),
         ],
         define,
     }),
