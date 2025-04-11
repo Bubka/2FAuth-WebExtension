@@ -101,8 +101,8 @@
         "help_colon": "Aide : ",
         "field_is_required": "Le champ est obligatoire",
         "field_is_required_and_valid_url": "Le champ est obligatoire et doit être une URL valide",
-        "copy_next_password" : "Copier le prochain code OTP dans le presse-papiers",
-        "settings_managed_by_administrator" : "Certains réglages sont gérés par votre administrateur"
+        "copy_next_password": "Copier le prochain code OTP dans le presse-papiers",
+        "settings_managed_by_administrator": "Certains réglages sont gérés par votre administrateur"
     },
     "error": {
         "cannot_create_otp_without_secret": "Impossible de créer un OTP sans un secret",
@@ -120,14 +120,14 @@
         "failed_to_store_encrypted_pat": "Impossible de stocker le PAT chiffré dans le magasin",
         "unknown_error_during_pat_encryption": "Erreur inconnu durant le chiffrement du PAT",
         "invalid_or_unknown_token": "Jeton d'accès invalide ou inconnu",
-        "failed_to_get_encryption_parameters": "Impossible d'obtenir les paramètres de chiffrement",
         "wrong_password": "Mauvais mot de passe",
         "wrong_current_password": "Mauvais mot de passe (actuel)",
         "reset_extension": "Réinitialiser l'extension",
         "failed_to_contact_host": "Serveur 2FAuth introuvable, contrôlez l'URL",
         "failed_to_authenticate_with_host": "Échec de l'authentification, contrôlez le PAT",
         "failed_to_set_autolock_delay": "Impossible de définir le délai d'auto-lock",
-        "data_cannot_be_refreshed_from_server": "Les données ne peuvent être actualisées depuis le serveur"
+        "data_cannot_be_refreshed_from_server": "Les données ne peuvent être actualisées depuis le serveur",
+        "failed_to_retrieve_encryption_store_data": "Échec de la récupération des données du magasin de chiffrement"
     },
     "field": {
         "hostUrl": {
@@ -214,9 +214,9 @@
             "label": "Révéler les codes OTP illisibles",
             "help": "Permet à l'utilisateur de réveler temporairement les code OTP dont les caractères ont été remplacés par des ●●●"
         },
-        "show_next_otp" : {
-            "label" : "Afficher le prochain code OTP",
-            "help" : "Prévisualiser le prochain code OTP, c'est-à-dire le code qui remplacera le code actuel après son expiration. Les préférences définies pour le code OTP actuel s'appliquent également au prochain code (mise en forme, affichage en point)"
+        "show_next_otp": {
+            "label": "Afficher le prochain code OTP",
+            "help": "Prévisualiser le prochain code OTP, c'est-à-dire le code qui remplacera le code actuel après son expiration. Les préférences définies pour le code OTP actuel s'appliquent également au prochain code (mise en forme, affichage en point)"
         }
     },
     "title": {
