@@ -4,7 +4,6 @@ import Notifications from '@kyvg/vue3-notification'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2'
-import { storage } from 'webextension-polyfill'
 import Popup from './Popup.vue'
 import router from './router'
 import { devtools } from '@vue/devtools'
@@ -23,17 +22,15 @@ const persistedStatePlugin = createPersistedStatePlugin({
     overwrite: false,
     storage: {
         getItem: async (key) => {
-            return storage.local.get(key).then((result) => {
-                return Promise.resolve(result[key])
+            return storage.getItem('local:' + key).then((result) => {
+                return Promise.resolve(result)
             })
         },
         setItem: async (key, value) => {
-            return storage.local.set({
-                [key]: value,
-            })
+            return storage.setItem('local:' + key, value)
         },
         removeItem: async (key) => {
-            return storage.local.remove(key)
+            return storage.removeItem('local:' + key)
         },
     },
     // serialize: (value) => JSON.stringify(value),

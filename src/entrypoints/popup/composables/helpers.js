@@ -1,8 +1,7 @@
 import { usePreferenceStore } from '@/stores/preferenceStore'
-import { tabs } from 'webextension-polyfill'
 
 export function openUrlInNewTab(url) {
-	tabs.create({
+	browser.tabs.create({
 		active: true,
 		url: url,
 	})
