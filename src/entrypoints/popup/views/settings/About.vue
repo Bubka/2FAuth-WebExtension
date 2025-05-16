@@ -5,6 +5,7 @@
     import { LucideGraduationCap, LucideFlaskConical } from 'lucide-vue-next'
     import { useNotifyStore } from '@popup/stores/notify'
 
+    const router = useRouter()
     const extensionVersion = ref('')
     const version = __VERSION__
     const notify = useNotifyStore()
@@ -87,7 +88,7 @@
             </UseColorMode>
         </div>
         <VueFooter :showButtons="true">
-            <ButtonBackCloseCancel :returnTo="{ name: 'accounts' }" action="close" />
+            <NavigationButton action="close" @closed="router.push({ name: 'accounts' })" />
         </VueFooter>
     </div>
 </template>

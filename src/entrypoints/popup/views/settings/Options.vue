@@ -4,15 +4,14 @@
     import { useGroups } from '@popup/stores/groups'
     import { useNotifyStore } from '@popup/stores/notify'
     import SettingTabs from '@popup/layouts/SettingTabs.vue'
-    import FormCheckbox from '@popup/components/formElements/FormCheckbox.vue'
-    import FormToggle from '@popup/components/formElements/FormToggle.vue'
-    import FormSelect from '@popup/components/formElements/FormSelect.vue'
+    import { FormCheckbox, FormSelect, FormToggle } from '@2fauth/formcontrols'
 
+    const { t } = useI18n()
+    const router = useRouter()
     const groups = useGroups()
     const notify = useNotifyStore()
     const preferenceStore = usePreferenceStore()
     const settingStore = useSettingStore()
-    const { t } = useI18n()
     const kickAfter = ref(preferenceStore.kickUserAfter)
 
     /**
@@ -219,7 +218,7 @@
             </form>
         </div>
         <VueFooter :showButtons="true">
-            <ButtonBackCloseCancel :returnTo="{ name: 'accounts' }" action="close" />
+            <NavigationButton action="close" @closed="router.push({ name: 'accounts' })" />
         </VueFooter>
     </div>
 </template>

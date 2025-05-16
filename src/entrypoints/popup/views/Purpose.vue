@@ -1,6 +1,8 @@
 <script setup>
     import { openUrlInNewTab } from '@popup/composables/helpers'
     import { LucideExternalLink } from 'lucide-vue-next'
+
+    const router = useRouter()
     
 </script>
 
@@ -25,7 +27,7 @@
     </div>
     <VueFooter>
         <VueFooter :showButtons="true">
-            <ButtonBackCloseCancel :returnTo="{ name: 'landing' }" action="back" />
+            <NavigationButton action="back" @goback="router.push({ name: 'landing' })" />
         </VueFooter>
     </VueFooter>
 </template>

@@ -1,7 +1,7 @@
 <script setup>
     import { useNotifyStore } from '@popup/stores/notify'
     import { usePreferenceStore } from '@/stores/preferenceStore'
-    import FormButtons from '@popup/components/formElements/FormButtons.vue'
+    import { FormButtons } from '@2fauth/formcontrols'
     import { isFilled } from '@popup/composables/validators'
     
     const { t } = useI18n()
@@ -64,7 +64,10 @@
         </p>
         <form id="frmUnlock" @submit.prevent="unlock">
             <FormPasswordField v-model="pwd" fieldName="password" :fieldError="errors.pwd" label="field.extPassword.label" autocomplete="current-password" />
-            <FormButtons :isBusy="isBusy" caption="message.unlock" submitId="btnUnlock"/>
+            <FormButtons
+                submitLabel="message.unlock"
+                submitId="btnUnlock"
+                :isBusy="isBusy" />
         </form>
     </div>
     <VueFooter>

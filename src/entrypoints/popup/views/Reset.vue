@@ -1,6 +1,8 @@
 <script setup>
     import { useResetExtension } from '@popup/composables/resetter'
+
     const { t } = useI18n()
+    const router = useRouter()
 
     const isReseting = ref(false)
 
@@ -19,14 +21,14 @@
         <p class="block">{{ $t('message.reset_extension_description') }}</p>
         <p class="block">{{ $t('message.token_remains_valid') }}</p>
         <form>
-            <VueButton @click="resetExtension" :isLoading="isReseting" id="btnResetExtension" color="is-danger">
+            <VueButton nativeType="submit" @click="resetExtension" :isLoading="isReseting" id="btnResetExtension" color="is-danger">
                 {{ $t('message.reset_extension') }}
             </VueButton>
         </form>
     </div>
     <VueFooter>
         <VueFooter :showButtons="true">
-            <ButtonBackCloseCancel :returnTo="{ name: 'unlock' }" action="back" />
+            <NavigationButton action="back" @goback="router.push({ name: 'unlock' })" />
         </VueFooter>
     </VueFooter>
 </template>

@@ -4,7 +4,7 @@
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { isFilled, isHttpUrl } from '@popup/composables/validators'
     import userService from '@popup/services/userService'
-    import FormButtons from '@popup/components/formElements/FormButtons.vue'
+    import { FormButtons } from '@2fauth/formcontrols'
     import { LucideCheck } from 'lucide-vue-next'
     
     const { t } = useI18n()
@@ -199,11 +199,11 @@
             <FormPasswordField v-model="_extPassword" fieldName="extPassword" :fieldError="errors.extPassword" :showRules="true" label="field.extPassword.label"  help="field.extPassword.help" autocomplete="new-password" />
             <VueFooter :showButtons="true">
                 <FormButtons
-                    :submitId="'btnSubmitSetup'"
+                    submitId="btnSubmitSetup"
+                    submitLabel="message.save"
                     :isBusy="isSaving == true"
-                    :caption="'message.save'"
                     :showCancelButton="true"
-                    cancelLandingView="landing" />
+                    @cancel="router.push({ name: 'landing' })" />
             </VueFooter>
         </form>
     </div>

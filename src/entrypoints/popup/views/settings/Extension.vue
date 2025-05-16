@@ -6,6 +6,7 @@
     import { isFilled } from '@popup/composables/validators'
 
     const { t } = useI18n()
+    const router = useRouter()
     const settingStore = useSettingStore()
     const notify = useNotifyStore()
 
@@ -139,14 +140,14 @@
                             {{  $t('message.token_remains_valid') }}
                         </span>
                     </div>
-                    <VueButton @click="resetExtension" :isLoading="isReseting" id="btnResetExtension" color="is-danger">
+                    <VueButton nativeType="submit" @click="resetExtension" :isLoading="isReseting" id="btnResetExtension" color="is-danger">
                         {{ $t('message.reset') }}
                     </VueButton>
                 </div>
             </form>
         </div>
         <VueFooter :showButtons="true">
-            <ButtonBackCloseCancel :returnTo="{ name: 'accounts' }" action="close" />
+            <NavigationButton action="close" @closed="router.push({ name: 'accounts' })" />
         </VueFooter>
     </div>
 </template>

@@ -51,23 +51,25 @@ popup.use(router)
 popup.use(Notifications)
 
 // Global components registration
-import Modal             from '@popup/layouts/Modal.vue'
-import FormField         from '@popup/components/formElements/FormField.vue'
-import FormPasswordField from '@popup/components/formElements/FormPasswordField.vue'
-import FormTextarea      from '@popup/components/formElements/FormTextarea.vue'
-import FieldError        from '@popup/components/formElements/FieldError.vue'
-import ButtonBackCloseCancel from '@popup/components/formElements/ButtonBackCloseCancel.vue'
-import Footer            from '@popup/layouts/Footer.vue'
-import VueButton         from '@popup/components/formElements/Button.vue'
+import Modal  from '@popup/layouts/Modal.vue'
+import Footer from '@popup/layouts/Footer.vue'
+import {
+    FormField,
+    FormPasswordField,
+    FormTextarea,
+    FormFieldError,
+    NavigationButton,
+    VueButton
+} from '@2fauth/formcontrols'
 
 popup
     .component('Modal', Modal)
+    .component('VueFooter', Footer)
     .component('FormField', FormField)
     .component('FormPasswordField', FormPasswordField)
     .component('FormTextarea', FormTextarea)
-    .component('FieldError', FieldError)
-    .component('ButtonBackCloseCancel', ButtonBackCloseCancel)
-    .component('VueFooter', Footer)
+    .component('FormFieldError', FormFieldError)
+    .component('NavigationButton', NavigationButton)
     .component('VueButton', VueButton)
 
 popup.mount('#popup')
