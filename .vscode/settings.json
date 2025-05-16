@@ -9,7 +9,8 @@
     "source.fixAll": "explicit"
   },
   "workbench.colorCustomizations": {
-    "tab.activeBorder": "#007FD4",
+    // "tab.activeBorder": "#007FD4",
+    "tab.inactiveBackground": "#0000004f",
   },
   "i18n-ally.localesPaths": [
     "src/assets/locales"
