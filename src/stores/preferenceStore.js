@@ -84,7 +84,7 @@ export const usePreferenceStore = defineStore('preferences', () => {
         await this.$persistedState.isReady()
 
         const mode = useColorMode({
-            attribute: 'data-theme',
+            class: 'dark',
         })
 
         mode.value = this.theme == 'system' ? 'auto' : this.theme
