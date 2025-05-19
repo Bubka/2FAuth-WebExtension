@@ -2,14 +2,14 @@
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useSettingStore } from '@/stores/settingStore'
     import { useGroups } from '@popup/stores/groups'
-    import { useNotifyStore } from '@popup/stores/notify'
     import SettingTabs from '@popup/layouts/SettingTabs.vue'
+    import { useNotify } from '@2fauth/ui'
     import { FormCheckbox, FormSelect, FormToggle } from '@2fauth/formcontrols'
 
     const { t } = useI18n()
     const router = useRouter()
     const groups = useGroups()
-    const notify = useNotifyStore()
+    const notify = useNotify()
     const preferenceStore = usePreferenceStore()
     const settingStore = useSettingStore()
     const kickAfter = ref(preferenceStore.kickUserAfter)

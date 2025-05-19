@@ -1,11 +1,11 @@
 <script setup>
-    import { useNotifyStore } from '@popup/stores/notify'
+    import { useNotify } from '@2fauth/ui'
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { FormButtons } from '@2fauth/formcontrols'
     import { isFilled } from '@popup/composables/validators'
     
     const { t } = useI18n()
-    const notify = useNotifyStore()
+    const notify = useNotify()
     const preferenceStore = usePreferenceStore()
     const router = useRouter()
     const isBusy = ref(false)

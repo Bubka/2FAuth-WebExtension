@@ -1,6 +1,6 @@
 <script setup>
     import { useSettingStore } from '@/stores/settingStore'
-    import { useNotifyStore } from '@popup/stores/notify'
+    import { useNotify } from '@2fauth/ui'
     import SettingTabs from '@popup/layouts/SettingTabs.vue'
     import { useResetExtension } from '@popup/composables/resetter'
     import { isFilled } from '@popup/composables/validators'
@@ -8,7 +8,7 @@
     const { t } = useI18n()
     const router = useRouter()
     const settingStore = useSettingStore()
-    const notify = useNotifyStore()
+    const notify = useNotify()
 
     const hostUrl = ref(settingStore.hostUrl)
     const apiToken = ref(null)

@@ -2,24 +2,20 @@
     import twofaccountService from '@popup/services/twofaccountService'
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useSettingStore } from '@/stores/settingStore'
-    import { useNotifyStore } from '@popup/stores/notify'
+    import { useNotify } from '@2fauth/ui'
     import { useTwofaccounts } from '@popup/stores/twofaccounts'
     import { useGroups } from '@popup/stores/groups'
     import { UseColorMode } from '@vueuse/components'
-    import { useDisplayablePassword } from '@popup/composables/helpers'
     import { LucideLoaderCircle, LucideEye, LucideEyeOff, LucideCircleAlert, LucideChevronsDownUp, LucideChevronsUpDown } from 'lucide-vue-next'
     import SearchBox from '@popup/components/SearchBox.vue'
     import GroupSwitch from '@popup/components/GroupSwitch.vue'
-    import Spinner from '@popup/components/Spinner.vue'
-    import OtpDisplay from '@popup/components/OtpDisplay.vue'
-    import TotpLooper from '@popup/components/TotpLooper.vue'
-    import Dots from '@popup/components/Dots.vue'
+    import { Dots, OtpDisplay, DotsController, Spinner, useVisiblePassword } from '@2fauth/ui'
 
     const { t } = useI18n()
     const router = useRouter()
     const preferenceStore = usePreferenceStore()
     const settingStore = useSettingStore()
-    const notify = useNotifyStore()
+    const notify = useNotify()
     const { copy, copied } = useClipboard()
     const twofaccounts = useTwofaccounts()
     const groups = useGroups()
@@ -30,13 +26,19 @@
     const opacities = ref({})
     
     const otpDisplay = ref(null)
-    const otpDisplayProps = ref({
-        otp_type: '',
+    const accountParams = ref({
+        otp_type : '',
         account : '',
         service : '',
         icon : '',
+        secret : '',
+        digits : null,
+        algorithm : '',
+        period : null,
+        counter : null,
+        image : ''
     })
-    const looperRefs = ref([])
+    const dotsControllers = ref([])
     const dotsRefs = ref([])
 
     /**
@@ -52,10 +54,10 @@
      function showOTP(account) {
         // Data that should be displayed quickly by the OtpDisplay
         // component are passed using props.
-        otpDisplayProps.value.otp_type = account.otp_type
-        otpDisplayProps.value.service = account.service
-        otpDisplayProps.value.account = account.account
-        otpDisplayProps.value.icon = account.icon
+        accountParams.value.otp_type = account.otp_type
+        accountParams.value.service = account.service
+        accountParams.value.account = account.account
+        accountParams.value.icon = account.icon
 
         nextTick().then(() => {
             showOtpInModal.value = true
@@ -146,7 +148,7 @@
     }
 
     /**
-     * Updates "Always On" OTPs for all TOTP accounts and (re)starts loopers
+     * Updates "Always On" OTPs for all TOTP accounts and (re)starts dots controllers
      */
     async function updateTotps(period) {
         if (! settingStore.hasFeature_showNextOtp) {
@@ -196,11 +198,11 @@
                 }
             })
 
-            // Loopers restart at new timestamp
+            // dots controllers restart at new timestamp
             nextTick().then(() => {
-                looperRefs.value.forEach((looper) => {
-                    if (looper.props.period == period || period == undefined) {
-                        looper.startLoop(generatedAt)
+                dotsControllers.value.forEach((dotsController) => {
+                    if (dotsController.props.period == period || period == undefined) {
+                        dotsController.startStepping(generatedAt)
                     }
                 })
             })
@@ -210,6 +212,15 @@
                 isRenewingOTPs.value = false
             }
             renewedPeriod.value = null
+        })
+    }
+
+    /**
+     * Lock the extension
+     */
+    function lockExtension() {
+        sendMessage('LOCK_EXTENSION', { }, 'background').then(() => {
+            router.push('unlock')
         })
     }
 
@@ -279,24 +290,32 @@
         <Modal v-model="showOtpInModal">
             <OtpDisplay
                 ref="otpDisplay"
-                v-bind="otpDisplayProps"
+                :accountParams="accountParams"
+                :preferences="preferenceStore.$state"
+                :twofaccountService="twofaccountService"
+                :can_showNextOtp="settingStore.hasFeature_showNextOtp"
+                :iconPathPrefix="settingStore.hostUrl"
                 @please-close-me="showOtpInModal = false"
-                @please-clear-search="twofaccounts.filter = ''">
-            </OtpDisplay>
+                @please-clear-search="twofaccounts.filter = ''"
+                @kickme="lockExtension"
+                @please-update-activeGroup="(newActiveGroup) => preferenceStore.activeGroup = newActiveGroup"
+                @otp-copied-to-clipboard="notify.success({ text: t('message.copied_to_clipboard') })"
+                @error="(err) => notify.error(err)"
+            />
         </Modal>
-        <!-- totp loopers -->
+        <!-- dots controllers -->
         <span v-if="!preferenceStore.getOtpOnRequest">
-            <TotpLooper
+            <DotsController
                 v-for="period in twofaccounts.periods"
+                ref="dotsControllers"
                 :key="period.period"
                 :autostart="false"
                 :period="period.period"
                 :generated_at="period.generated_at"
-                v-on:loop-ended="updateTotps(period.period)"
-                v-on:loop-started="turnDotsOn(period.period, $event)"
-                v-on:stepped-up="turnDotsOn(period.period, $event)"
-                ref="looperRefs"
-            ></TotpLooper>
+                @stepping-started="turnDotsOn(period.period, $event)"
+                @stepped-up="turnDotsOn(period.period, $event)"
+                @stepping-ended="updateTotps(period.period)"
+            ></DotsController>
         </span>
         <!-- show accounts list -->
         <div class="container" v-if="showAccounts == true">
@@ -319,16 +338,33 @@
                                     <!-- POST SHOW-NEXT-OTP ( >= 2FAuth v5.5.0) -->
                                     <div v-if="settingStore.hasFeature_showNextOtp && account.otp != undefined">
                                         <div class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('message.copy_to_clipboard')">
-                                            {{ useDisplayablePassword(account.otp.password, preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP && revealPassword == account.id) }}
+                                            {{  
+                                                useVisiblePassword(
+                                                    account.otp.password,
+                                                    preferenceStore.formatPassword,
+                                                    preferenceStore.formatPasswordBy,
+                                                    preferenceStore.showOtpAsDot,
+                                                    preferenceStore.revealDottedOTP && revealPassword == account.id
+                                                )
+                                            }}
                                         </div>
                                         <div class="has-nowrap" style="line-height: 0.9;">
                                             <span v-if="preferenceStore.showNextOtp" class="always-on-otp is-clickable has-nowrap has-text-grey is-size-7 mr-2" :class="opacities[account.period]" @click="copyToClipboard(account.otp.next_password)" @keyup.enter="copyToClipboard(account.otp.next_password)" :title="$t('message.copy_next_password')">
-                                                {{ useDisplayablePassword(account.otp.next_password, preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP && revealPassword == account.id) }}
+                                                {{  
+                                                    useVisiblePassword(
+                                                        account.otp.next_password,
+                                                        preferenceStore.formatPassword,
+                                                        preferenceStore.formatPasswordBy,
+                                                        preferenceStore.showOtpAsDot,
+                                                        preferenceStore.revealDottedOTP && revealPassword == account.id
+                                                    )
+                                                }}
                                             </span>
                                             <Dots
                                                 v-if="account.otp_type.includes('totp')"
-                                                :class="'condensed is-inline-block'"
                                                 ref="dotsRefs"
+                                                :class="'is-inline-block'"
+                                                :isCondensed="true"
                                                 :period="account.period" />
                                         </div>
                                     </div>
@@ -338,12 +374,20 @@
                                             <LucideLoaderCircle class="spinning" />
                                         </span>
                                         <span v-else class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('message.copy_to_clipboard')">
-                                            {{ useDisplayablePassword(account.otp.password, preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP && revealPassword == account.id) }}
+                                            {{ 
+                                                useVisiblePassword(
+                                                    account.otp.password,
+                                                    preferenceStore.formatPassword,
+                                                    preferenceStore.formatPasswordBy,
+                                                    preferenceStore.showOtpAsDot,
+                                                    preferenceStore.revealDottedOTP && revealPassword == account.id
+                                                )
+                                            }}
                                         </span>
                                         <Dots
                                             v-if="account.otp_type.includes('totp')"
-                                            :class="'condensed'"
                                             ref="dotsRefs"
+                                            :isCondensed="true"
                                             :period="account.period" />
                                     </span>
                                     <div v-else>
@@ -374,7 +418,11 @@
                 </router-link>
             </VueFooter>
         </div>
-        <Spinner :isVisible="!showAccounts && !showGroupSwitch"  :type="'fullscreen-overlay'" message="message.fetching_data" />
+        <Spinner
+            :type="'fullscreen-overlay'"
+            :isVisible="!showAccounts && !showGroupSwitch"
+            message="message.fetching_data"
+        />
     </div>
     </UseColorMode>
 </template>

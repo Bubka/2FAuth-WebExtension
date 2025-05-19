@@ -1,6 +1,6 @@
 <script setup>
     import { useSettingStore } from '@/stores/settingStore'
-    import { useNotifyStore }  from '@popup/stores/notify'
+    import { useNotify } from '@2fauth/ui'
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { isFilled, isHttpUrl } from '@popup/composables/validators'
     import userService from '@popup/services/userService'
@@ -11,7 +11,7 @@
     const settingStore = useSettingStore()
     const preferenceStore = usePreferenceStore()
     const router = useRouter()
-    const notify = useNotifyStore()
+    const notify = useNotify()
 
     const _hostUrl = ref('')
     const _apiToken = ref('')

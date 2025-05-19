@@ -2,11 +2,12 @@
     import { RouterView, useRoute } from 'vue-router'
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useSettingStore } from '@/stores/settingStore'
-    import Kicker from './components/Kicker.vue'
+    import { Kicker } from '@2fauth/ui'
 
     const preferenceStore = usePreferenceStore()
     const settingStore = useSettingStore()
     const route = useRoute()
+    const router = useRouter()
     const kickUser = ref(null)
     const kickUserAfter = ref(null)
     const isProtectedRoute = ref(route.meta.watchedByKicker)
@@ -47,6 +48,13 @@
         preferenceStore.resetGroupFilter()
     })
 
+    // Locks the extension
+    async function lockExtension() {
+        await sendMessage('LOCK_EXTENSION', { }, 'background')
+        
+        router.push({ name: 'unlock' })
+    }
+
 </script>
 
 <template>
@@ -62,5 +70,9 @@
     <main class="main-section">
         <RouterView />
     </main>
-    <kicker v-if="kickUser && kickUserAfter > 0 && isProtectedRoute" :kickAfter="kickUserAfter"></kicker>
+    <Kicker
+        v-if="kickUser && kickUserAfter > 0 && isProtectedRoute"
+        :kickAfter="kickUserAfter"
+        @kicked="lockExtension"
+    />
 </template>

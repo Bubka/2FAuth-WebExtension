@@ -3,12 +3,12 @@
     import { openUrlInNewTab } from '@popup/composables/helpers'
     import SettingTabs from '@popup/layouts/SettingTabs.vue'
     import { LucideGraduationCap, LucideFlaskConical } from 'lucide-vue-next'
-    import { useNotifyStore } from '@popup/stores/notify'
+    import { useNotify } from '@2fauth/ui'
 
     const router = useRouter()
     const extensionVersion = ref('')
     const version = __VERSION__
-    const notify = useNotifyStore()
+    const notify = useNotify()
 
     onMounted(async () => {
         extensionVersion.value = await sendMessage('GET_EXT_VERSION',{}, 'background')

@@ -1,5 +1,5 @@
 <script setup>
-    const { notify }  = useNotification()
+    import { useNotify } from '@2fauth/ui'
 
     const props = defineProps({
         modelValue: Boolean,
@@ -25,7 +25,7 @@
     })
 
     function closeModal(event) {
-        notify({ clean: true })
+        useNotify().clear()
         isActive.value = false
     }
 </script>

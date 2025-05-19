@@ -1,6 +1,8 @@
 import axios from "axios"
-import { useNotifyStore } from '@popup/stores/notify'
+import { useNotify } from '@2fauth/ui'
 import { useSettingStore } from '@/stores/settingStore'
+
+const router = useRouter()
 
 export const httpClientFactory = () => {
 
@@ -38,7 +40,7 @@ export const httpClientFactory = () => {
         },
         async function (error) {
             if (error.response && [407].includes(error.response.status)) {
-                useNotifyStore().error(error)
+                useNotify().error(error)
                 return new Promise(() => {})
             }
 
@@ -48,7 +50,7 @@ export const httpClientFactory = () => {
             }
             
             if (error.response && [401].includes(error.response.status)) {
-                useNotifyStore().forbidden()
+                useNotify().forbidden()
                 return Promise.reject(error)
             }
 
@@ -59,11 +61,11 @@ export const httpClientFactory = () => {
 
             // Not found
             if (error.response && [404].includes(error.response.status)) {
-                useNotifyStore().notFound()
+                router.push({ name: '404' })
                 return new Promise(() => {})
             }
 
-            useNotifyStore().error(error)
+            useNotify().error(error)
             return new Promise(() => {})
         }
     )

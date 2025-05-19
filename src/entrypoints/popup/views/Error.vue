@@ -1,9 +1,9 @@
 <script setup>
     import { ref, computed, watch, onMounted } from 'vue'
-    import { useNotifyStore } from '@popup/stores/notify'
+    import { useNotify } from '@2fauth/ui'
     import { useRouter, useRoute } from 'vue-router'
     
-    const errorHandler = useNotifyStore()
+    const errorHandler = useNotify()
     const router = useRouter()
     const route = useRoute()
 

@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
-import { useNotifyStore }  from '@popup/stores/notify'
+import { useNotify } from '@2fauth/ui'
 import { useSettingStore }  from '@/stores/settingStore'
 import userService from '@popup/services/userService'
 
 export const usePreferenceStore = defineStore('preferences', () => {
 
-    const notify = useNotifyStore()
+    const notify = useNotify()
     const { t } = useI18n()
 
     // STATE
