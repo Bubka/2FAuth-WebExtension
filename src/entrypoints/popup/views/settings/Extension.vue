@@ -119,8 +119,8 @@
                 <FormField v-model="hostUrl" fieldName="hostUrl" :isDisabled="true" inputType="text" label="field.hostUrl" />
                 <FormField v-model="apiToken" fieldName="apiToken" :isDisabled="true"  inputType="text" label="field.apiToken" />
                 <h4 class="title is-4 pt-6 has-text-grey-light">{{ $t('message.change_password') }}</h4>
-                <FormPasswordField v-model="extCurrentPassword" fieldName="extCurrentPassword" :fieldError="errors.currentPassword" inputType="password" label="field.extCurrentPassword.label" autocomplete="none" help="field.extCurrentPassword.help" />
-                <FormPasswordField v-model="extNewPassword" fieldName="extNewPassword" :fieldError="errors.newPassword" :showRules="true" label="field.extNewPassword.label"  help="field.extNewPassword.help" autocomplete="new-password" />
+                <FormPasswordField v-model="extCurrentPassword" fieldName="extCurrentPassword" :errorMessage="errors.currentPassword" inputType="password" label="field.extCurrentPassword" autocomplete="none" help="field.extCurrentPassword.help" />
+                <FormPasswordField v-model="extNewPassword" fieldName="extNewPassword" :errorMessage="errors.newPassword" :showRules="true" label="field.extNewPassword"  help="field.extNewPassword.help" autocomplete="new-password" />
                 <div class="field is-grouped">
                     <div class="control">
                         <VueButton :isLoading="isRunning" class="button mr-2" nativeType="button" @click="changePassword">

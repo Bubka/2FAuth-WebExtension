@@ -179,8 +179,8 @@
     <div>
         <h1 class="title has-text-grey-dark" v-html="$t('title.setup')"></h1>
         <form id="frmExtSetup" @submit.prevent="saveSetup">
-            <FormField v-model="_hostUrl" fieldName="hostUrl" :fieldError="errors.hostUrl" inputType="text" label="field.hostUrl.label" help="field.hostUrl.help" />
-            <FormTextarea v-model="_apiToken" :fieldError="errors.apiToken" fieldName="apiToken" rows="4" label="field.apiToken.label"  help="field.apiToken.help" :size="'is-small'" />
+            <FormField v-model="_hostUrl" fieldName="hostUrl" :errorMessage="errors.hostUrl" inputType="text" label="field.hostUrl" help="field.hostUrl.help" />
+            <FormTextarea v-model="_apiToken" :errorMessage="errors.apiToken" fieldName="apiToken" rows="4" label="field.apiToken"  help="field.apiToken.help" :size="'is-small'" />
             <div class="field is-grouped">
                 <div class="control">
                     <VueButton :isLoading="isTesting" class="tag mr-2" nativeType="button" @click="checkConnection">
@@ -196,7 +196,7 @@
                     <span v-else-if="isConnected == false" class="has-text-danger is-size-7">{{  errors.connexion }}</span>
                 </div>
             </div>
-            <FormPasswordField v-model="_extPassword" fieldName="extPassword" :fieldError="errors.extPassword" :showRules="true" label="field.extPassword.label"  help="field.extPassword.help" autocomplete="new-password" />
+            <FormPasswordField v-model="_extPassword" fieldName="extPassword" :errorMessage="errors.extPassword" :showRules="true" label="field.extPassword"  help="field.extPassword.help" autocomplete="new-password" />
             <VueFooter :showButtons="true">
                 <FormButtons
                     submitId="btnSubmitSetup"

@@ -63,7 +63,7 @@
             {{ $t('message.unlock_description') }}
         </p>
         <form id="frmUnlock" @submit.prevent="unlock">
-            <FormPasswordField v-model="pwd" fieldName="password" :fieldError="errors.pwd" label="field.extPassword.label" autocomplete="current-password" />
+            <FormPasswordField v-model="pwd" fieldName="password" :errorMessage="errors.pwd" label="field.extPassword" autocomplete="current-password" />
             <FormButtons
                 submitLabel="message.unlock"
                 submitId="btnUnlock"
