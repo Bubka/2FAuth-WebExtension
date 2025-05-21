@@ -83,7 +83,8 @@ export default defineConfig({
         plugins: [
             // vue(),
             vueI18n({
-                include: 'src/assets/locales/*.json',
+                // include: 'src/assets/locales/*.json',
+                include: 'resources/lang/*.json',
             }),
         ],
         define,

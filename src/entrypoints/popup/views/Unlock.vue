@@ -58,7 +58,7 @@
 
 <template>
     <div>
-        <h1 class="title has-text-grey-dark" v-html="$t('title.popup.twofauth')"></h1>
+        <h1 class="title has-text-grey-dark" v-html="$t('title.twofauth_webext')"></h1>
         <p class="block">
             {{ $t('message.unlock_description') }}
         </p>

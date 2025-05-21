@@ -8,7 +8,7 @@
 
 <template>
     <div>
-        <h1 class="title has-text-grey-dark" v-html="$t('title.popup.purpose')"></h1>
+        <h1 class="title has-text-grey-dark" v-html="$t('title.purpose')"></h1>
         <p class="block">
             {{ $t('message.purpose_description') }}
         </p>

@@ -116,8 +116,8 @@
         <SettingTabs activeTab="settings.extension" />
         <div class="options-tabs">
             <form>
-                <FormField v-model="hostUrl" fieldName="hostUrl" :isDisabled="true" inputType="text" label="field.hostUrl.label" />
-                <FormField v-model="apiToken" fieldName="apiToken" :isDisabled="true"  inputType="text" label="field.apiToken.label" />
+                <FormField v-model="hostUrl" fieldName="hostUrl" :isDisabled="true" inputType="text" label="field.hostUrl" />
+                <FormField v-model="apiToken" fieldName="apiToken" :isDisabled="true"  inputType="text" label="field.apiToken" />
                 <h4 class="title is-4 pt-6 has-text-grey-light">{{ $t('message.change_password') }}</h4>
                 <FormPasswordField v-model="extCurrentPassword" fieldName="extCurrentPassword" :fieldError="errors.currentPassword" inputType="password" label="field.extCurrentPassword.label" autocomplete="none" help="field.extCurrentPassword.help" />
                 <FormPasswordField v-model="extNewPassword" fieldName="extNewPassword" :fieldError="errors.newPassword" :showRules="true" label="field.extNewPassword.label"  help="field.extNewPassword.help" autocomplete="new-password" />

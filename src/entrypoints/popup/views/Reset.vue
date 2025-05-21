@@ -16,7 +16,7 @@
 
 <template>
     <div>
-        <h1 class="title has-text-grey-dark" v-html="$t('title.popup.reset_extension')"></h1>
+        <h1 class="title has-text-grey-dark" v-html="$t('title.reset_extension')"></h1>
         <p class="block">{{ $t('message.reset_extension_description_bis') }}</p>
         <p class="block">{{ $t('message.reset_extension_description') }}</p>
         <p class="block">{{ $t('message.token_remains_valid') }}</p>
