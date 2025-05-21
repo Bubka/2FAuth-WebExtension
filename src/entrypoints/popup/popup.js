@@ -37,7 +37,7 @@ const persistedStatePlugin = createPersistedStatePlugin({
     // deserialize: (value) => JSON.parse(value),
 })
 pinia.use((context) => {
-    context.store.$i18n = i18n
+    context.store.$i18n = markRaw(i18n)
     if (['settings', 'preferences'].includes(context.store.$id)) {
         persistedStatePlugin(context)
     }
