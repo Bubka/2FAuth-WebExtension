@@ -147,7 +147,7 @@
             </form>
         </div>
         <VueFooter :showButtons="true">
-            <NavigationButton action="close" @closed="router.push({ name: 'accounts' })" />
+            <NavigationButton action="close" @closed="router.push({ name: 'accounts' })" :current-page-title="$t('title.settings')" />
         </VueFooter>
     </div>
 </template>
