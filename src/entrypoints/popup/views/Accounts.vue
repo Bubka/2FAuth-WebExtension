@@ -3,6 +3,7 @@
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useSettingStore } from '@/stores/settingStore'
     import { useNotify } from '@2fauth/ui'
+    import { useErrorHandler } from '@2fauth/stores'
     import { useTwofaccounts } from '@popup/stores/twofaccounts'
     import { useGroups } from '@popup/stores/groups'
     import { UseColorMode } from '@vueuse/components'
@@ -15,6 +16,7 @@
     const router = useRouter()
     const preferenceStore = usePreferenceStore()
     const settingStore = useSettingStore()
+    const errorHandler = useErrorHandler()
     const notify = useNotify()
     const { copy, copied } = useClipboard()
     const twofaccounts = useTwofaccounts()
@@ -224,6 +226,11 @@
         })
     }
 
+    function handleError(error) {
+        errorHandler.parse(error)
+        router.push({ name: 'genericError' })
+    }
+
     onMounted(async () => {
         // This SFC is reached only if the user has some twofaccounts (see the starter middleware).
         // This allows to display accounts without latency.
@@ -300,7 +307,7 @@
                 @kickme="lockExtension"
                 @please-update-activeGroup="(newActiveGroup) => preferenceStore.activeGroup = newActiveGroup"
                 @otp-copied-to-clipboard="notify.success({ text: t('message.copied_to_clipboard') })"
-                @error="(err) => notify.error(err)"
+                @error="handleError"
             />
         </Modal>
         <!-- dots controllers -->

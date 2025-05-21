@@ -1,8 +1,7 @@
 import axios from "axios"
-import { useNotify } from '@2fauth/ui'
 import { useSettingStore } from '@/stores/settingStore'
-
-const router = useRouter()
+import { useErrorHandler } from '@2fauth/stores'
+import router from '../router'
 
 export const httpClientFactory = () => {
 
@@ -10,7 +9,6 @@ export const httpClientFactory = () => {
 		withCredentials: false,
         withXSRFToken: false,
 	})
-
 
 	httpClient.interceptors.request.use(
         async function (config) {
@@ -40,7 +38,8 @@ export const httpClientFactory = () => {
         },
         async function (error) {
             if (error.response && [407].includes(error.response.status)) {
-                useNotify().error(error)
+                useErrorHandler().parse(error)
+                router.push({ name: 'genericError' })
                 return new Promise(() => {})
             }
 
@@ -50,7 +49,7 @@ export const httpClientFactory = () => {
             }
             
             if (error.response && [401].includes(error.response.status)) {
-                useNotify().forbidden()
+                router.push({ name: 'unauthorized' })
                 return Promise.reject(error)
             }
 
@@ -65,7 +64,8 @@ export const httpClientFactory = () => {
                 return new Promise(() => {})
             }
 
-            useNotify().error(error)
+            useErrorHandler().parse(error)
+            router.push({ name: 'genericError' })
             return new Promise(() => {})
         }
     )

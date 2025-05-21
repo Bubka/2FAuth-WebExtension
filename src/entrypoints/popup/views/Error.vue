@@ -1,9 +1,9 @@
 <script setup>
     import { ref, computed, watch, onMounted } from 'vue'
-    import { useNotify } from '@2fauth/ui'
+    import { useErrorHandler } from '@2fauth/stores'
     import { useRouter, useRoute } from 'vue-router'
     
-    const errorHandler = useNotify()
+    const errorHandler = useErrorHandler()
     const router = useRouter()
     const route = useRoute()
 

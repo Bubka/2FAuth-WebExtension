@@ -1,6 +1,7 @@
 <script setup>
     import { useSettingStore } from '@/stores/settingStore'
     import { useNotify } from '@2fauth/ui'
+    import { useErrorHandler } from '@2fauth/stores'
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { isFilled, isHttpUrl } from '@popup/composables/validators'
     import userService from '@popup/services/userService'
@@ -130,7 +131,8 @@
                     notify.alert({ text: t('error.failed_to_authenticate_with_host') })
                 }
                 else {
-                    notify.error(error)
+                    useErrorHandler().parse(error)
+                    router.push({ name: 'genericError' })
                 }
             })
             .finally(() => {
