@@ -8,8 +8,7 @@
     import { useGroups } from '@popup/stores/groups'
     import { UseColorMode } from '@vueuse/components'
     import { LucideLoaderCircle, LucideEye, LucideEyeOff, LucideCircleAlert, LucideChevronsDownUp, LucideChevronsUpDown } from 'lucide-vue-next'
-    import GroupSwitch from '@popup/components/GroupSwitch.vue'
-    import { Dots, OtpDisplay, DotsController, Spinner, useVisiblePassword } from '@2fauth/ui'
+    import { Dots, OtpDisplay, DotsController, Spinner, useVisiblePassword, GroupSwitch } from '@2fauth/ui'
 
     const { t } = useI18n()
     const router = useRouter()
@@ -257,7 +256,11 @@
     <UseColorMode v-slot="{ mode }">
     <div>
         <!-- group switch -->
-        <GroupSwitch v-if="showGroupSwitch" v-model:showGroupSwitch="showGroupSwitch" v-model:groups="groups.items" />
+        <GroupSwitch
+            v-model:is-visible="showGroupSwitch"
+            v-model:active-group="preferenceStore.activeGroup"
+            :groups="groups.items">
+        </GroupSwitch>
         <!-- header -->
         <div class="header" v-if="showAccounts || showGroupSwitch">
             <div class="columns is-gapless is-mobile is-centered">

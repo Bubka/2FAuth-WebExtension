@@ -107,6 +107,7 @@
     "message.authentication_against_server_failed": "Authentication against the server failed.",
     "message.is_pat_still_valid": "Is your personal access token still valid?",
     "message.retry_or_reset_extension": "You can try to refresh (maybe it was a temporary problem) or you can reset the extension and provide a new token.",
+    "message.manage_groups": "Manage groups",
 
     "tooltip.reveal_password": "Reveal password",
     "tooltip.hide_password": "Hide password",
