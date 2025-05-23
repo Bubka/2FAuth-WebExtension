@@ -1,9 +1,9 @@
 <script setup>
     import { UseColorMode } from '@vueuse/components'
     import { openUrlInNewTab } from '@popup/composables/helpers'
-    import SettingTabs from '@popup/layouts/SettingTabs.vue'
     import { LucideGraduationCap, LucideFlaskConical } from 'lucide-vue-next'
-    import { useNotify } from '@2fauth/ui'
+    import { useNotify, TabBar } from '@2fauth/ui'
+    import tabs from './tabs'
 
     const router = useRouter()
     const extensionVersion = ref('')
@@ -24,7 +24,7 @@
 
 <template>
     <div>
-        <SettingTabs activeTab="settings.about" />
+        <TabBar :tabs="tabs" :active-tab="'settings.about'" :is-responsive="false" @tab-selected="(to) => router.push({ name: to })" />
         <div class="options-tabs">
             <UseColorMode v-slot="{ mode }"> 
                 <div class="options-tabs">

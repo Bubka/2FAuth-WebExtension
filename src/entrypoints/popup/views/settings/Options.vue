@@ -2,9 +2,9 @@
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useSettingStore } from '@/stores/settingStore'
     import { useGroups } from '@popup/stores/groups'
-    import SettingTabs from '@popup/layouts/SettingTabs.vue'
-    import { useNotify } from '@2fauth/ui'
+    import { useNotify, TabBar } from '@2fauth/ui'
     import { FormCheckbox, FormSelect, FormToggle } from '@2fauth/formcontrols'
+    import tabs from './tabs'
 
     const { t } = useI18n()
     const router = useRouter()
@@ -159,7 +159,7 @@
 
 <template>
     <div>
-        <SettingTabs activeTab="settings.options" />
+        <TabBar :tabs="tabs" :active-tab="'settings.options'" :is-responsive="false" @tab-selected="(to) => router.push({ name: to })" />
         <div class="options-tabs">
             <form>
                 <!-- user preferences -->

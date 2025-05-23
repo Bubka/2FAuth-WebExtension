@@ -1,9 +1,9 @@
 <script setup>
     import { useSettingStore } from '@/stores/settingStore'
-    import { useNotify } from '@2fauth/ui'
-    import SettingTabs from '@popup/layouts/SettingTabs.vue'
+    import { useNotify, TabBar } from '@2fauth/ui'
     import { useResetExtension } from '@popup/composables/resetter'
     import { isFilled } from '@popup/composables/validators'
+    import tabs from './tabs'
 
     const { t } = useI18n()
     const router = useRouter()
@@ -113,7 +113,7 @@
 
 <template>
     <div>
-        <SettingTabs activeTab="settings.extension" />
+        <TabBar :tabs="tabs" :active-tab="'settings.extension'" :is-responsive="false" @tab-selected="(to) => router.push({ name: to })" />
         <div class="options-tabs">
             <form>
                 <FormField v-model="hostUrl" fieldName="hostUrl" :isDisabled="true" inputType="text" label="field.hostUrl" />
