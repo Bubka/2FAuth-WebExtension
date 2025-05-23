@@ -42,7 +42,7 @@
 
 <template>
     <div class="modal-error">
-        <modal v-model="showModal" :closable="props.closable" :isFullHeight="true">
+        <Modal v-model="showModal" :isFullHeight="true">
             <div class="error-message" v-if="$route.name == '404' || $route.name == 'notFound'">
                 <p class="error-404"></p>
                 <p>{{ $t('message.resource_not_found') }}</p>
@@ -54,6 +54,6 @@
                 <p v-if="errorHandler.originalMessage" class="has-text-grey-lighter">{{ errorHandler.originalMessage }}</p>
                 <p v-if="showDebug && errorHandler.debug" class="is-size-7 is-family-code pt-3">{{ errorHandler.debug }}</p>
             </div>
-        </modal>
+        </Modal>
     </div>
 </template>

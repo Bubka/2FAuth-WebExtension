@@ -51,8 +51,6 @@ popup.use(router)
 popup.use(Notifications)
 
 // Global components registration
-import Modal  from '@popup/layouts/Modal.vue'
-import Footer from '@popup/layouts/Footer.vue'
 import {
     FormField,
     FormPasswordField,
@@ -61,10 +59,14 @@ import {
     NavigationButton,
     VueButton
 } from '@2fauth/formcontrols'
+import {
+    VueFooter,
+    Modal
+} from '@2fauth/ui'
 
 popup
     .component('Modal', Modal)
-    .component('VueFooter', Footer)
+    .component('VueFooter', VueFooter)
     .component('FormField', FormField)
     .component('FormPasswordField', FormPasswordField)
     .component('FormTextarea', FormTextarea)
