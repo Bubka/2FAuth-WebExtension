@@ -72,8 +72,8 @@
         { text: 'message.active_group', value: -1 },
     ])
     const getOtpTriggers = [
-        { text: 'message.otp_generation_on_request', value: true, legend: 'message.otp_generation_on_request.legend', title: 'message.otp_generation_on_request_title' },
-        { text: 'message.otp_generation_on_home', value: false, legend: 'message.otp_generation_on_home.legend', title: 'message.otp_generation_on_home_title' },
+        { text: 'message.otp_generation_on_request', value: true, legend: 'message.otp_generation_on_request.legend', title: 'message.otp_generation_on_request.title' },
+        { text: 'message.otp_generation_on_home', value: false, legend: 'message.otp_generation_on_home.legend', title: 'message.otp_generation_on_home.title' },
     ]
 
     const langs = computed(() => {
