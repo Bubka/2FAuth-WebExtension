@@ -199,7 +199,7 @@
                 </div>
             </div>
             <FormPasswordField v-model="_extPassword" fieldName="extPassword" :errorMessage="errors.extPassword" :showRules="true" label="field.extPassword"  help="field.extPassword.help" autocomplete="new-password" />
-            <VueFooter :showButtons="true">
+            <VueFooter>
                 <FormButtons
                     submitId="btnSubmitSetup"
                     submitLabel="message.save"

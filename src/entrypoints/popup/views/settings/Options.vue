@@ -219,7 +219,7 @@
                 </div>
             </form>
         </div>
-        <VueFooter :showButtons="true">
+        <VueFooter>
             <NavigationButton action="close" @closed="router.push({ name: 'accounts' })" :current-page-title="$t('title.settings')" />
         </VueFooter>
     </div>

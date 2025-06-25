@@ -27,7 +27,7 @@
         </form>
     </div>
     <VueFooter>
-        <VueFooter :showButtons="true">
+        <VueFooter>
             <NavigationButton action="back" @goback="router.push({ name: 'unlock' })" :previous-page-title="$t('title.unlock')" />
         </VueFooter>
     </VueFooter>
