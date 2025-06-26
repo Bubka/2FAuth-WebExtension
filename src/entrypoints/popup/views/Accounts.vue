@@ -285,7 +285,7 @@
                             </div> -->
                             <div class="column">
                                 <button type="button" id="btnShowGroupSwitch" :title="$t('message.show_group_selector')" tabindex="1" class="button is-text is-like-text" :class="{'has-text-grey' : mode != 'dark'}" @click.stop="showGroupSwitch = !showGroupSwitch">
-                                    {{ groups.current }} ({{ twofaccounts.filteredCount }})&nbsp;
+                                    {{ groups.current ? groups.current : $t('message.all') }} ({{ twofaccounts.filteredCount }})&nbsp;
                                      <LucideChevronsDownUp v-if="showGroupSwitch" />
                                      <LucideChevronsUpDown v-else />
                                 </button>
