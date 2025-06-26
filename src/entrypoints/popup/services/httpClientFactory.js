@@ -38,8 +38,7 @@ export const httpClientFactory = () => {
         },
         async function (error) {
             if (error.response && [407].includes(error.response.status)) {
-                useErrorHandler().parse(error)
-                router.push({ name: 'genericError' })
+                useErrorHandler().show(error)
                 return new Promise(() => {})
             }
 
@@ -64,8 +63,7 @@ export const httpClientFactory = () => {
                 return new Promise(() => {})
             }
 
-            useErrorHandler().parse(error)
-            router.push({ name: 'genericError' })
+            useErrorHandler().show(error)
             return new Promise(() => {})
         }
     )

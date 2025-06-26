@@ -38,6 +38,8 @@ const persistedStatePlugin = createPersistedStatePlugin({
 })
 pinia.use((context) => {
     context.store.$i18n = i18n
+    context.store.$router = markRaw(router)
+
     if (['settings', 'preferences'].includes(context.store.$id)) {
         persistedStatePlugin(context)
     }

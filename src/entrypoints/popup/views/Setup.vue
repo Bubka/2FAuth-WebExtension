@@ -131,8 +131,7 @@
                     notify.alert({ text: t('error.failed_to_authenticate_with_host') })
                 }
                 else {
-                    useErrorHandler().parse(error)
-                    router.push({ name: 'genericError' })
+                    useErrorHandler().show(error)
                 }
             })
             .finally(() => {

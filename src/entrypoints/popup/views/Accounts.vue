@@ -224,11 +224,6 @@
         })
     }
 
-    function handleError(error) {
-        errorHandler.parse(error)
-        router.push({ name: 'genericError' })
-    }
-
     onMounted(async () => {
         // This SFC is reached only if the user has some twofaccounts (see the starter middleware).
         // This allows to display accounts without latency.
@@ -309,7 +304,7 @@
                 @kickme="lockExtension"
                 @please-update-activeGroup="(newActiveGroup) => preferenceStore.activeGroup = newActiveGroup"
                 @otp-copied-to-clipboard="notify.success({ text: t('message.copied_to_clipboard') })"
-                @error="handleError"
+                @error="(error) => errorHandler.show(error)"
             />
         </Modal>
         <!-- dots controllers -->
