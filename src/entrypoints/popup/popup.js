@@ -13,6 +13,12 @@ if ('development' == process.env.NODE_ENV)
 
 const popup = createApp(Popup)
 
+// Injected immutable properties (as per the 2FAuth webapp)
+const $2fauth = {
+    context: 'webext',
+}
+popup.provide('2fauth', readonly($2fauth))
+
 // Localization
 popup.use(i18n)
 
