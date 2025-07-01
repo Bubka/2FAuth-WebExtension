@@ -42,6 +42,18 @@ Once downloaded, open the extension manager of your browser and drop the downloa
 npm install
 ```
 
+### Link @2fauth components
+
+Some parts of the Js front-end are provided by the [2FAuth-Components library](https://github.com/Bubka/2FAuth-Components). Since the library has not yet been published, it is necessary to clone its repository locally and link it to the webext repo in order to build the web extension.
+
+Assuming the library repository is cloned in the same directory as the webext repository, linking can be done by running the following npm command:
+
+```shell
+npm link ../2FAuth-Components/packages/ui ../2FAuth-Components/packages/formcontrols ../2FAuth-Components/packages/styles ../2FAuth-Components/packages/stores
+```
+
+See [pnpm link usage](https://serko.dev/post/pnpm-link-usage#directory-link)
+
 ### Dev env
 
 The extension uses the [WXT](https://wxt.dev/) web extension framework.
