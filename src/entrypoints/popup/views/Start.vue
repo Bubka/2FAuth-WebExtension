@@ -26,7 +26,7 @@
         </div>
         <!-- Footer -->
         <VueFooter>
-            <router-link id="lnkLanding" :to="{ name: 'settings.options' }" class="has-text-grey">
+            <router-link id="lnkSettings" :to="{ name: 'settings.options' }" class="has-text-grey">
                 {{ $t('link.settings') }}
             </router-link>
         </VueFooter>
