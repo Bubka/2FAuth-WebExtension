@@ -2,14 +2,15 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import middlewarePipeline  from '@popup/router/middlewarePipeline'
 import { useSettingStore } from '@/stores/settingStore'
 import mustBeConfigured    from './middlewares/mustBeConfigured'
-import checkLock    from './middlewares/checkLock'
+import checkLock           from './middlewares/checkLock'
+import skipIfConfigured    from './middlewares/skipIfConfigured'
 
 const router = createRouter({
 	history: createWebHashHistory(),
 	routes: [
-        { path: '/landing', name: 'landing', component: () => import('../views/Landing.vue'), meta: { middlewares: [checkLock] } },
-        { path: '/setup', name: 'setup', component: () => import('../views/Setup.vue'), meta: { middlewares: [checkLock] } },
-        { path: '/purpose', name: 'purpose', component: () => import('../views/Purpose.vue'), meta: { middlewares: [checkLock] } },
+        { path: '/landing', name: 'landing', component: () => import('../views/Landing.vue'), meta: { middlewares: [skipIfConfigured] } },
+        { path: '/setup', name: 'setup', component: () => import('../views/Setup.vue'), meta: { middlewares: [skipIfConfigured] } },
+        { path: '/purpose', name: 'purpose', component: () => import('../views/Purpose.vue'), meta: { middlewares: [skipIfConfigured] } },
         
         { path: '/reset', name: 'reset', component: () => import('../views/Reset.vue'), meta: { middlewares: [mustBeConfigured] } },
         { path: '/unauthorized', name: 'unauthorized', component: () => import('../views/Unauthorized.vue'), meta: { middlewares: [mustBeConfigured] } },

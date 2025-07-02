@@ -566,25 +566,20 @@ export default defineBackground({
         function resetExt() {
             swlogTitle('RESETTING EXTENSION')
 
-            encryptionParams = {
-                salt: null,
-                iv: null,
-                default: true
-            }
-            state.locked = false
-            state.lastActiveAt = null
-            state.kickAfter = null
-            state.pat = ''
-
-            browser.storage.local.clear().then(() => {
-                return generateNewCryptoParams(true).then(() => {
-                        return storeState().then(() => {
-                            swlog('✔️ Extension reset done')
-                            return new Promise(resolve => resolve())
-                        
-                    })
+            return browser.storage.local.clear()
+                .then(() => {
+                    Object.assign(state, default_state)
+                    encryptionKey = null
+                    encryptionParams = {
+                        salt: null,
+                        iv: null,
+                        default: true
+                    }
+                    return generateNewCryptoParams(true)
                 })
-            })
+                .then(() => browser.alarms.clear())
+                .then(() => swlog('✔️ Extension reset done'))
+                .then(() => isLocked())
         }
 
         /**
