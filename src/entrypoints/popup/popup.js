@@ -16,6 +16,11 @@ const popup = createApp(Popup)
 // Injected immutable properties (as per the 2FAuth webapp)
 const $2fauth = {
     context: 'webext',
+    version: 'x.y.z',
+    config: {
+        proxyAuth: false,
+        proxyLogoutUrl: null,
+    }
 }
 popup.provide('2fauth', readonly($2fauth))
 

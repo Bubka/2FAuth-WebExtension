@@ -5,7 +5,6 @@ import groupService from '@popup/services/groupService'
 export const useGroups = defineStore('groups', () => {
 
     const preferenceStore = usePreferenceStore()
-    const { t } = useI18n()
 
     // STATE
 
