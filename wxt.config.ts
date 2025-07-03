@@ -78,7 +78,8 @@ export default defineConfig({
     vite: () => ({
         build: {
             // emptyOutDir: true,
-            sourcemap: 'development' === process.env.NODE_ENV,
+            // sourcemap: 'development' === process.env.NODE_ENV,
+            // sourcemap: true
         },
         plugins: [
             // vue(),
@@ -91,6 +92,12 @@ export default defineConfig({
             }),
         ],
         define,
+        resolve: {
+            dedupe: [
+                'pinia',
+                '@kyvg/vue3-notification',
+            ],
+        },
     }),
     alias: {
         '@popup': 'src/entrypoints/popup',
