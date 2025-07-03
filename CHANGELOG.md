@@ -1,5 +1,18 @@
 # Change log
 
+## [1.1.2] - 2025-07-04
+
+### Changed
+
+- The extension is now built using the brand new [2FAuth component libraries](https://github.com/Bubka/2FAuth-Components). These libraries contain the common front-end components used by the web extension and web app.
+- Requests receiving a 401 unauthorized response from the server now push the user to a dedicated view (instead of displaying a notification) with the ability to reset the extension from this view. This should eliminate the need to uninstall and reinstall the extension when locked out due to an invalid token.
+- The error view now displays the reason why an error has occured (when available)
+
+### Fixed
+
+- The 'All' group label does not update dynamically when browser language changes
+- Blank popup right after extension reset
+
 ## [1.1.1] - 2025-04-09
 
 ### Fixed
