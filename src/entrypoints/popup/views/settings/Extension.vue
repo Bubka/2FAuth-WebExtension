@@ -44,7 +44,7 @@
                 return
             }
 
-            notify.success({ type: 'is-success', text: t('message.password_changed') })
+            notify.success({ type: 'is-success', text: t('notification.password_changed') })
         }
     }
 
@@ -66,7 +66,7 @@
      * 
      */
     function resetExtension() {
-        if(confirm(t('message.are_you_sure'))) {
+        if(confirm(t('confirmation.are_you_sure'))) {
             useResetExtension()
         }
     }
@@ -78,7 +78,7 @@
         errors.value.newPassword = ''
 
         if (! isFilled(extNewPassword.value)) {
-            errors.value.newPassword = t('message.field_is_required')
+            errors.value.newPassword = t('error.field_is_required')
             return false
         }
 
@@ -92,7 +92,7 @@
         errors.value.currentPassword = ''
 
         if (! isFilled(extCurrentPassword.value)) {
-            errors.value.currentPassword = t('message.field_is_required')
+            errors.value.currentPassword = t('error.field_is_required')
             return false
         }
 
@@ -118,22 +118,22 @@
             <form>
                 <FormField v-model="hostUrl" fieldName="hostUrl" :isDisabled="true" inputType="text" label="field.hostUrl" />
                 <FormField v-model="apiToken" fieldName="apiToken" :isDisabled="true"  inputType="text" label="field.apiToken" />
-                <h4 class="title is-4 pt-6 has-text-grey-light">{{ $t('message.change_password') }}</h4>
+                <h4 class="title is-4 pt-6 has-text-grey-light">{{ $t('heading.change_password') }}</h4>
                 <FormPasswordField v-model="extCurrentPassword" fieldName="extCurrentPassword" :errorMessage="errors.currentPassword" inputType="password" label="field.extCurrentPassword" autocomplete="none" help="field.extCurrentPassword.help" />
                 <FormPasswordField v-model="extNewPassword" fieldName="extNewPassword" :errorMessage="errors.newPassword" :showRules="true" label="field.extNewPassword"  help="field.extNewPassword.help" autocomplete="new-password" />
                 <div class="field is-grouped">
                     <div class="control">
                         <VueButton :isLoading="isRunning" class="button mr-2" nativeType="button" @click="changePassword">
-                            {{  $t('message.save') }}
+                            {{  $t('label.save') }}
                         </VueButton>
                     </div>
                 </div>
             </form>
             <!-- danger zone -->
             <form>
-                <h4 class="title is-4 pt-6 has-text-danger">{{ $t('message.danger_zone') }}</h4>
+                <h4 class="title is-4 pt-6 has-text-danger">{{ $t('heading.danger_zone') }}</h4>
                 <div class="is-left-bordered-danger">
-                    <h5 class="title is-5 has-text-grey-light mb-2">{{ $t('message.reset_extension') }}</h5>
+                    <h5 class="title is-5 has-text-grey-light mb-2">{{ $t('heading.reset_extension') }}</h5>
                     <div class="block is-size-6 is-size-7-mobile">
                         {{  $t('message.reset_extension_description') }}
                         <span class="is-block mt-2 has-text-grey has-text-weight-bold">
@@ -141,7 +141,7 @@
                         </span>
                     </div>
                     <VueButton nativeType="submit" @click="resetExtension" :isLoading="isReseting" id="btnResetExtension" color="is-danger">
-                        {{ $t('message.reset') }}
+                        {{ $t('label.reset') }}
                     </VueButton>
                 </div>
             </form>

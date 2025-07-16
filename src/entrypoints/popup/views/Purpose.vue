@@ -8,7 +8,7 @@
 
 <template>
     <div>
-        <h1 class="title has-text-grey-dark" v-html="$t('title.purpose')"></h1>
+        <h1 class="title has-text-grey-dark" v-html="$t('heading.purpose')"></h1>
         <p class="block">
             {{ $t('message.purpose_description') }}
         </p>
@@ -19,7 +19,7 @@
             {{ $t('message.help_colon') }}
             <a @click="openUrlInNewTab('https://docs.2fauth.app/api/#creating-an-access-token')">
                 <span class="icon-text">
-                    <span>{{ $t('message.docs_how_to_create_a_pat') }}</span>
+                    <span>{{ $t('link.docs_how_to_create_a_pat') }}</span>
                     <span class="icon"><LucideExternalLink class="icon-size-1"/></span>
                 </span>
             </a>

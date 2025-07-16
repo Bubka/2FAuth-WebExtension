@@ -98,7 +98,7 @@
                 : preferenceStore.defaultGroup
             }
             
-            notify.success({ text: t('message.copied_to_clipboard') })
+            notify.success({ text: t('notification.copied_to_clipboard') })
         }
     }
 
@@ -274,13 +274,13 @@
                     <div class="has-text-centered">
                         <div class="columns">
                             <!-- <div class="column" v-if="showGroupSwitch">
-                                <button type="button" id="btnHideGroupSwitch" :title="$t('message.hide_group_selector')" tabindex="1" class="button is-text is-like-text" :class="{'has-text-grey' : mode != 'dark'}" @click.stop="showGroupSwitch = !showGroupSwitch">
-                                    {{ $t('message.select_accounts_to_show') }}
+                                <button type="button" id="btnHideGroupSwitch" :title="$t('tooltip.hide_group_selector')" tabindex="1" class="button is-text is-like-text" :class="{'has-text-grey' : mode != 'dark'}" @click.stop="showGroupSwitch = !showGroupSwitch">
+                                    {{ $t('label.select_accounts_to_show') }}
                                 </button>
                             </div> -->
                             <div class="column">
-                                <button type="button" id="btnShowGroupSwitch" :title="$t('message.show_group_selector')" tabindex="1" class="button is-text is-like-text" :class="{'has-text-grey' : mode != 'dark'}" @click.stop="showGroupSwitch = !showGroupSwitch">
-                                    {{ groups.current ? groups.current : $t('message.all') }} ({{ twofaccounts.filteredCount }})&nbsp;
+                                <button type="button" id="btnShowGroupSwitch" :title="$t('tooltip.show_group_selector')" tabindex="1" class="button is-text is-like-text" :class="{'has-text-grey' : mode != 'dark'}" @click.stop="showGroupSwitch = !showGroupSwitch">
+                                    {{ groups.current ? groups.current : $t('label.all') }} ({{ twofaccounts.filteredCount }})&nbsp;
                                      <LucideChevronsDownUp v-if="showGroupSwitch" />
                                      <LucideChevronsUpDown v-else />
                                 </button>
@@ -303,7 +303,7 @@
                 @please-clear-search="twofaccounts.filter = ''"
                 @kickme="lockExtension"
                 @please-update-activeGroup="(newActiveGroup) => preferenceStore.activeGroup = newActiveGroup"
-                @otp-copied-to-clipboard="notify.success({ text: t('message.copied_to_clipboard') })"
+                @otp-copied-to-clipboard="notify.success({ text: t('notification.copied_to_clipboard') })"
                 @error="(error) => errorHandler.show(error)"
             />
         </Modal>
@@ -333,7 +333,7 @@
                                     <img v-if="account.icon && preferenceStore.showAccountsIcons" role="presentation" class="tfa-icon" :src="settingStore.hostUrl + '/storage/icons/' + account.icon" alt="">
                                     <img v-else-if="account.icon == null && preferenceStore.showAccountsIcons" role="presentation" class="tfa-icon" :src="settingStore.hostUrl + '/storage/noicon.svg'" alt="">
                                     {{ account.service ? account.service : $t('message.no_service') }}
-                                    <LucideCircleAlert class="has-text-danger ml-2" v-if="account.account === $t('message.indecipherable')" />
+                                    <LucideCircleAlert class="has-text-danger ml-2" v-if="account.account === $t('error.indecipherable')" />
                                     <span class="is-block has-ellipsis is-family-primary is-size-6 is-size-7-mobile has-text-grey ">{{ account.account }}</span>
                                 </div>
                             </div>
@@ -341,7 +341,7 @@
                                 <div v-show="preferenceStore.getOtpOnRequest == false" class="has-text-right">
                                     <!-- POST SHOW-NEXT-OTP ( >= 2FAuth v5.5.0) -->
                                     <div v-if="settingStore.hasFeature_showNextOtp && account.otp != undefined">
-                                        <div class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('message.copy_to_clipboard')">
+                                        <div class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('label.copy_to_clipboard')">
                                             {{  
                                                 useVisiblePassword(
                                                     account.otp.password,
@@ -353,7 +353,7 @@
                                             }}
                                         </div>
                                         <div class="has-nowrap" style="line-height: 0.9;">
-                                            <span v-if="preferenceStore.showNextOtp" class="always-on-otp is-clickable has-nowrap has-text-grey is-size-7 mr-2" :class="opacities[account.period]" @click="copyToClipboard(account.otp.next_password)" @keyup.enter="copyToClipboard(account.otp.next_password)" :title="$t('message.copy_next_password')">
+                                            <span v-if="preferenceStore.showNextOtp" class="always-on-otp is-clickable has-nowrap has-text-grey is-size-7 mr-2" :class="opacities[account.period]" @click="copyToClipboard(account.otp.next_password)" @keyup.enter="copyToClipboard(account.otp.next_password)" :title="$t('tooltip.copy_next_password')">
                                                 {{  
                                                     useVisiblePassword(
                                                         account.otp.next_password,
@@ -377,7 +377,7 @@
                                         <span v-if="isRenewingOTPs == true && (renewedPeriod == -1 || renewedPeriod == account.period)" class="has-nowrap has-text-grey has-text-centered is-size-5">
                                             <LucideLoaderCircle class="spinning" />
                                         </span>
-                                        <span v-else class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('message.copy_to_clipboard')">
+                                        <span v-else class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('tooltip.copy_to_clipboard')">
                                             {{ 
                                                 useVisiblePassword(
                                                     account.otp.password,
@@ -396,8 +396,8 @@
                                     </span>
                                     <div v-else>
                                         <!-- get hotp button -->
-                                        <button type="button" class="button tag" :class="mode == 'dark' ? 'is-dark' : 'is-white'" @click="showOTP(account)" :title="$t('message.import_this_account')">
-                                            {{ $t('message.generate') }}
+                                        <button type="button" class="button tag" :class="mode == 'dark' ? 'is-dark' : 'is-white'" @click="showOTP(account)" :title="$t('tooltip.import_this_account')">
+                                            {{ $t('label.generate') }}
                                         </button>
                                     </div>
                                 </div>

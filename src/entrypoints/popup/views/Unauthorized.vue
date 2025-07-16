@@ -12,7 +12,7 @@
     }
 
     function resetExtension() {
-        if(confirm(t('message.are_you_sure'))) {
+        if(confirm(t('confirmation.are_you_sure'))) {
             useResetExtension()
         }
     }
@@ -21,7 +21,7 @@
 
 <template>
     <div>
-        <h1 class="title has-text-grey-dark" v-html="$t('title.unauthorized')"></h1>
+        <h1 class="title has-text-grey-dark" v-html="$t('heading.unauthorized')"></h1>
         <p class="block">{{ $t('message.authentication_against_server_failed') }}</p>
         <p class="block">{{ $t('message.is_pat_still_valid') }}</p>
         <p class="block">{{ $t('message.retry_or_reset_extension') }}</p>
@@ -29,12 +29,12 @@
             <div class="field is-grouped">
                 <p class="control">
                     <VueButton nativeType="submit" @click="refresh" :isLoading="isRefreshing" id="btnRefresh">
-                        {{ $t('message.refresh') }}
+                        {{ $t('label.refresh') }}
                     </VueButton>
                 </p>
                 <p class="control">
                     <VueButton nativeType="submit" @click="resetExtension" :isLoading="isReseting" id="btnResetExtension" color="is-danger">
-                        {{ $t('message.reset_extension') }}
+                        {{ $t('label.reset_extension') }}
                     </VueButton>
                 </p>
             </div>

@@ -1,16 +1,16 @@
 export default [
     {
-        'name' : 'message.options',
+        'name' : 'label.options',
         'view' : 'settings.options',
         'id'   : 'lnkTabOptions'
     },
     {
-        'name' : 'message.extension',
+        'name' : 'label.extension',
         'view' : 'settings.extension',
         'id'   : 'lnkTabExtSetup'
     },
     {
-        'name' : 'message.about',
+        'name' : 'label.about',
         'view' : 'settings.about',
         'id'   : 'lnkTabAbout'
     },

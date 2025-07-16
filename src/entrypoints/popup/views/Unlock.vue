@@ -47,7 +47,7 @@
         errors.value.pwd = ''
 
         if (! isFilled(pwd.value)) {
-            errors.value.pwd = t('message.field_is_required')
+            errors.value.pwd = t('error.field_is_required')
             return false
         }
 
@@ -58,14 +58,14 @@
 
 <template>
     <div>
-        <h1 class="title has-text-grey-dark" v-html="$t('title.twofauth_webext')"></h1>
+        <h1 class="title has-text-grey-dark" v-html="$t('heading.twofauth_webext')"></h1>
         <p class="block">
             {{ $t('message.unlock_description') }}
         </p>
         <form id="frmUnlock" @submit.prevent="unlock">
             <FormPasswordField v-model="pwd" fieldName="password" :errorMessage="errors.pwd" label="field.extPassword" autocomplete="current-password" />
             <FormButtons
-                submitLabel="message.unlock"
+                submitLabel="label.unlock"
                 submitId="btnUnlock"
                 :isBusy="isBusy" />
         </form>

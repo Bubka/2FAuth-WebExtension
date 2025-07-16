@@ -144,7 +144,7 @@
         errors.value.hostUrl = ''
 
         if (! isFilled(_hostUrl.value) || ! isHttpUrl(_hostUrl.value)) {
-            errors.value.hostUrl = t('message.field_is_required_and_valid_url')
+            errors.value.hostUrl = t('error.field_is_required_and_valid_url')
             return false
         }
 
@@ -156,7 +156,7 @@
         errors.value.apiToken = ''
 
         if (! isFilled(_apiToken.value)) {
-            errors.value.apiToken = t('message.field_is_required')
+            errors.value.apiToken = t('error.field_is_required')
             return false
         }
 
@@ -167,7 +167,7 @@
         errors.value.extPassword = ''
 
         if (! isFilled(_extPassword.value)) {
-            errors.value.extPassword = t('message.field_is_required')
+            errors.value.extPassword = t('error.field_is_required')
             return false
         }
 
@@ -178,14 +178,14 @@
 
 <template>
     <div>
-        <h1 class="title has-text-grey-dark" v-html="$t('title.setup')"></h1>
+        <h1 class="title has-text-grey-dark" v-html="$t('heading.setup')"></h1>
         <form id="frmExtSetup" @submit.prevent="saveSetup">
             <FormField v-model="_hostUrl" fieldName="hostUrl" :errorMessage="errors.hostUrl" inputType="text" label="field.hostUrl" help="field.hostUrl.help" />
             <FormTextarea v-model="_apiToken" :errorMessage="errors.apiToken" fieldName="apiToken" rows="4" label="field.apiToken"  help="field.apiToken.help" :size="'is-small'" />
             <div class="field is-grouped">
                 <div class="control">
                     <VueButton :isLoading="isTesting" class="tag mr-2" nativeType="button" @click="checkConnection">
-                        {{  $t('message.test') }}
+                        {{  $t('label.test') }}
                     </VueButton>
                     <!-- <span v-if="isConnected == true" class="has-text-success-dark is-size-7">{{ $t('message.hi_x_its_all_good', { username: username }) }}
                          <LucideUserRoundCheck />

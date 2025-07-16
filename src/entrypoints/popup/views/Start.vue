@@ -19,7 +19,7 @@
             <div class="column is-full quick-uploader-button" >
                 <div class="quick-uploader-centerer">
                     <a :title="settingStore.hostUrl" tabindex="0" class="button is-link is-medium is-rounded is-main" @click="openUrlInNewTab(settingStore.hostUrl)">
-                        {{ $t('message.go_to_2fauth_host') }}
+                        {{ $t('link.go_to_2fauth_host') }}
                     </a>
                 </div>
             </div>

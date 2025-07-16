@@ -7,7 +7,7 @@
     const isReseting = ref(false)
 
     function resetExtension() {
-        if(confirm(t('message.are_you_sure'))) {
+        if(confirm(t('confirmation.are_you_sure'))) {
             useResetExtension()
         }
     }
@@ -16,13 +16,13 @@
 
 <template>
     <div>
-        <h1 class="title has-text-grey-dark" v-html="$t('title.reset_extension')"></h1>
+        <h1 class="title has-text-grey-dark" v-html="$t('heading.reset_extension')"></h1>
         <p class="block">{{ $t('message.reset_extension_description_bis') }}</p>
         <p class="block">{{ $t('message.reset_extension_description') }}</p>
         <p class="block">{{ $t('message.token_remains_valid') }}</p>
         <form>
             <VueButton nativeType="submit" @click="resetExtension" :isLoading="isReseting" id="btnResetExtension" color="is-danger">
-                {{ $t('message.reset_extension') }}
+                {{ $t('label.reset_extension') }}
             </VueButton>
         </form>
     </div>

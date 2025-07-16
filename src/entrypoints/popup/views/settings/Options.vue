@@ -46,39 +46,39 @@
         { text: 'message.automatic', value: 'system', icon: 'MonitorCheck' },
     ]
     const passwordFormats = [
-        { text: 'message.pair.label', value: 2, legend: 'message.pair', title: 'message.pair.legend' },
-        { text: 'message.trio.label', value: 3, legend: 'message.trio', title: 'message.trio.legend' },
-        { text: 'message.half.label', value: 0.5, legend: 'message.half', title: 'message.half.legend' },
+        { text: 'label.pair_digit', value: 2, legend: 'label.pair', title: 'label.pair.legend' },
+        { text: 'label.trio_digit', value: 3, legend: 'label.trio', title: 'label.trio.legend' },
+        { text: 'label.half_digit', value: 0.5, legend: 'label.half', title: 'label.half.legend' },
     ]
     const kickUserAfters = [
-        { text: 'message.never', value: 0 },
-        { text: 'message.on_otp_copy', value: -1 },
-        { text: 'message.one_minutes', value: 1 },
-        { text: 'message.five_minutes', value: 5 },
-        { text: 'message.ten_minutes', value: 10 },
-        { text: 'message.fifteen_minutes', value: 15 },
-        { text: 'message.thirty_minutes', value: 30 },
-        { text: 'message.one_hour', value: 60 },
-        { text: 'message.one_day', value: 1440 }, 
+        { text: 'label.never', value: 0 },
+        { text: 'label.on_otp_copy', value: -1 },
+        { text: 'label.one_minutes', value: 1 },
+        { text: 'label.five_minutes', value: 5 },
+        { text: 'label.ten_minutes', value: 10 },
+        { text: 'label.fifteen_minutes', value: 15 },
+        { text: 'label.thirty_minutes', value: 30 },
+        { text: 'label.one_hour', value: 60 },
+        { text: 'label.one_day', value: 1440 }, 
     ]
     const autoCloseTimeout = [
-        { text: 'message.never', value: 0 },
-        { text: 'message.one_minutes', value: 1 },
-        { text: 'message.two_minutes', value: 2 },
-        { text: 'message.five_minutes', value: 5 },
+        { text: 'label.never', value: 0 },
+        { text: 'label.one_minutes', value: 1 },
+        { text: 'label.two_minutes', value: 2 },
+        { text: 'label.five_minutes', value: 5 },
     ]
     const groupsList = ref([
-        { text: 'message.no_group', value: 0 },
-        { text: 'message.active_group', value: -1 },
+        { text: 'label.no_group', value: 0 },
+        { text: 'label.active_group', value: -1 },
     ])
     const getOtpTriggers = [
-        { text: 'message.otp_generation_on_request', value: true, legend: 'message.otp_generation_on_request.legend', title: 'message.otp_generation_on_request.title' },
-        { text: 'message.otp_generation_on_home', value: false, legend: 'message.otp_generation_on_home.legend', title: 'message.otp_generation_on_home.title' },
+        { text: 'label.after_a_click_tap', value: true, legend: 'label.alone_in_its_own_view', title: 'label.alone_in_its_own_view.title' },
+        { text: 'label.constantly', value: false, legend: 'label.all_of_them_on_home', title: 'label.all_of_them_on_home.title' },
     ]
 
     const langs = computed(() => {
         let locales = [{
-            text: 'message.browser_preference',
+            text: 'label.browser_preference',
             value: 'browser'
         }];
 
@@ -118,7 +118,7 @@
      * 
      */
     function notifySuccess() {
-        notify.success({ type: 'is-success', text: t('message.setting_saved') })
+        notify.success({ type: 'is-success', text: t('notification.setting_saved') })
     }
 
     /**
@@ -166,7 +166,7 @@
             <form>
                 <!-- user preferences -->
                 <div class="block">
-                    <h4 class="title is-4 has-text-grey-light">{{ $t('message.general') }}</h4>
+                    <h4 class="title is-4 has-text-grey-light">{{ $t('heading.general') }}</h4>
                     <div v-if="settingStore.hasLockedPreferences && lockedPreferences.length > 0" class="notification is-warning is-size-7">
                         {{ $t('message.settings_managed_by_administrator') }}
                     </div>
@@ -176,7 +176,7 @@
                         {{ $t('message.some_translation_are_missing') }}
                         <a class="ml-2" @click="openUrlInNewTab('https://crowdin.com/project/2fauth')">
                             <span class="icon-text" style="line-height: inherit">
-                                <span>{{ $t('message.help_translate_2fauth') }}</span>
+                                <span>{{ $t('link.help_translate_2fauth') }}</span>
                                 <span class="icon is-small"><LucideExternalLink /></span>
                             </span>
                         </a>
@@ -191,7 +191,7 @@
                     <!-- clear search on copy -->
                     <FormCheckbox v-model="preferenceStore.clearSearchOnCopy" @update:model-value="notifySuccess" fieldName="clearSearchOnCopy" :isLocked="settingStore.lockedPreferences.includes('clearSearchOnCopy')" label="field.clear_search_on_copy" help="field.clear_search_on_copy.help" />
                     
-                    <h4 class="title is-4 pt-4 has-text-grey-light">{{ $t('message.groups') }}</h4>
+                    <h4 class="title is-4 pt-4 has-text-grey-light">{{ $t('heading.groups') }}</h4>
                     <!-- default group -->
                     <FormSelect v-model="preferenceStore.defaultGroup" @update:model-value="notifySuccess" :options="groupsList" fieldName="defaultGroup" label="field.default_group" help="field.default_group.help" />
                     <!-- retain active group -->
@@ -199,9 +199,9 @@
                     <!-- always return to default group after copying -->
                     <FormCheckbox v-model="preferenceStore.viewDefaultGroupOnCopy" @update:model-value="notifySuccess" fieldName="viewDefaultGroupOnCopy" :isLocked="settingStore.lockedPreferences.includes('viewDefaultGroupOnCopy')" label="field.view_default_group_on_copy" help="field.view_default_group_on_copy.help" />
                     
-                    <h4 class="title is-4 pt-4 has-text-grey-light">{{ $t('message.security') }}</h4>
+                    <h4 class="title is-4 pt-4 has-text-grey-light">{{ $t('heading.security') }}</h4>
                     <!-- auto lock -->
-                    <FormSelect v-model="kickAfter" @update:model-value="changeAutolockDelay()" :options="kickUserAfters" fieldName="kickUserAfter" :isLocked="settingStore.lockedPreferences.includes('kickUserAfter')" label="field.auto_lock" help="field.auto_lock.help" />
+                    <FormSelect v-model="kickAfter" @update:model-value="changeAutolockDelay()" :options="kickUserAfters" fieldName="kickUserAfter" :isLocked="settingStore.lockedPreferences.includes('kickUserAfter')" label="field.auto_lock_extension" help="field.auto_lock_extension.help" />
                     <!-- get OTP on request -->
                     <FormToggle v-model="preferenceStore.getOtpOnRequest" @update:model-value="notifySuccess" :choices="getOtpTriggers" fieldName="getOtpOnRequest" :isLocked="settingStore.lockedPreferences.includes('getOtpOnRequest')" label="field.otp_generation" help="field.otp_generation.help"/>
                         <!-- close otp on copy -->
