@@ -19,5 +19,12 @@
   "i18n-ally.sourceLanguage": "en",
   "i18n-ally.indent": 4,
   "i18n-ally.review.gutters": false,
-  "i18n-ally.review.enabled": false
+  "i18n-ally.review.enabled": false,
+  "i18n-ally.usage.scanningIgnore": [
+      "**/.vscode/**/*",
+      "**/.wxt/**/*",
+      "**/dist/**/*",
+      "**/public/**/*",
+      "**/releases/**/*",
+  ]
 }
