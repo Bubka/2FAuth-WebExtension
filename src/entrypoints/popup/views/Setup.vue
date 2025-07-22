@@ -178,7 +178,7 @@
 
 <template>
     <div>
-        <h1 class="title has-text-grey-dark" v-html="$t('heading.setup')"></h1>
+        <h1 class="title has-text-grey-dark">{{ $t('heading.setup') }}</h1>
         <form id="frmExtSetup" @submit.prevent="saveSetup">
             <FormField v-model="_hostUrl" fieldName="hostUrl" :errorMessage="errors.hostUrl" inputType="text" label="field.hostUrl" help="field.hostUrl.help" />
             <FormTextarea v-model="_apiToken" :errorMessage="errors.apiToken" fieldName="apiToken" rows="4" label="field.apiToken"  help="field.apiToken.help" :size="'is-small'" />

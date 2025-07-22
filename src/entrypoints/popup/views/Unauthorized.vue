@@ -21,7 +21,7 @@
 
 <template>
     <div>
-        <h1 class="title has-text-grey-dark" v-html="$t('heading.unauthorized')"></h1>
+        <h1 class="title has-text-grey-dark">{{ $t('heading.unauthorized') }}</h1>
         <p class="block">{{ $t('message.authentication_against_server_failed') }}</p>
         <p class="block">{{ $t('message.is_pat_still_valid') }}</p>
         <p class="block">{{ $t('message.retry_or_reset_extension') }}</p>

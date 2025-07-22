@@ -8,7 +8,7 @@
 
 <template>
     <div>
-        <h1 class="title has-text-grey-dark" v-html="$t('heading.purpose')"></h1>
+        <h1 class="title has-text-grey-dark">{{ $t('heading.purpose') }}</h1>
         <p class="block">
             {{ $t('message.purpose_description') }}
         </p>
