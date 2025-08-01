@@ -17,6 +17,7 @@ dist
 releases
 dist-ssr
 *.local
+resources
 
 # Editor directories and files
 # .vscode/*
