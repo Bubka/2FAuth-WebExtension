@@ -201,7 +201,7 @@
             <VueFooter>
                 <FormButtons
                     submitId="btnSubmitSetup"
-                    submitLabel="message.save"
+                    submitLabel="label.save"
                     :isBusy="isSaving == true"
                     :showCancelButton="true"
                     @cancel="router.push({ name: 'landing' })" />

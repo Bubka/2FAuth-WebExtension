@@ -41,9 +41,9 @@
     })
 
     const themes = [
-        { text: 'message.light', value: 'light', icon: 'Sun' },
-        { text: 'message.dark', value: 'dark', icon: 'Moon' },
-        { text: 'message.automatic', value: 'system', icon: 'MonitorCheck' },
+        { text: 'label.light', value: 'light', icon: 'Sun' },
+        { text: 'label.dark', value: 'dark', icon: 'Moon' },
+        { text: 'label.automatic', value: 'system', icon: 'MonitorCheck' },
     ]
     const passwordFormats = [
         { text: 'label.pair_digit', value: 2, legend: 'label.pair', title: 'label.pair.legend' },
