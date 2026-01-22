@@ -16,7 +16,7 @@
         "build:firefox": "wxt build -b firefox",
         "zip": "wxt zip",
         "zip:firefox": "wxt zip -b firefox",
-        "postinstall": "wxt prepare",
+        "postinstall": "wxt prepare && node ./scripts/postinstall-crowdin-check.js",
         "lint": "eslint . --fix"
     },
     "devDependencies": {
