@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const { spawnSync } = require('child_process')
+import { spawnSync } from 'child_process'
 
 function runCommand(cmd, args) {
   const proc = spawnSync(cmd, args, { stdio: 'inherit', shell: false })
