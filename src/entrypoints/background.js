@@ -49,6 +49,10 @@ export default defineBackground({
         let enable_debug = 'development' == process.env.NODE_ENV
         // let enable_debug = true
         let encryptionKey = null
+        
+        // QR code capture state
+        let qrImageBuffer = null
+        let qrImageMimeType = null
 
         //  MARK: Listeners
         // Lancer quand une fenêtre est fermée.
@@ -129,6 +133,85 @@ export default defineBackground({
         onMessage('GET_EXT_VERSION', () => {
             swlog('📢 GET_EXT_VERSION message received')
             return browser.runtime.getManifest().version
+        })
+        onMessage('INJECT_CONTENT_SCRIPT', async () => {
+            swlog('📢 INJECT_CONTENT_SCRIPT message received')
+            try {
+                const tabs = await browser.tabs.query({ active: true, currentWindow: true })
+                if (tabs.length === 0) {
+                    return { success: false, error: 'No active tab found' }
+                }
+                
+                const tabId = tabs[0].id
+                
+                // For Manifest V3 (Chrome/Edge)
+                if (import.meta.env.MANIFEST_VERSION === 3) {
+                    await browser.scripting.executeScript({
+                        target: { tabId },
+                        files: ['content-scripts/content.js']
+                    })
+                } else {
+                    // For Manifest V2 (Firefox/Safari)
+                    await browser.tabs.executeScript(tabId, {
+                        file: '/content-scripts/content.js'
+                    })
+                }
+                
+                swlog('Content script injected successfully')
+                
+                // Send message to start scanning
+                await sendMessage('START_QR_SCAN', {}, `content-script@${tabId}`)
+                
+                return { success: true }
+            } catch (error) {
+                swlog('❌ Failed to inject content script:', error)
+                return { success: false, error: error.message }
+            }
+        })
+        onMessage('QR_IMAGE_SELECTED', async ({ data }) => {
+            swlog('📢 QR_IMAGE_SELECTED message received')
+            try {
+                // Store the image data
+                qrImageBuffer = new Uint8Array(data.imageBuffer)
+                qrImageMimeType = data.mimeType
+
+                swlog('QR image stored, waiting for popup to retrieve it')
+
+                return { success: true }
+            } catch (error) {
+                swlog('❌ Failed to store QR image:', error)
+                return { success: false, error: error.message }
+            }
+        })
+        onMessage('QR_SCAN_COMPLETE', ({ data }) => {
+            swlog('📢 QR_SCAN_COMPLETE message received')
+            swlog('QR codes found:', data.found, 'Count:', data.count)
+            return { success: true }
+        })
+        onMessage('QR_CAPTURE_ERROR', ({ data }) => {
+            swlog('📢 QR_CAPTURE_ERROR message received')
+            swlog('❌ QR capture error:', data.error)
+            return { success: true }
+        })
+        onMessage('GET_QR_BLOB', () => {
+            swlog('📢 GET_QR_BLOB message received')
+            if (qrImageBuffer && qrImageMimeType) {
+                const result = {
+                    success: true,
+                    imageBuffer: Array.from(qrImageBuffer),
+                    mimeType: qrImageMimeType
+                }
+                
+                // Clear the stored data after retrieval
+                qrImageBuffer = null
+                qrImageMimeType = null
+                
+                swlog('QR blob data sent to popup')
+                return result
+            } else {
+                swlog('⚠️ No QR blob data available')
+                return { success: false, error: 'No QR image data available' }
+            }
         })
 
         //  MARK: Loggers

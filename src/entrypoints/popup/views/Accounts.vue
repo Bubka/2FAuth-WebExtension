@@ -1,4 +1,5 @@
 <script setup>
+    import ActionButtons from '@popup/components/ActionButtons.vue'
     import twofaccountService from '@popup/services/twofaccountService'
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useSettingStore } from '@/stores/settingStore'
@@ -416,10 +417,15 @@
                     </div>
                 </span>
             </div>
-            <VueFooter>
+            <!-- <VueFooter>
                 <router-link id="lnkSettings" :to="{ name: 'settings.options' }" class="has-text-grey">
                     {{ $t('link.settings') }}
                 </router-link>
+            </VueFooter> -->
+            <VueFooter>
+                <template #default>
+                    <ActionButtons />
+                </template>
             </VueFooter>
         </div>
         <Spinner

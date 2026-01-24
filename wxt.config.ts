@@ -17,6 +17,8 @@ export default defineConfig({
             'clipboardWrite',
             'alarms',
             'idle',
+            'activeTab',
+            'tabs',
         ]
 
         if (browser === 'chrome' || browser === 'edge' ) {

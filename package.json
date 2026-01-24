@@ -34,6 +34,7 @@
         "cross-env": "^7.0.3",
         "crypto-js": "^4.2.0",
         "eslint-plugin-vue": "^9.30.0",
+        "jsqr": "^1.4.0",
         "lucide-vue-next": "^0.474.0",
         "pinia": "^2.2.6",
         "pinia-plugin-persistedstate-2": "^2.0.28",
