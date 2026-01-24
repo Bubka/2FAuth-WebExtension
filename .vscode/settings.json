@@ -9,8 +9,8 @@
     "source.fixAll": "explicit"
   },
   "workbench.colorCustomizations": {
-    // "tab.activeBorder": "#007FD4",
     "tab.inactiveBackground": "#0000004f",
+    "tab.activeBorder": "#007FD4"
   },
   "i18n-ally.localesPaths": [
     "resources/lang"
@@ -21,10 +21,10 @@
   "i18n-ally.review.gutters": false,
   "i18n-ally.review.enabled": false,
   "i18n-ally.usage.scanningIgnore": [
-      "**/.vscode/**/*",
-      "**/.wxt/**/*",
-      "**/dist/**/*",
-      "**/public/**/*",
-      "**/releases/**/*",
+    "**/.vscode/**/*",
+    "**/.wxt/**/*",
+    "**/dist/**/*",
+    "**/public/**/*",
+    "**/releases/**/*",
   ]
 }
