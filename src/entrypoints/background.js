@@ -158,11 +158,9 @@ export default defineBackground({
                 }
                 
                 swlog('Content script injected successfully')
+                console.log(`content-script@${tabId}`)
                 
-                // Send message to start scanning
-                await sendMessage('START_QR_SCAN', {}, `content-script@${tabId}`)
-                
-                return { success: true }
+                return { success: true, tabId: tabId }
             } catch (error) {
                 swlog('❌ Failed to inject content script:', error)
                 return { success: false, error: error.message }
@@ -176,6 +174,7 @@ export default defineBackground({
                 qrImageMimeType = data.mimeType
 
                 swlog('QR image stored, waiting for popup to retrieve it')
+                // await sendMessage('QR_BLOB_AVAILABLE', {}, 'popup')
 
                 return { success: true }
             } catch (error) {

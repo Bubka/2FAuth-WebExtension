@@ -1,9 +1,11 @@
 <script setup>
+    // import { onMessage } from 'webext-bridge/popup'
     import qrcodeService from '@popup/services/qrcodeService'
     import { useBusStore } from '@popup/stores/bus'
     import { useNotify } from '@2fauth/ui'
     import { useTwofaccounts } from '@popup/stores/twofaccounts'
 
+    const { t } = useI18n()
     const router = useRouter()
     const bus = useBusStore()
     const notify = useNotify()
@@ -43,32 +45,42 @@
     /**
      * Handle QR capture button click
      */
-    async function handleCaptureQr() {
+    async function captureQrCode() {
         try {
             const result = await sendMessage('INJECT_CONTENT_SCRIPT', {}, 'background')
             if (!result.success) {
-                notify.alert({ text: t('error.failed_to_inject_content_script') })
+                notify.alert({ text: t(result.error) })
             }
-            // Popup stays open, waiting for user to click a QR code
+ 
+            // Send message to start scanning
+            await sendMessage('START_QR_SCAN', {}, `content-script@${result.tabId}`)
+
         } catch (error) {
             notify.alert({ text: t('error.failed_to_inject_content_script') })
             console.error('Error injecting content script:', error)
         }
     }
 
-    onMounted(async () => {
-        // Check if there's QR data waiting from a capture
-        try {
-            const qrBlobData = await sendMessage('GET_QR_BLOB', {}, 'background')
+    // onMounted(async () => {
+    //     // Check if there's QR data waiting from a capture
+    //     try {
+    //         const qrBlobData = await sendMessage('GET_QR_BLOB', {}, 'background')
             
-            if (qrBlobData.success && qrBlobData.imageBuffer) {
-                // QR data found, navigate to create route
-                router.push({ name: 'createAccount' })
-            }
-        } catch (error) {
-            // Ignore - no QR data available
-        }
-    })
+    //         if (qrBlobData.success && qrBlobData.imageBuffer) {
+    //             // QR data found, navigate to create route
+    //             router.push({ name: 'createAccount' })
+    //         }
+    //     } catch (error) {
+    //         // Ignore - no QR data available
+    //     }
+    // })
+
+    // onMounted(async () => {
+    //     onMessage('QR_BLOB_AVAILABLE', () => {
+    //         submitQrCode()
+    //         return { success: true }
+    //     })
+    // })
 
 </script>
 
@@ -85,7 +97,7 @@
             <div class="column is-full quick-uploader-button" >
                 <div class="quick-uploader-centerer">
                     <!-- scan button that launch qrcode detection in current tab -->
-                    <button type="button" class="button is-link is-medium is-rounded is-main" @click="handleCaptureQr()">
+                    <button type="button" class="button is-link is-medium is-rounded is-main" @click="captureQrCode()">
                         {{ $t('label.scan_qrcode') }}
                     </button>
                 </div>
