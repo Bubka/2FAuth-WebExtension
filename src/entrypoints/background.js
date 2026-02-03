@@ -1,4 +1,4 @@
-import { onMessage } from 'webext-bridge/background'
+import { onMessage, sendMessage } from 'webext-bridge/background'
 
 export default defineBackground({
 
@@ -134,12 +134,12 @@ export default defineBackground({
             swlog('📢 GET_EXT_VERSION message received')
             return browser.runtime.getManifest().version
         })
-        onMessage('INJECT_CONTENT_SCRIPT', async () => {
+        onMessage('INJECT_CONTENT_SCRIPT', async ({ data }) => {
             swlog('📢 INJECT_CONTENT_SCRIPT message received')
             try {
                 const tabs = await browser.tabs.query({ active: true, currentWindow: true })
                 if (tabs.length === 0) {
-                    return { success: false, error: 'No active tab found' }
+                    return { success: false, error: 'error.no_active_tab_found' }
                 }
                 
                 const tabId = tabs[0].id
@@ -157,13 +157,16 @@ export default defineBackground({
                     })
                 }
                 
-                swlog('Content script injected successfully')
+                swlog('✔️ Content script injected successfully')
                 console.log(`content-script@${tabId}`)
+
+                // Send message to start scanning
+                await sendMessage('START_QR_SCAN', data, `content-script@${tabId}`)
                 
-                return { success: true, tabId: tabId }
+                return { success: true }
             } catch (error) {
                 swlog('❌ Failed to inject content script:', error)
-                return { success: false, error: error.message }
+                return { success: false, error: 'error.failed_to_inject_content_script' }
             }
         })
         onMessage('QR_IMAGE_SELECTED', async ({ data }) => {
@@ -173,8 +176,9 @@ export default defineBackground({
                 qrImageBuffer = new Uint8Array(data.imageBuffer)
                 qrImageMimeType = data.mimeType
 
-                swlog('QR image stored, waiting for popup to retrieve it')
-                // await sendMessage('QR_BLOB_AVAILABLE', {}, 'popup')
+                swlog('QR image stored, waiting for popup to ask for it')
+                
+                await browser.action.openPopup()
 
                 return { success: true }
             } catch (error) {
@@ -182,15 +186,19 @@ export default defineBackground({
                 return { success: false, error: error.message }
             }
         })
-        onMessage('QR_SCAN_COMPLETE', ({ data }) => {
-            swlog('📢 QR_SCAN_COMPLETE message received')
-            swlog('QR codes found:', data.found, 'Count:', data.count)
-            return { success: true }
-        })
-        onMessage('QR_CAPTURE_ERROR', ({ data }) => {
-            swlog('📢 QR_CAPTURE_ERROR message received')
-            swlog('❌ QR capture error:', data.error)
-            return { success: true }
+        onMessage('IS_THERE_QR', async () => {
+            swlog('📢 IS_THERE_QR message received')
+
+                const tabs = await browser.tabs.query({ active: true, currentWindow: true })
+                if (tabs.length === 0) {
+                    return { success: false, error: 'error.no_active_tab_found' }
+                }
+                
+                const tabId = tabs[0].id
+
+                await sendMessage('CLEANUP', {}, `content-script@${tabId}`)
+
+            return { success: true, hasQR: qrImageBuffer && qrImageMimeType }
         })
         onMessage('GET_QR_BLOB', () => {
             swlog('📢 GET_QR_BLOB message received')
@@ -209,7 +217,30 @@ export default defineBackground({
                 return result
             } else {
                 swlog('⚠️ No QR blob data available')
-                return { success: false, error: 'No QR image data available' }
+                return { success: false, error: 'error.no_qr_image_data_available' }
+            }
+        })
+        onMessage('CAPTURE_SCREENSHOT', async ({ data }) => {
+            swlog('📢 CAPTURE_SCREENSHOT message received')
+            try {
+                const tabs = await browser.tabs.query({ active: true, currentWindow: true })
+                if (tabs.length === 0) {
+                    return { success: false, error: 'error.no_active_tab_found' }
+                }
+                
+                // Capture the full visible tab
+                const dataUrl = await browser.tabs.captureVisibleTab(tabs[0].windowId, {
+                    format: 'png',
+                    rect: data.rect
+                })
+                
+                return { 
+                    success: true, 
+                    dataUrl: dataUrl
+                }
+            } catch (error) {
+                swlog('❌ Failed to capture screenshot:', error)
+                return { success: false, error: error.message }
             }
         })
 

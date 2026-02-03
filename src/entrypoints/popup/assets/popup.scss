@@ -8,7 +8,13 @@
 #popup {
   width:350px;
   min-height:350px;
-  max-height:550px;
+  max-height:600px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.ext-full-height {
+  height: 600px;
 }
 
 a.button.is-main {
@@ -59,10 +65,6 @@ footer.main {
   padding-top: 0;
 }
 
-.modal-error {
-  min-height: 350px;
-}
-
 .error-message {
   overflow-x: clip;
 }
@@ -73,4 +75,14 @@ footer.main {
 
 .accounts {
   min-height: 300px;
+  margin-top: 70px;
+}
+
+.quick-uploader-button {
+  margin-bottom: 0;
+}
+
+.quick-uploader-header {
+  padding-top: 3vh;
+  padding-bottom: 3vh;
 }

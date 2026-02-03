@@ -16,9 +16,6 @@ export default {
         
         return apiClient.post('/qrcode/decode', formData, {
             ...config,
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
         })
     },
 }

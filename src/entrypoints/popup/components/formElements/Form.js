@@ -1,4 +1,4 @@
-import { httpClientFactory } from '@/services/httpClientFactory'
+import { httpClientFactory } from '@popup/services/httpClientFactory'
 import Errors   from './FormErrors'
 
 class Form {

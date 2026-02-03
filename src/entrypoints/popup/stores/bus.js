@@ -8,6 +8,8 @@ export const useBusStore = defineStore('bus', {
             inManagementMode: false,
             editedGroupName: null,
             username: null,
+            hasQR: false,
+            closeErrorPushTo: null,
         }
     },
 

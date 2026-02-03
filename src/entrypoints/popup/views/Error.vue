@@ -3,10 +3,12 @@
     import { useErrorHandler } from '@2fauth/stores'
     import { UseColorMode } from '@vueuse/components'
     import { useRouter, useRoute } from 'vue-router'
+    import { useBusStore } from '@popup/stores/bus'
     
     const errorHandler = useErrorHandler()
     const router = useRouter()
     const route = useRoute()
+    const bus = useBusStore()
 
     const showModal = ref(true)
     const showDebug = computed(() => process.env.NODE_ENV === 'development')
@@ -34,15 +36,23 @@
      * Exits the error view
      */
     function exit() {
-        window.history.length > 1 && route.name !== '404' && route.name !== 'notFound' && !route.query.err
-            ? router.go(-1)
-            : router.push({ name: 'accounts' })
+        if (bus.closeErrorPushTo != null && bus.closeErrorPushTo != '') {
+            const pushTo = bus.closeErrorPushTo
+            bus.closeErrorPushTo = null
+
+            router.push({ name: pushTo })
+        }
+        else if (window.history.length > 1 && route.name !== '404' && route.name !== 'notFound' && !route.query.err) {
+            router.go(-1)
+        } else {
+            router.push({ name: 'accounts' })
+        }
     }
 
 </script>
 
 <template>
-    <div class="modal-error">
+    <div class="ext-full-height">
         <Modal v-model="showModal" :isFullHeight="true">
             <UseColorMode v-slot="{ mode }">
                 <div class="error-message" v-if="$route.name == '404' || $route.name == 'notFound'">

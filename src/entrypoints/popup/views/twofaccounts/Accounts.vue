@@ -1,4 +1,5 @@
 <script setup>
+    import { onMessage, sendMessage } from 'webext-bridge/popup'
     import ActionButtons from '@popup/components/ActionButtons.vue'
     import twofaccountService from '@popup/services/twofaccountService'
     import { usePreferenceStore } from '@/stores/preferenceStore'
@@ -225,7 +226,43 @@
         })
     }
 
+    /**
+     * Handle QR capture button click
+     */
+    async function scanForQrCodeInTab() {
+        try {
+            const result = await sendMessage('INJECT_CONTENT_SCRIPT', {
+                addButtonCaption: t('label.add_to_2fauth'),
+                cancelButtonCaption: t('label.cancel')
+            }, 'background')
+            
+            if (!result.success) {
+                notify.alert({ text: t(result.error) })
+            }
+        } catch (error) {
+            notify.alert({ text: t('error.failed_to_inject_content_script') })
+        }
+    }
+
     onMounted(async () => {
+
+        // listener for qr capture
+        onMessage('QR_SCAN_COMPLETE', ({ data }) => {
+            if (! data.found) {
+                notify.alert({ text: t('error.no_qrcode_found') })
+            }
+            else {
+                window.close()
+            }
+
+            return { success: true }
+        })
+
+        // if (bus.hasQR) {
+        //     console.log('bus.hasQR', bus.hasQR)
+        //     submitQrCode()
+        // }
+
         // This SFC is reached only if the user has some twofaccounts (see the starter middleware).
         // This allows to display accounts without latency.
         //
@@ -417,14 +454,16 @@
                     </div>
                 </span>
             </div>
-            <!-- <VueFooter>
-                <router-link id="lnkSettings" :to="{ name: 'settings.options' }" class="has-text-grey">
-                    {{ $t('link.settings') }}
-                </router-link>
-            </VueFooter> -->
             <VueFooter>
                 <template #default>
-                    <ActionButtons />
+                    <ActionButtons
+                        @capture-button-clicked="scanForQrCodeInTab()">
+                    </ActionButtons>
+                </template>
+                <template #subpart>
+                    <router-link id="lnkSettings" :to="{ name: 'settings.options' }" class="has-text-grey">
+                        {{ $t('link.settings') }}
+                    </router-link>
                 </template>
             </VueFooter>
         </div>

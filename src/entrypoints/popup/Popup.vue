@@ -1,11 +1,14 @@
 <script setup>
+    import { sendMessage } from 'webext-bridge/popup'
     import { RouterView, useRoute } from 'vue-router'
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useSettingStore } from '@/stores/settingStore'
+    import { useBusStore } from '@popup/stores/bus'
     import { Kicker } from '@2fauth/ui'
 
     const preferenceStore = usePreferenceStore()
     const settingStore = useSettingStore()
+    const bus = useBusStore()
     const route = useRoute()
     const router = useRouter()
     const kickUser = ref(null)
@@ -46,6 +49,16 @@
         preferenceStore.applyTheme()
         preferenceStore.applyLanguage()
         preferenceStore.resetGroupFilter()
+    })
+
+    onMounted(async () => {
+        const result = await sendMessage('IS_THERE_QR', {}, 'background')
+
+        if (result.hasQR) {
+            bus.hasQR = true
+            router.push({ name: 'createAccount' })
+        }
+        else bus.hasQR = false
     })
 
     // Locks the extension

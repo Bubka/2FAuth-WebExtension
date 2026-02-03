@@ -20,9 +20,19 @@ export const httpClientFactory = () => {
             const { pat } = await sendMessage('GET_PAT', { }, 'background')
 
             config.baseURL = settingStore.hostUrl + '/api/v1'
+
+            const headers = { 
+                'Authorization': 'Bearer ' + pat, 
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+            
+            if (!(config.data instanceof FormData)) {
+                headers['Content-Type'] = 'application/json'
+            }
+            
 		    config.headers = {
                 ...config.headers,
-                ...{ 'Authorization': 'Bearer ' + pat , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' }
+                ...headers
             }
 
             return config
