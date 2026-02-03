@@ -116,9 +116,10 @@
         <TabBar :tabs="tabs" :active-tab="'settings.extension'" :is-responsive="false" @tab-selected="(to) => router.push({ name: to })" />
         <div class="options-tabs">
             <form>
+                <h4 class="title is-4 has-text-grey-light">{{ $t('heading.server_parameter') }}</h4>
                 <FormField v-model="hostUrl" fieldName="hostUrl" :isDisabled="true" inputType="text" label="field.hostUrl" />
                 <FormField v-model="apiToken" fieldName="apiToken" :isDisabled="true"  inputType="text" label="field.apiToken" />
-                <h4 class="title is-4 pt-6 has-text-grey-light">{{ $t('heading.change_password') }}</h4>
+                <h4 class="title is-4 pt-5 has-text-grey-light">{{ $t('heading.change_password') }}</h4>
                 <FormPasswordField v-model="extCurrentPassword" fieldName="extCurrentPassword" :errorMessage="errors.currentPassword" inputType="password" label="field.extCurrentPassword" autocomplete="none" help="field.extCurrentPassword.help" />
                 <FormPasswordField v-model="extNewPassword" fieldName="extNewPassword" :errorMessage="errors.newPassword" :showRules="true" label="field.extNewPassword"  help="field.extNewPassword.help" autocomplete="new-password" />
                 <div class="field is-grouped">
