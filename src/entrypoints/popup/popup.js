@@ -6,10 +6,10 @@ import { createPinia } from 'pinia'
 import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2'
 import Popup from './Popup.vue'
 import router from './router'
-import { devtools } from '@vue/devtools'
+// import { devtools } from '@vue/devtools'
 
-if ('development' == process.env.NODE_ENV)
-    devtools.connect() // default is 'http://localhost:8098'
+// if ('development' == process.env.NODE_ENV)
+//     devtools.connect() // default is 'http://localhost:8098'
 
 const popup = createApp(Popup)
 
