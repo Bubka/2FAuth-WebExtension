@@ -69,6 +69,12 @@ You can specify the browser binaries to use when running `npm run dev`. Rename `
 
 The standalone [@vue/devtools](https://devtools.vuejs.org/) app comes as an npm dev dependency. Run `./node_modules/.bin/vue-devtools` in a terminal to start it. The app is configured to listen for the extension pop-up and automatically connect to it when it opens.
 
+On ubuntu 24.04, security restriction can lead to the following error :
+
+> The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now. You need to make sure that /home/bubka/Repositories/2FAuth-WebExtension/node_modules/electron/dist/chrome-sandbox is owned by root and has mode 4755.
+
+In this case, uses `./node_modules/.bin/vue-devtools --no-sandbox`
+
 ### Build commands
 
 ```shell
