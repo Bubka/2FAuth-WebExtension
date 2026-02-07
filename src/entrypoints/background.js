@@ -192,7 +192,25 @@ export default defineBackground({
 
                 swlog('QR image stored, waiting for popup to ask for it')
                 
-                await browser.action.openPopup()
+                if (import.meta.env.MANIFEST_VERSION === 2) {
+                    // Firefox
+                    try {
+                        await browser.browserAction.openPopup()
+                    } catch (popupError) {
+                        browser.notifications.create({
+                            type: 'basic',
+                            iconUrl: 'icon-64.png',
+                            title: 'QR Code Captured',
+                            message: 'Click the extension icon to view the account'
+                        })
+                        
+                        browser.browserAction.setBadgeText({ text: '1' })
+                        browser.browserAction.setBadgeBackgroundColor({ color: '#00d1b2' })
+                    }
+                }
+                else {
+                    await browser.action.openPopup()
+                }
 
                 return { success: true }
             } catch (error) {
@@ -226,6 +244,11 @@ export default defineBackground({
                 // Clear the stored data after retrieval
                 qrImageBuffer = null
                 qrImageMimeType = null
+                
+                // Clear badge (Firefox only)
+                if (import.meta.env.MANIFEST_VERSION === 2) {
+                    browser.browserAction.setBadgeText({ text: '' })
+                }
                 
                 swlog('QR blob data sent to popup')
                 return result

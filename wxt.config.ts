@@ -20,6 +20,7 @@ export default defineConfig({
             'activeTab',
             'scripting',
             'tabs',
+            'notifications',
         ]
 
         if (browser === 'chrome' || browser === 'edge' ) {
