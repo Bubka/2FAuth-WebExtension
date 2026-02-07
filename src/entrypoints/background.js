@@ -172,9 +172,23 @@ export default defineBackground({
         onMessage('QR_IMAGE_SELECTED', async ({ data }) => {
             swlog('📢 QR_IMAGE_SELECTED message received')
             try {
+                // Reconstruct ImageData from raw data
+                const canvas = new OffscreenCanvas(data.imageData.width, data.imageData.height)
+                const ctx = canvas.getContext('2d')
+                const imageData = new ImageData(
+                    new Uint8ClampedArray(data.imageData.data),
+                    data.imageData.width,
+                    data.imageData.height
+                )
+                ctx.putImageData(imageData, 0, 0)
+                
+                // Convert to blob
+                const blob = await canvas.convertToBlob({ type: 'image/png' })
+                const arrayBuffer = await blob.arrayBuffer()
+                
                 // Store the image data
-                qrImageBuffer = new Uint8Array(data.imageBuffer)
-                qrImageMimeType = data.mimeType
+                qrImageBuffer = new Uint8Array(arrayBuffer)
+                qrImageMimeType = blob.type
 
                 swlog('QR image stored, waiting for popup to ask for it')
                 
@@ -229,9 +243,33 @@ export default defineBackground({
                 }
                 
                 // Capture the full visible tab
-                const dataUrl = await browser.tabs.captureVisibleTab(tabs[0].windowId, {
-                    format: 'png',
-                    rect: data.rect
+                const fullDataUrl = await browser.tabs.captureVisibleTab(tabs[0].windowId, {
+                    format: 'png'
+                })
+                
+                // Convert data URL to blob then to ImageBitmap
+                const response = await fetch(fullDataUrl)
+                const blob = await response.blob()
+                const imageBitmap = await createImageBitmap(blob)
+                
+                // Create canvas and crop the screenshot
+                const canvas = new OffscreenCanvas(data.rect.width, data.rect.height)
+                const ctx = canvas.getContext('2d')
+                
+                // Crop the image using the rect coordinates
+                ctx.drawImage(
+                    imageBitmap,
+                    data.rect.x, data.rect.y, data.rect.width, data.rect.height,
+                    0, 0, data.rect.width, data.rect.height
+                )
+                
+                // Convert canvas to blob then to dataUrl
+                const croppedBlob = await canvas.convertToBlob({ type: 'image/png' })
+                const reader = new FileReader()
+                const dataUrl = await new Promise((resolve, reject) => {
+                    reader.onloadend = () => resolve(reader.result)
+                    reader.onerror = reject
+                    reader.readAsDataURL(croppedBlob)
                 })
                 
                 return { 

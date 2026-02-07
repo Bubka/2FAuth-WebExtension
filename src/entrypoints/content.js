@@ -53,26 +53,32 @@ export default defineContentScript({
         }
 
         /**
-         * Extract the QR code portion from a canvas based on jsQR location data
+         * Extract the QR code portion from imageData based on jsQR location data
          */
-        function extractQRCodePortion(sourceCanvas, code) {
-            const qrCanvas = document.createElement('canvas')
-            const qrCtx = qrCanvas.getContext('2d')
-            
+        function extractQRImageData(sourceImageData, code) {
             const { topLeftCorner, topRightCorner, bottomLeftCorner } = code.location
-            const width = topRightCorner.x - topLeftCorner.x
-            const height = bottomLeftCorner.y - topLeftCorner.y
+            const width = Math.round(topRightCorner.x - topLeftCorner.x)
+            const height = Math.round(bottomLeftCorner.y - topLeftCorner.y)
+            const startX = Math.round(topLeftCorner.x)
+            const startY = Math.round(topLeftCorner.y)
             
-            qrCanvas.width = width
-            qrCanvas.height = height
+            // Create new ImageData for the QR portion
+            const qrData = new Uint8ClampedArray(width * height * 4)
             
-            qrCtx.drawImage(
-                sourceCanvas,
-                topLeftCorner.x, topLeftCorner.y, width, height,
-                0, 0, width, height
-            )
+            // Copy pixels from source to QR portion
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const sourceIndex = ((startY + y) * sourceImageData.width + (startX + x)) * 4
+                    const targetIndex = (y * width + x) * 4
+                    
+                    qrData[targetIndex] = sourceImageData.data[sourceIndex]
+                    qrData[targetIndex + 1] = sourceImageData.data[sourceIndex + 1]
+                    qrData[targetIndex + 2] = sourceImageData.data[sourceIndex + 2]
+                    qrData[targetIndex + 3] = sourceImageData.data[sourceIndex + 3]
+                }
+            }
             
-            return qrCanvas
+            return new ImageData(qrData, width, height)
         }
 
         /**
@@ -87,11 +93,11 @@ export default defineContentScript({
             })
             
             if (code) {
-                const qrCanvas = extractQRCodePortion(canvas, code)
+                const qrImageData = extractQRImageData(imageData, code)
                 
                 return { 
                     found: true, 
-                    qrCanvas: qrCanvas,
+                    qrImageData: qrImageData,
                     originalElement: element,
                     location: code.location 
                 }
@@ -291,18 +297,13 @@ export default defineContentScript({
          */
         async function handleQRClick(qrData) {
             try {
-                // Convert the extracted QR canvas to blob
-                const blob = await new Promise((resolve) => {
-                    qrData.qrCanvas.toBlob((b) => resolve(b))
-                })
-                
-                // Convert blob to ArrayBuffer for message transfer
-                const arrayBuffer = await blob.arrayBuffer()
-                
-                // Send serializable data to popup
+                // Send raw image data to background (ImageData is already untainted)
                 await sendMessage('QR_IMAGE_SELECTED', {
-                    imageBuffer: Array.from(new Uint8Array(arrayBuffer)),
-                    mimeType: blob.type
+                    imageData: {
+                        data: Array.from(qrData.qrImageData.data),
+                        width: qrData.qrImageData.width,
+                        height: qrData.qrImageData.height
+                    }
                 }, 'background')
                 
                 // Cleanup
