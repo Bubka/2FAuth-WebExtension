@@ -16,8 +16,9 @@
         "build:firefox": "wxt build -b firefox",
         "zip": "wxt zip",
         "zip:firefox": "wxt zip -b firefox",
-        "postinstall": "wxt prepare && node ./scripts/postinstall-crowdin-check.js",
-        "lint": "eslint . --fix"
+        "postinstall": "wxt prepare",
+        "lint": "eslint . --fix",
+        "get-translations": "node ./scripts/crowdin-get-translations.js"
     },
     "devDependencies": {
         "@eslint/js": "^9.14.0",
