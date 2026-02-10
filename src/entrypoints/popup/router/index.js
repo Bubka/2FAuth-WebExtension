@@ -13,6 +13,7 @@ const router = createRouter({
         { path: '/purpose', name: 'purpose', component: () => import('../views/Purpose.vue'), meta: { middlewares: [skipIfConfigured] } },
         
         { path: '/reset', name: 'reset', component: () => import('../views/Reset.vue'), meta: { middlewares: [mustBeConfigured] } },
+        { path: '/restrictions', name: 'restrictions', component: () => import('../views/Restrictions.vue'), meta: { middlewares: [mustBeConfigured, checkLock], watchedByKicker: true } },
         { path: '/unauthorized', name: 'unauthorized', component: () => import('../views/Unauthorized.vue'), meta: { middlewares: [mustBeConfigured] } },
         { path: '/unlock', name: 'unlock', component: () => import('../views/Unlock.vue'), meta: { middlewares: [mustBeConfigured] } },
         { path: '/start', name: 'start', component: () => import('../views/Start.vue'), meta: { middlewares: [mustBeConfigured, checkLock], watchedByKicker: true } },

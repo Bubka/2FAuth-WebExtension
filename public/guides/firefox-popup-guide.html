@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2FAuth Extension - Firefox Setup Guide</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <style>
+        body {
+            padding: 2rem;
+        }
+        .step {
+            margin-bottom: 2rem;
+        }
+        .step-number {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            line-height: 2rem;
+            text-align: center;
+            background-color: #3273dc;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        .code {
+            background-color: #f5f5f5;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        .warning {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title is-2">Enable popup free-opening for Web Extensions</h1>
+            <h2 class="subtitle is-3">Firefox Setup Guide</h2>
+
+            <div class="content">
+                <article class="message is-info">
+                    <div class="message-header">
+                        <p>About The Current Restriction</p>
+                    </div>
+                    <div class="message-body">
+                        <p>
+                            By default, your Firefox version prevents web extensions from opening their popups without a user gesture.
+                        </p>
+                        <p>
+                            <strong>Why does this restriction exist?</strong><br>
+                            This is a legacy measure initially introduced for ergonomic and security reasons. As Web Extension APIs have evolved, this restriction has become less relevant. In 2022, a new preference was added to Firefox that allows users to control this behavior while keeping it disabled.
+                        </p>
+                        <p class="mt-3">
+                            <strong>Is this still relevant?</strong><br>
+                            No, not really. Mozilla <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1799344#c6" target="_blank" rel="noopener noreferrer"><strong>plans to disable this restriction</strong></a> in future Firefox versions to harmonize its default behavior with other browsers.
+                        </p>
+                        <p class="mt-3">
+                            <strong>Why disabling this restriction can improve your user experience</strong><br>
+                            The 2FAuth web extension offers to capture QR code from webpages to automatically register 2FA accounts to your 2FAuth database. With the restriction enabled, when you capture a QR code, you'll receive a notification prompting you to click the extension icon to open the popup and complete the registration process.
+                        </p>
+                        <p>
+                            Without this restriction, the popup would open automatically without any notification, streamlining the process.
+                        </p>
+                        <p class="mt-3">
+                            <strong>Can it be disabled safely?</strong><br>
+                            Yes. This setting only affects the way extension popup opening is triggered. It does not affect the websites you visit or other security features.
+                        </p>
+                    </div>
+                </article>
+
+                <h3 class="title is-4">Steps to Enable Automatic Popup Opening</h3>
+
+                <div class="step">
+                    <h3 class="title is-4">
+                        <span class="step-number">1</span>
+                        Open Firefox Configuration
+                    </h3>
+                    <p class="ml-6">
+                        Type <span class="code">about:config</span> in your Firefox address bar and press Enter.
+                    </p>
+                </div>
+
+                <div class="step">
+                    <h3 class="title is-4">
+                        <span class="step-number">2</span>
+                        Accept the Warning
+                    </h3>
+                    <p class="ml-6">
+                        Click the <strong>"Accept the Risk and Continue"</strong> button to access advanced settings.
+                    </p>
+                </div>
+
+                <div class="step">
+                    <h3 class="title is-4">
+                        <span class="step-number">3</span>
+                        Search for the Preference
+                    </h3>
+                    <p class="ml-6">
+                        In the search bar at the top of the page, type: <span class="code">extensions.openPopupWithoutUserGesture.enabled</span>
+                    </p>
+                </div>
+
+                <div class="step">
+                    <h3 class="title is-4">
+                        <span class="step-number">4</span>
+                        Edit the Preference
+                    </h3>
+                    <p class="ml-6">
+                        Click the toggle button next to the preference name to change its value from <span class="code">false</span> to <span class="code">true</span>.
+                    </p>
+                </div>
+
+                <div class="step">
+                    <h3 class="title is-4">
+                        <span class="step-number">5</span>
+                        Restart Firefox (Optional)
+                    </h3>
+                    <p class="ml-6">
+                        While not always necessary, restarting Firefox ensures the change takes effect immediately.
+                    </p>
+                </div>
+
+                <div class="notification is-success mt-5">
+                    <p class="has-text-weight-bold">All done!</p>
+                    <p>The 2FAuth extension will now be able to open automatically when you capture a QR code.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

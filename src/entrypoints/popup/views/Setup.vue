@@ -7,6 +7,7 @@
     import userService from '@popup/services/userService'
     import { FormButtons } from '@2fauth/formcontrols'
     import { LucideCheck } from 'lucide-vue-next'
+    import { detect } from 'detect-browser'
     
     const { t } = useI18n()
     const settingStore = useSettingStore()
@@ -28,6 +29,13 @@
     const isSaving = ref(false)
     const isConnected = ref(null)
     const username = ref(null)
+    const canOpenPopup = ref(true)
+
+    onMounted(async () => {
+        // Test if browser supports opening popup programmatically
+        const result = await sendMessage('TEST_OPENPOPUP_CAPABILITY', {}, 'background')
+        canOpenPopup.value = result.canOpenPopup
+    })
 
     /**
      * Get user based on provided token
@@ -116,7 +124,14 @@
                         hostUrl: _hostUrl.value,
                     })
 
-                    router.push({ name: 'accounts' })
+                    // Check if browser supports automatic popup opening
+                    const browser = detect();
+
+                    if (browser && browser.name == 'firefox' && !canOpenPopup.value) {
+                        router.push({ name: 'restrictions' })
+                    } else {
+                        router.push({ name: 'accounts' })
+                    }
                 }
                 else {
                     notify.alert({ text: t(failedUnlockReason) })

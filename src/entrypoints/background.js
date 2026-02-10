@@ -169,6 +169,24 @@ export default defineBackground({
                 return { success: false, error: 'error.failed_to_inject_content_script' }
             }
         })
+        onMessage('TEST_OPENPOPUP_CAPABILITY', async () => {
+            swlog('📢 TEST_OPENPOPUP_CAPABILITY message received')
+            
+            // For non-Firefox browsers (MV3), always return true
+            if (import.meta.env.MANIFEST_VERSION !== 2) {
+                return { canOpenPopup: true }
+            }
+            
+            // For Firefox (MV2), test if openPopup() works
+            try {
+                await browser.browserAction.openPopup()
+                swlog('✔️ openPopup() capability test: SUCCESS')
+                return { canOpenPopup: true }
+            } catch (error) {
+                swlog('⚠️ openPopup() capability test: FAILED -', error.message)
+                return { canOpenPopup: false }
+            }
+        })
         onMessage('QR_IMAGE_SELECTED', async ({ data }) => {
             swlog('📢 QR_IMAGE_SELECTED message received')
             try {
