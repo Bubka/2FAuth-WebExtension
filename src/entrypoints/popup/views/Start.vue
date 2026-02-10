@@ -32,16 +32,16 @@
 
 <template>
     <!-- static landing UI -->
-    <div class="container has-text-centered ext-full-height">
+    <div class="container has-text-centered">
         <div class="columns quick-uploader">
             <!-- trailer phrase that invite to add an account -->
-            <div class="column is-full quick-uploader-header py-5 pt-6" :class="{ 'is-invisible' : twofaccounts.count !== 0 }">
-                {{ $t('message.no_account_here') }}<br>
-                <span>{{  $t('message.need_to_import_qrcode_punchline') }}</span>
+            <div class="column is-full py-5" :class="{ 'is-invisible' : twofaccounts.count !== 0 }">
+                {{  $t('message.need_to_import_qrcode_punchline') }}<br>
+                {{  $t('message.detect_qrcode_in_page_legend') }}
                 <!-- {{ $t('message.add_first_account') }} -->
             </div>
             <!-- Livescan button -->
-            <div class="column is-full quick-uploader-button" >
+            <div class="column is-full quick-uploader-button mb-5" >
                 <div class="quick-uploader-centerer">
                     <!-- scan button that launch qrcode detection in current tab -->
                     <button type="button" class="button is-link is-medium is-rounded is-main" @click="scanForQrCodeInTab()">
@@ -49,14 +49,14 @@
                     </button>
                 </div>
             </div>
-            <div class="column pt-5">
+            <!-- <div class="column pt-5">
                 {{ $t('message.detect_qrcode_in_page_legend') }}
-            </div>
+            </div> -->
         </div>
         <!-- Footer -->
         <VueFooter>
             <template #default>
-                <a :title="settingStore.hostUrl" tabindex="0" class="button is-dark is-rounded" @click="openUrlInNewTab(settingStore.hostUrl)">
+                <a :title="settingStore.hostUrl" tabindex="0" class="button is-text is-rounded" @click="openUrlInNewTab(settingStore.hostUrl)">
                     {{ $t('link.go_to_2fauth_host') }}
                 </a>
             </template>
