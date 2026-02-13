@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { usePreferenceStore } from '@/stores/preferenceStore'
 import twofaccountService from '@popup/services/twofaccountService'
+import { asArray } from '@popup/composables/helpers'
 
 export const useTwofaccounts = defineStore('twofaccounts', () => {
 
@@ -76,12 +77,14 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
             fetchedOn.value = Date.now()
 
             await twofaccountService.getAll(! preferenceStore.getOtpOnRequest).then(response => {
+                const backendItems = asArray(response?.data)
+                
                 // Defines if the store was up-to-date with the backend
                 if (force) {
-                    backendWasNewer.value = response.data.length !== items.value.length
+                    backendWasNewer.value = backendItems.length !== items.value.length
                     
                     items.value.forEach((item) => {
-                        let matchingBackendItem = response.data.find(e => e.id === item.id)
+                        let matchingBackendItem = backendItems.find(e => e.id === item.id)
                         if (matchingBackendItem == undefined) {
                             backendWasNewer.value = true
                             return;
@@ -96,7 +99,7 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
                 }
 
                 // Updates the state
-                items.value = response.data
+                items.value = backendItems
             })
         }
         else backendWasNewer.value = false

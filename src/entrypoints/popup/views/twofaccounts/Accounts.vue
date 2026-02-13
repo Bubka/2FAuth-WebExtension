@@ -4,6 +4,7 @@
     import twofaccountService from '@popup/services/twofaccountService'
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useSettingStore } from '@/stores/settingStore'
+    import { asArray } from '@popup/composables/helpers'
     import { useNotify, SearchBox } from '@2fauth/ui'
     import { useErrorHandler } from '@2fauth/stores'
     import { useTwofaccounts } from '@popup/stores/twofaccounts'
@@ -187,9 +188,10 @@
 
         fetchPromise.then(response => {
             let generatedAt = 0
+            const backendItems = asArray(response.data)
 
             // twofaccounts TOTP updates
-            response.data.forEach((account) => {
+            backendItems.forEach((account) => {
                 if (account.otp_type === 'totp') {
                     const index = twofaccounts.items.findIndex(acc => acc.id === account.id)
                     if (twofaccounts.items[index] == undefined) {
