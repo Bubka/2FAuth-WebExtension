@@ -11,9 +11,8 @@ export default defineBackground({
         const EXTSTATE_STORE = 'extstateStore'
         const PREFERENCE_STORE = 'preferences'
 
-        const decoder = new TextDecoder()
         const encoder = new TextEncoder()
-        const _crypto = (typeof window === "undefined") ? crypto : window.crypto
+        const cryptoApi = (typeof window === "undefined") ? crypto : window.crypto
 
         const default_state = {
             isLoaded: false,
@@ -45,10 +44,12 @@ export default defineBackground({
             salt: null,
             iv: null
         }
-        let state = { ...default_state }
+        let state
+        resetStateToDefaults()
+
         let enable_debug = 'development' == process.env.NODE_ENV
         // let enable_debug = true
-        let encryptionKey = null
+        let password = null
         
         // QR code capture state
         let qrImageBuffer = null
@@ -94,24 +95,20 @@ export default defineBackground({
             swlog('📢 ENCRYPT_PAT message received')
             return encryptPat(data.apiToken)
         })
-        onMessage('SET_ENC_KEY', ({ data }) => {
-            swlog('📢 SET_ENC_KEY message received')
-            return setEncKey(data.password)
+        onMessage('SET_PASSWORD', ({ data }) => {
+            swlog('📢 SET_PASSWORD message received')
+            return setPassword(data.password)
         })
-        onMessage('CHANGE_ENC_KEY', ({ data }) => {
-            swlog('📢 CHANGE_ENC_KEY message received')
-            return changeEncKey(data.password)
+        onMessage('CHANGE_PASSWORD', ({ data }) => {
+            swlog('📢 CHANGE_PASSWORD message received')
+            return changePassword(data.password)
         })
-        onMessage('CHECK_ENC_KEY', ({ data }) => {
-            swlog('📢 CHECK_ENC_KEY message received')
-            return checkEncKey(data.password)
+        onMessage('CHECK_PASSWORD', ({ data }) => {
+            swlog('📢 CHECK_PASSWORD message received')
+            return checkPassword(data.password)
         })
-        onMessage('GET_PAT', () => {
-            swlog('📢 GET_PAT message received')
-            return getPat()
-        })
-        onMessage('CHECK_LOCKED', () => {
-            swlog('📢 CHECK_LOCKED message received')
+        onMessage('CHECK_IS_LOCKED', () => {
+            swlog('📢 CHECK_IS_LOCKED message received')
             return isLocked()
         })
         onMessage('LOCK_EXTENSION', () => {
@@ -121,6 +118,10 @@ export default defineBackground({
         onMessage('UNLOCK', () => {
             swlog('📢 UNLOCK message received')
             return unlockExt()
+        })
+        onMessage('GET_PAT', () => {
+            swlog('📢 GET_PAT message received')
+            return getPat()
         })
         onMessage('GET_PARTIAL_PAT', () => {
             swlog('📢 GET_PARTIAL_PAT message received')
@@ -411,7 +412,6 @@ export default defineBackground({
         function handleBrowserClosed(window_id) {
             browser.windows.getAll().then(window_list => {
                 if (window_list.length === 0) {
-                    // bglog('Browser closing triggered')
                     if (state.kickAfter !== null) {
                         lockNow('handleBrowserClosed()')
                     } else {
@@ -470,6 +470,7 @@ export default defineBackground({
          */
         function handleSystemStateChange(new_state) {
             swlogTitle('SYSTEM CHANGE HANDLING')
+
             function checkLockState() {
                 if (state.kickAfter !== null && state.kickAfter !== -1) {
                     lockNow('handleSystemStateChange()')
@@ -494,6 +495,7 @@ export default defineBackground({
          */
         function handleStartup() {
             swlogTitle('STARTUP HANDLING')
+
             setPopupIcon()
             loadState().then(() => {
                 if (state.locked) {
@@ -535,42 +537,41 @@ export default defineBackground({
          * Save the workers state in storage
          * MARK: storeState()
          *
-         * @param update_active
+         * @param updateLastActiveAt
          * @returns {Promise<boolean>}
          */
-        function storeState(update_active = true) {
+        function storeState(updateLastActiveAt = true) {
             swlog('🖫 Storing state')
-            if (update_active) {
-                updateLastActivity()
+            
+            if (updateLastActiveAt) {
+                state.lastActiveAt = Date.now()
             }
 
             return browser.storage.local.set({ [EXTSTATE_STORE]: state }).then(() => true, () => false)
         }
 
         /**
-         * Update the last activity time in the worker state
+         * Reset worker state to defaults
          */
-        function updateLastActivity() {
-            state.lastActiveAt = Date.now()
+        function resetStateToDefaults() {
+            state = { ...default_state }
         }
 
         /**
-         * Load the workers state from storage or populate default values
+         * Set worker state to locked
+         */
+        function setStateToLocked() {
+            state.pat = ''
+            state.locked = true
+        }
+
+        /**
+         * Load the workers state from storage or apply default values
          * MARK: loadState()
          *
          * @returns {Promise<{[p: string]: any} | *>}
          */
         function loadState() {
-            /**
-             * Check if the current state warrants manually locking
-             */
-            function _checkLock() {
-                if (state.kickAfter > 0 && state.lastActiveAt !== null && ((Date.now() - state.lastActiveAt) / 60000) > state.kickAfter) {
-                    state.pat = ''
-                    state.locked = true
-                }
-            }
-
             return browser.storage.local.get({ [EXTSTATE_STORE]: null }).then(stores => {
                 state = stores[EXTSTATE_STORE]
 
@@ -579,8 +580,11 @@ export default defineBackground({
                     swlog('State loaded (from store)')
                     
                     // We force reload the kickAfter delay from the preferences store
-                    return getKickAfterFromPreferences().then(() => {
-                        _checkLock()
+                    return setKickAfterDelayUsingPreferenceStore().then(() => {
+                        // We update the state to locked if kickAfter delay is elapsed since last activity
+                        if (state.kickAfter > 0 && state.lastActiveAt !== null && ((Date.now() - state.lastActiveAt) / 60000) > state.kickAfter) {
+                            setStateToLocked()
+                        }
                     })
                 } else {
                     return loadDefaultState()
@@ -592,19 +596,16 @@ export default defineBackground({
         }
 
         /**
-         * Populate the workers state with default values
+         * Populate the workers state with default values and save it to storage
          * MARK: loadDefaultState()
          *
          * @returns {Promise<boolean>}
          */
         function loadDefaultState() {
-            state = { ...default_state }
+            resetStateToDefaults()
             swlog('State loaded (from defaults)')
 
-            return getKickAfterFromPreferences().then(() => {
-                // if (state.kickAfter !== null) {
-                //     state.locked = true
-                // }
+            return setKickAfterDelayUsingPreferenceStore().then(() => {
                 return storeState(false).then(() => {
                     return false
                 })
@@ -614,7 +615,7 @@ export default defineBackground({
         /**
          * 
          */
-        function getKickAfterFromPreferences() {
+        function setKickAfterDelayUsingPreferenceStore() {
             return browser.storage.local.get({ [PREFERENCE_STORE]: null }).then(stores => {
                 const preferencesStore = stores[PREFERENCE_STORE]
 
@@ -633,7 +634,6 @@ export default defineBackground({
                         swlog('kickAfter defaulting to 15')
                     }
                     else {
-                        // state.kickAfter = null
                         swlog('kickAfter unchanged (= ' + state.kickAfter + ')')
                     }
                     return true
@@ -647,11 +647,9 @@ export default defineBackground({
          */
         function lockNow(by = 'unknown') {
             swlog('🔒 locked by ' + by)
-            state.locked = true
-            state.pat = ''
+            setStateToLocked()
             storeState().then(() => {
-                // Clear the encryption key
-                encryptionKey = null
+                password = null
                 // Clear the alarm so it doesn't fire again
                 browser.alarms.clear('lock-extension').then((cleared) => {
                     if (cleared) swlog('⏰ lock-extension alarm cleared by lockNow()')
@@ -674,9 +672,6 @@ export default defineBackground({
                     swlog('⏰ lock-extension alarm started for ' + kickAfter + ' minutes from ' + state.lastActiveAt)
                 }
                 else swlog('⏰ No need of lock timer (kickAfter = ' + state.kickAfter + ')')
-                // else if (kickAfter === 0) {
-                //     lockNow('startLockTimer()')
-                // }
             }
             else swlog('⏰ kickAfter is null, exiting startLockTimer without creating a lock timer')
         }
@@ -687,7 +682,6 @@ export default defineBackground({
         //  * @returns {Promise<Awaited<{pat: string, status: boolean}>>}
         //  */
         function getPat() {
-            // swlog(state.pat)
             return Promise.resolve({ status: true, pat: state.pat })
         }
 
@@ -697,7 +691,6 @@ export default defineBackground({
         //  * @returns {Promise<Awaited<{pat: string, status: boolean}>>}
         //  */
         function getPartialPat() {
-            // swlog(state.pat)
             return Promise.resolve({ status: true, partialPat: state.pat.substring(0, 16) + ' ... ' + state.pat.slice(-16) })
         }
 
@@ -736,7 +729,7 @@ export default defineBackground({
                     if (return_value.locked === true && encryptionParams.default === true) {
                         return unlockExt().then(status => {
                             return_value.locked = false
-                            swlog('Extension identified as locked 🔒 (with default encryption params)')
+                            swlog('Extension identified as unlocked 🔓 (with default encryption params)')
                             return return_value
                         })
                     } else {
@@ -760,8 +753,8 @@ export default defineBackground({
 
             return browser.storage.local.clear()
                 .then(() => {
-                    Object.assign(state, default_state)
-                    encryptionKey = null
+                    resetStateToDefaults()
+                    password = null
                     encryptionParams = {
                         salt: null,
                         iv: null,
@@ -797,11 +790,11 @@ export default defineBackground({
                     return { status: false, reason: 'error.failed_to_retrieve_encryption_store_data' }
                 }
                 
-                state.pat = stores[CRYPTO_STORE]['encryptedApiToken'] || ''
+                let encryptedApiToken = stores[CRYPTO_STORE]['encryptedApiToken'] || ''
 
-                return getEncKey().then(_encryptionKey => {
-                    return deriveKey(_encryptionKey, encryptionParams.salt).then(derivatedKey => {
-                        return decryptPat(state.pat, derivatedKey).then(decipheredPat => {
+                return getPassword().then(pwd => {
+                    return deriveKey(pwd, encryptionParams.salt).then(encryptionKey => {
+                        return decryptPat(encryptedApiToken, encryptionKey).then(decipheredPat => {
                             swlog('🔃 ✔️ Decrypted')
                             state.pat = decipheredPat
                             state.locked = false
@@ -823,7 +816,7 @@ export default defineBackground({
                         return { status: false, reason: 'error.failed_to_derive_key' }
                     })
                 }, () => {
-                    swlog('🔑 ❌ Cannot unlock: Couldn\'t get encryption key')
+                    swlog('🔑 ❌ Cannot unlock: Couldn\'t get password')
                     return { status: false, reason: 'error.failed_to_get_password' }
                 })
             }, () => {
@@ -832,34 +825,25 @@ export default defineBackground({
             })
         }
         /**
-         * Check the given password is the current encryption key
+         * Check the given password is the current password by trying to decrypt the stored PAT
          * MARK: checkEncKey()
          *
-         * @param key
+         * @param pwd
          * @returns {Promise<{[p: string]: any} | {status: boolean}>}
          */
-        function checkEncKey(key) {
-            swlogTitle('CHECKING ENCRYPTION KEY')
+        function checkPassword(pwd) {
+            swlogTitle('CHECKING PASSWORD')
 
             return browser.storage.local.get({ [CRYPTO_STORE]: {} }).then(stores => {
                 if (!stores || stores.hasOwnProperty(CRYPTO_STORE) === false) {
-                    swlog('❌ Cannot check enc key: Failed to retrieve crypto store data')
+                    swlog('❌ Cannot validate password: Failed to retrieve crypto store data')
                     return { status: false, reason: 'error.failed_to_retrieve_encryption_store_data' }
                 }
-                // if (stores && stores.hasOwnProperty(CRYPTO_STORE) && stores[CRYPTO_STORE]) {
-                //     encryptionParams.iv = new Uint8Array(stores[CRYPTO_STORE].iv)
-                //     encryptionParams.salt = new Uint8Array(stores[CRYPTO_STORE].salt)
-                //     encryptionParams.default = stores[CRYPTO_STORE].default ?? true
-                //     swlog('Crypto params loaded from store')
-                // } else {
-                //     swlog('❌ Cannot check enc key: Crypto store is missing')
-                //     return { status: false, reason: 'error.failed_to_retrieve_encryption_store_data' }
-                // }
                 
                 const _pat = stores[CRYPTO_STORE]['encryptedApiToken'] || ''
 
-                return deriveKey(key, encryptionParams.salt).then(derivatedKey => {
-                    return decryptPat(_pat, derivatedKey).then(() => {
+                return deriveKey(pwd, encryptionParams.salt).then(encryptionKey => {
+                    return decryptPat(_pat, encryptionKey).then(() => {
                         return { status: true }
                     }, () => {
                         return { status: false }
@@ -873,30 +857,28 @@ export default defineBackground({
         }
 
         /**
-         * Set the encryption key to be used by unlockExt
-         * MARK: setEncKey()
+         * Set the password to be used to unlock the extension and encrypt/decrypt the PAT
+         * MARK: setPassword()
          *
-         * @param key
+         * @param pwd
          * @returns {Promise<{status: boolean}>}
          */
-        function setEncKey(key) {
-            swlogTitle('SETTING ENC KEY')
-            // swlog('Setting enc key')
-            // swlog('  incoming key length = ' + key?.length)
-            encryptionKey = key
-            // swlog('  stored key length = ' + encryptionKey?.length)
-            swlog('🔑 ✔️ Encryption key set')
+        function setPassword(pwd) {
+            swlogTitle('SETTING PASSWORD')
+            password = pwd
+            swlog('🔑 ✔️ Password set')
+
             return Promise.resolve({ status: true })
         }
 
         /**
-         * Get the currently stored encryption key
-         * MARK: getEncKey()
+         * Get the current password
+         * MARK: getPassword()
          *
          * @returns {Promise<{[p: string]: any}>}
          */
-        function getEncKey() {
-            return Promise.resolve(encryptionKey)
+        function getPassword() {
+            return Promise.resolve(password)
         }
 
         /**
@@ -909,8 +891,8 @@ export default defineBackground({
         function generateNewCryptoParams(set_default = false) {
             swlog('♻️ Generating new crypto params...')
 
-            let _iv = _crypto.getRandomValues(new Uint8Array(12))
-            let _salt = _crypto.getRandomValues(new Uint8Array(16))
+            let _iv = cryptoApi.getRandomValues(new Uint8Array(12))
+            let _salt = cryptoApi.getRandomValues(new Uint8Array(16))
 
             // Store the generated salt + iv (the iv is re-generated every time the pat is encrypted)
             return browser.storage.local.set({
@@ -934,30 +916,30 @@ export default defineBackground({
         }
 
         /**
-         * Set a new encryption key and re-encrypt PAT using the new key
-         * MARK: changeEncKey()
+         * Set a new password and re-encrypt PAT using the new password-derived key
+         * MARK: changePassword()
          *
-         * @param key
+         * @param pwd
          * @returns {Promise<* | {encryptedApiToken: null, status: boolean}>}
          */
-        function changeEncKey(key) {
-            swlogTitle('CHANGING ENCRYPTION KEY')
+        function changePassword(pwd) {
+            swlogTitle('CHANGING PASSWORD')
             return generateNewCryptoParams().then(
-                () => setEncKey(key)
+                () => setPassword(pwd)
             ).then(
                 () => {
-                    swlog('🔑 ✔️ Encryption key changed')
+                    swlog('🔑 ✔️ Password changed')
                     return encryptPat(state.pat)
                 },
                 () => {
-                    swlog('🔑 ❌ Failed to set encryption key')
+                    swlog('🔑 ❌ Failed to set password')
                     return { status: false, encryptedApiToken: null, reason: 'error.failed_to_set_enc_key' }
                 }
             )
         }
 
         /**
-         * Decrypt the PAT using the currently stored key
+         * Decrypt a text using a given encryption key
          * MARK: decryptPat()
          *
          * @param cipherText
@@ -967,14 +949,13 @@ export default defineBackground({
         function decryptPat(cipherText, encryptionKey) {
             swlog('🔃 Decrypting PAT...')
 
-            // const failedPromise = Promise.resolve('decryption error')
-
             if (encryptionKey && cipherText) {
                 try {
-                    return _crypto.subtle.decrypt({
+                    return cryptoApi.subtle.decrypt({
                         name: "AES-GCM", iv: encryptionParams.iv
                     }, encryptionKey, new Uint8Array(cipherText)).then(decodedBuffer => {
                         try {
+                            const decoder = new TextDecoder()
                             const decoded = decoder.decode(new Uint8Array(decodedBuffer))
 
                             return decoded
@@ -991,7 +972,7 @@ export default defineBackground({
         }
 
         /**
-         * Derive the encryption key from the users password
+         * Derive the encryption key from the user password
          * MARK: deriveKey()
          *
          * @param key
@@ -1001,9 +982,9 @@ export default defineBackground({
         function deriveKey(key, salt) {
             swlog('🔀 Deriving encryption key...')
 
-            return _crypto.subtle.importKey("raw", encoder.encode(key), "PBKDF2", false, ["deriveBits", "deriveKey"]).then(
+            return cryptoApi.subtle.importKey("raw", encoder.encode(key), "PBKDF2", false, ["deriveBits", "deriveKey"]).then(
                 key_material => {
-                    return _crypto.subtle.deriveKey({
+                    return cryptoApi.subtle.deriveKey({
                         name: "PBKDF2", salt: encoder.encode(salt), iterations: 100000, hash: "SHA-256"
                     }, key_material, {
                         name: "AES-GCM", length: 256
@@ -1021,7 +1002,7 @@ export default defineBackground({
         }
 
         /**
-         * Encrypt the PAT using the currently stored encryption key
+         * Encrypt the PAT using the current password-derived key and store it in the extension storage
          * MARK: encryptPat()
          *
          * @returns {Promise<{[p: string]: any}>}
@@ -1031,11 +1012,11 @@ export default defineBackground({
             swlogTitle('ENCRYPTING PAT')
 
             try {
-                return deriveKey(encryptionKey, encryptionParams.salt).then(derivatedKey => {
+                return deriveKey(password, encryptionParams.salt).then(encryptionKey => {
                     swlog('🔃 Regenerating encryption iv...')
 
-                    encryptionParams.iv = _crypto.getRandomValues(new Uint8Array(12))
-                    encryptionParams.default = derivatedKey === null
+                    encryptionParams.iv = cryptoApi.getRandomValues(new Uint8Array(12))
+                    encryptionParams.default = encryptionKey === null
                     const ivArray = Array(...new Uint8Array(encryptionParams.iv))
                     const saltArray = Array(...new Uint8Array(encryptionParams.salt))
 
@@ -1052,9 +1033,9 @@ export default defineBackground({
                         swlog('🔃 ✔️ iv regenerated')
                         swlog('🔃 Encrypting PAT...')
 
-                        return _crypto.subtle.encrypt({
+                        return cryptoApi.subtle.encrypt({
                             name: "AES-GCM", iv: encryptionParams.iv
-                        }, derivatedKey, encoder.encode(apiToken).buffer).then(ciphertext => {
+                        }, encryptionKey, encoder.encode(apiToken).buffer).then(ciphertext => {
                             swlog('🔃 ✔️ PAT encrypted')
 
                             _cryptoParams.encryptedApiToken = Array(...new Uint8Array(ciphertext))

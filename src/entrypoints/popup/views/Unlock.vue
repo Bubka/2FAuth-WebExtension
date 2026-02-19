@@ -21,7 +21,7 @@
         if (hasValidPassword) {
             isBusy.value = true
 
-            const { status: setEncKeyStatus } = await sendMessage('SET_ENC_KEY', { password: pwd.value }, 'background')
+            const { status: setEncKeyStatus } = await sendMessage('SET_PASSWORD', { password: pwd.value }, 'background')
             
             if (! setEncKeyStatus) {
                 isBusy.value = false

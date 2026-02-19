@@ -30,14 +30,14 @@
         notify.clear()
 
         if (hasValidCurrentPassword && hasValidNewPassword) {
-            const { status: checkPasswordStatus } = await sendMessage('CHECK_ENC_KEY', { password: extCurrentPassword.value }, 'background')
+            const { status: checkPasswordStatus } = await sendMessage('CHECK_PASSWORD', { password: extCurrentPassword.value }, 'background')
 
             if (! checkPasswordStatus) {
                 notify.alert({ text: t('error.wrong_current_password') })
                 return
             }
 
-            const { status: changePasswordStatus, reason } = await sendMessage('CHANGE_ENC_KEY', { password: extNewPassword.value }, 'background')
+            const { status: changePasswordStatus, reason } = await sendMessage('CHANGE_PASSWORD', { password: extNewPassword.value }, 'background')
 
             if (! changePasswordStatus) {
                 notify.alert({ text: t(reason) })

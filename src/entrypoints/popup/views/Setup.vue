@@ -94,7 +94,7 @@
                 ignoreRequestInterceptor: true,
             }).then(async ({ data: fetchedPreferences }) => {
                 // Setting enc key
-                const { status: setEncKeyStatus } = await sendMessage('SET_ENC_KEY', { password: _extPassword.value }, 'background')
+                const { status: setEncKeyStatus } = await sendMessage('SET_PASSWORD', { password: _extPassword.value }, 'background')
 
                 if (! setEncKeyStatus) {
                     notify.alert({ text: t('error.encryption_key_generation_failed') })

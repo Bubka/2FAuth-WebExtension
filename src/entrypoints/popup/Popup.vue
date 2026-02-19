@@ -26,7 +26,7 @@
         const { language } = useNavigatorLanguage()
         await preferenceStore.$persistedState.isReady()
 
-        sendMessage('CHECK_LOCKED', { }, 'background').then(({locked}) => {
+        sendMessage('CHECK_IS_LOCKED', { }, 'background').then(({locked}) => {
             if (! locked && settingStore.isConfigured) {
                 preferenceStore.syncWithServer()
             }
