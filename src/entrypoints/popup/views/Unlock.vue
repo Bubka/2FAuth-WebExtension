@@ -57,22 +57,28 @@
 </script>
 
 <template>
-    <div>
-        <h1 class="title has-text-grey-dark">{{ $t('heading.twofauth_webext') }}</h1>
-        <p class="block">
-            {{ $t('message.unlock_description') }}
-        </p>
-        <form id="frmUnlock" @submit.prevent="unlock">
-            <FormPasswordField v-model="pwd" fieldName="password" :errorMessage="errors.pwd" label="field.extPassword" autocomplete="current-password" />
-            <FormButtons
-                submitLabel="label.unlock"
-                submitId="btnUnlock"
-                :isBusy="isBusy" />
-        </form>
-    </div>
-    <VueFooter>
-        <router-link id="lnkReset" :to="{ name: 'reset' }" class="has-text-grey">
-            {{ $t('link.reset_extension') }}
-        </router-link>
-    </VueFooter>
+    <StackLayout :should-grow="false">
+        <template #content>
+            <div class="my-5">
+                <h1 class="title">{{ $t('heading.twofauth_webext') }}</h1>
+                <p class="block">
+                    {{ $t('message.unlock_description') }}
+                </p>
+                <form id="frmUnlock" @submit.prevent="unlock">
+                    <FormPasswordField v-model="pwd" fieldName="password" :errorMessage="errors.pwd" label="field.extPassword" autocomplete="current-password" />
+                    <FormButtons
+                        submitLabel="label.unlock"
+                        submitId="btnUnlock"
+                        :isBusy="isBusy" />
+                </form>
+            </div>
+        </template>
+        <template #footer>
+            <VueFooter>
+                <router-link id="lnkReset" :to="{ name: 'reset' }" class="has-text-grey">
+                    {{ $t('link.reset_extension') }}
+                </router-link>
+            </VueFooter>
+        </template>
+    </StackLayout>
 </template>

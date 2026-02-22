@@ -31,40 +31,40 @@
 </script>
 
 <template>
-    <!-- static landing UI -->
-    <div class="container has-text-centered">
-        <div class="columns quick-uploader">
-            <!-- trailer phrase that invite to add an account -->
-            <div class="column is-full py-5" :class="{ 'is-invisible' : twofaccounts.count !== 0 }">
-                {{  $t('message.need_to_import_qrcode_punchline') }}<br>
-                {{  $t('message.detect_qrcode_in_page_legend') }}
-                <!-- {{ $t('message.add_first_account') }} -->
-            </div>
-            <!-- Livescan button -->
-            <div class="column is-full quick-uploader-button mb-5" >
-                <div class="quick-uploader-centerer">
-                    <!-- scan button that launch qrcode detection in current tab -->
-                    <button type="button" class="button is-link is-medium is-rounded is-main" @click="scanForQrCodeInTab()">
-                        {{ $t('label.detect_qrcode') }}
-                    </button>
+    <StackLayout :should-grow="false">
+        <template #content>
+            <div class="has-text-centered">
+                <!-- trailer phrase that invite to add an account -->
+                <div class="mt-5" :class="{ 'is-hidden' : twofaccounts.count !== 0 }">
+                    {{  $t('message.need_to_import_qrcode_punchline') }}<br>
+                    {{  $t('message.detect_qrcode_in_page_legend') }}
+                </div>
+                <!-- Livescan button -->
+                <div class="quick-uploader-wrapper p-0 mt-6 mb-5" >
+                    <div class="quick-uploader-background"></div>
+                    <div class="quick-uploader-button is-align-content-center">
+                        <!-- scan button that launch qrcode detection in current tab -->
+                        <button type="button" class="button is-link is-medium is-rounded is-main" @click="scanForQrCodeInTab()">
+                            {{ $t('label.detect_qrcode') }}
+                        </button>
+                    </div>
+                    <!-- <FormFieldError v-if="form.errors.hasAny('qrcode')" :error="form.errors.get('qrcode')" :field="'qrcode'" /> -->
                 </div>
             </div>
-            <!-- <div class="column pt-5">
-                {{ $t('message.detect_qrcode_in_page_legend') }}
-            </div> -->
-        </div>
-        <!-- Footer -->
-        <VueFooter>
-            <template #default>
-                <a :title="settingStore.hostUrl" tabindex="0" class="button is-text is-rounded" @click="openUrlInNewTab(settingStore.hostUrl)">
-                    {{ $t('link.go_to_2fauth_host') }}
-                </a>
-            </template>
-            <template #subpart>
-                <router-link id="lnkSettings" :to="{ name: 'settings.options' }" class="has-text-grey">
-                    {{ $t('link.settings') }}
-                </router-link>
-            </template>
-        </VueFooter>
-    </div>
+        </template>
+        <template #footer>
+            <VueFooter>
+                <template #default>
+                    <a :title="settingStore.hostUrl" tabindex="0" class="button is-text is-rounded" @click="openUrlInNewTab(settingStore.hostUrl)">
+                        {{ $t('link.go_to_2fauth_host') }}
+                    </a>
+                </template>
+                <template #subpart>
+                    <router-link id="lnkSettings" :to="{ name: 'settings.options' }" class="has-text-grey">
+                        {{ $t('link.settings') }}
+                    </router-link>
+                </template>
+            </VueFooter>
+        </template>
+    </StackLayout>
 </template>

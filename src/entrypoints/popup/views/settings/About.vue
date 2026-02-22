@@ -23,11 +23,13 @@
 </script>
 
 <template>
-    <div>
-        <TabBar :tabs="tabs" :active-tab="'settings.about'" :is-responsive="false" @tab-selected="(to) => router.push({ name: to })" />
-        <div class="options-tabs">
+    <StackLayout>
+        <template #header>
+            <TabBar :tabs="tabs" :active-tab="'settings.about'" :is-responsive="false" @tab-selected="(to) => router.push({ name: to })" />
+        </template>
+        <template #content>
             <UseColorMode v-slot="{ mode }"> 
-                <div class="options-tabs">
+                <div class="mt-4">
                     <!-- <h2 class="title is-5 ">
                         <span :class="mode == 'dark' ? 'has-text-white':'has-text-black'">2FAuth</span>
                         <span class="has-text-grey">web extension <span class="is-size-7">v{{ version }}</span></span>
@@ -40,9 +42,9 @@
                     </p>
                     <img class="about-logo" src="/src/logo.svg" alt="2FAuth logo" />
                     <p class="block">
-                        ©Bubka <a class="is-size-7" @click="openUrlInNewTab('https://github.com/Bubka/2FAuth/blob/master/LICENSE')">AGPL-3.0 license</a>
+                        ©Bubka <a class="is-size-7 is-link" @click="openUrlInNewTab('https://github.com/Bubka/2FAuth/blob/master/LICENSE')">AGPL-3.0 license</a>
                     </p>
-                    <h2 class="title is-5 has-text-grey-light">
+                    <h2 class="title is-5">
                         {{ $t('heading.resources') }}
                     </h2>
                     <div class="buttons">
@@ -77,18 +79,20 @@
                             <span>{{ $t('label.demo') }}</span>
                         </a>
                     </div>
-                    <h2 class="title is-5 has-text-grey-light">
+                    <h2 class="title is-5">
                         {{ $t('heading.credits') }}
                     </h2>
                     <ul class="is-size-7">
-                        <li>{{ $t('message.made_with') }}&nbsp;<a @click="openUrlInNewTab('https://docs.2fauth.app/credits/')">Laravel, Bulma CSS, Vue.js and more</a></li>
-                        <li>{{ $t('message.ui_icons_by') }}&nbsp;<a @click="openUrlInNewTab('https://lucide.dev/')">Lucide</a>&nbsp;<a class="is-size-7" @click="openUrlInNewTab('https://lucide.dev/license')">(ISC License)</a></li>
+                        <li>{{ $t('message.made_with') }}&nbsp;<a class="is-link" @click="openUrlInNewTab('https://docs.2fauth.app/credits/')">Laravel, Bulma CSS, Vue.js and more</a></li>
+                        <li>{{ $t('message.ui_icons_by') }}&nbsp;<a class="is-link" @click="openUrlInNewTab('https://lucide.dev/')">Lucide</a>&nbsp;<a class="is-size-7 is-link" @click="openUrlInNewTab('https://lucide.dev/license')">(ISC License)</a></li>
                     </ul>
                 </div>
             </UseColorMode>
-        </div>
-        <VueFooter>
-            <NavigationButton action="close" @closed="router.push({ name: 'accounts' })" :current-page-title="$t('title.settings')" />
-        </VueFooter>
-    </div>
+        </template>
+        <template #footer>
+            <VueFooter>
+                <NavigationButton action="close" @closed="router.push({ name: 'accounts' })" :current-page-title="$t('title.settings')" />
+            </VueFooter>
+        </template>
+    </StackLayout>
 </template>

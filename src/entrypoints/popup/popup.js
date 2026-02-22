@@ -1,5 +1,3 @@
-import './assets/popup.scss'
-
 import Notifications from '@kyvg/vue3-notification'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
@@ -10,6 +8,8 @@ import router from './router'
 
 // if ('development' == process.env.NODE_ENV)
 //     devtools.connect() // default is 'http://localhost:8098'
+
+import './assets/popup.scss'
 
 const popup = createApp(Popup)
 
@@ -74,11 +74,13 @@ import {
 } from '@2fauth/formcontrols'
 import {
     VueFooter,
-    Modal
+    Modal,
+    StackLayout
 } from '@2fauth/ui'
 
 popup
     .component('Modal', Modal)
+    .component('StackLayout', StackLayout)
     .component('VueFooter', VueFooter)
     .component('FormField', FormField)
     .component('FormPasswordField', FormPasswordField)

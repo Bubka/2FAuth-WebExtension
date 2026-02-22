@@ -192,35 +192,42 @@
 </script>
 
 <template>
-    <div>
-        <h1 class="title has-text-grey-dark">{{ $t('heading.setup') }}</h1>
-        <form id="frmExtSetup" @submit.prevent="saveSetup">
-            <FormField v-model="_hostUrl" fieldName="hostUrl" :errorMessage="errors.hostUrl" inputType="text" label="field.hostUrl" help="field.hostUrl.help" />
-            <FormTextarea v-model="_apiToken" :errorMessage="errors.apiToken" fieldName="apiToken" rows="4" label="field.apiToken"  help="field.apiToken.help" :size="'is-small'" />
-            <div class="field is-grouped">
-                <div class="control">
-                    <VueButton :isLoading="isTesting" class="tag mr-2" nativeType="button" @click="checkConnection">
-                        {{  $t('label.test') }}
-                    </VueButton>
-                    <!-- <span v-if="isConnected == true" class="has-text-success-dark is-size-7">{{ $t('message.hi_x_its_all_good', { username: username }) }}
-                         <LucideUserRoundCheck />
-                    </span> -->
-                    <span v-if="isConnected == true" class="icon-text has-text-success-dark is-size-7">
-                        <span>{{ $t('message.hi_x_its_all_good', { username: username }) }}</span>
-                        <span class="icon"><LucideCheck class="icon-size-1"/></span>
-                    </span>
-                    <span v-else-if="isConnected == false" class="has-text-danger is-size-7">{{  errors.connexion }}</span>
-                </div>
+    <StackLayout :should-grow="false">
+        <template #content>
+            <div class="mt-5">
+                <h1 class="title">{{ $t('heading.setup') }}</h1>
+                <form id="frmExtSetup" @submit.prevent="saveSetup">
+                    <FormField v-model="_hostUrl" fieldName="hostUrl" :errorMessage="errors.hostUrl" inputType="text" label="field.hostUrl" help="field.hostUrl.help" />
+                    <FormTextarea v-model="_apiToken" :errorMessage="errors.apiToken" fieldName="apiToken" rows="4" label="field.apiToken"  help="field.apiToken.help" :size="'is-small'" />
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <VueButton :isLoading="isTesting" class="tag mr-2" nativeType="button" @click="checkConnection">
+                                {{  $t('label.test') }}
+                            </VueButton>
+                            <!-- <span v-if="isConnected == true" class="has-text-success-dark is-size-7">{{ $t('message.hi_x_its_all_good', { username: username }) }}
+                                <LucideUserRoundCheck />
+                            </span> -->
+                            <span v-if="isConnected == true" class="icon-text has-text-success-dark-invert is-size-7">
+                                <span>{{ $t('message.hi_x_its_all_good', { username: username }) }}</span>
+                                <span class="icon"><LucideCheck class="icon-size-1"/></span>
+                            </span>
+                            <span v-else-if="isConnected == false" class="has-text-danger is-size-7">{{  errors.connexion }}</span>
+                        </div>
+                    </div>
+                    <FormPasswordField v-model="_extPassword" fieldName="extPassword" :errorMessage="errors.extPassword" :showRules="true" label="field.extPassword"  help="field.extPassword.help" autocomplete="new-password" />
+                </form>
             </div>
-            <FormPasswordField v-model="_extPassword" fieldName="extPassword" :errorMessage="errors.extPassword" :showRules="true" label="field.extPassword"  help="field.extPassword.help" autocomplete="new-password" />
+        </template>
+        <template #footer>
             <VueFooter>
                 <FormButtons
                     submitId="btnSubmitSetup"
                     submitLabel="label.save"
                     :isBusy="isSaving == true"
                     :showCancelButton="true"
+                    @submit="saveSetup"
                     @cancel="router.push({ name: 'landing' })" />
             </VueFooter>
-        </form>
-    </div>
+        </template>
+    </StackLayout>
 </template>

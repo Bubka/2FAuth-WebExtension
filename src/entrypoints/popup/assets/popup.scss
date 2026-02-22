@@ -7,22 +7,23 @@
   
 #popup {
   width:350px;
-  min-height:350px;
-  max-height:600px;
-  overflow-y: auto;
+  max-height:590px;
+}
+
+.stack-content-wrapper {
   scrollbar-width: none;
 }
 
 .ext-full-height {
-  height: 600px;
+  height: 590px;
 }
 
 a.button.is-main {
-  box-shadow: $button-focus-box-shadow-size $button-focus-box-shadow-color;
+  box-shadow: var(--bulma-button-focus-box-shadow-size) var(--bulma-button-focus-box-shadow-color);
 }
 
-.main-section {
-  padding: 1rem 1rem 6rem 1rem;
+a.button.is-main:hover {
+  color: hsl(var(--bulma-button-h), var(--bulma-button-s), var(--bulma-button-color-l));
 }
 
 .tfa-list {
@@ -33,24 +34,7 @@ a.button.is-main {
 }
 
 footer.main {
-  padding: 1rem 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  position: fixed;
-  z-index: 30;
-}
-
-.options-tabs {
-  margin-top: 50px;
-}
-
-@media screen and (max-height: 700px) {
-  .modal-with-footer {
-    margin-bottom: 0;
-    // min-height:350px !important;
-    max-height: calc(100vh - 134px) !important;
-  }
+  padding: 0 0 1rem 0;
 }
 
 .error-404,
@@ -61,28 +45,10 @@ footer.main {
   background-size: 50%;
 }
 
-.modal .field.is-grouped:last-child {
-  padding-top: 0;
-}
-
 .error-message {
   overflow-x: clip;
 }
 
 .no-scrollbar {
   scrollbar-width: none;
-}
-
-.accounts {
-  min-height: 300px;
-  margin-top: 70px;
-}
-
-.quick-uploader-button {
-  margin-bottom: 0;
-}
-
-.quick-uploader-header {
-  padding-top: 4vh;
-  // padding-bottom: 3vh;
 }

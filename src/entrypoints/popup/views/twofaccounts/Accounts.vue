@@ -289,47 +289,155 @@
 
 <template>
     <UseColorMode v-slot="{ mode }">
-    <div>
-        <!-- group switch -->
-        <GroupSwitch
-            v-model:is-visible="showGroupSwitch"
-            v-model:active-group="preferenceStore.activeGroup"
-            :groups="groups.items">
-        </GroupSwitch>
-        <!-- header -->
-        <div class="header" v-if="showAccounts || showGroupSwitch">
-            <div class="columns is-gapless is-mobile is-centered">
-                <div class="column is-three-quarters-mobile">
-                    <!-- search -->
-                    <SearchBox v-model:keyword="twofaccounts.filter"/>
-                    <!-- toolbar -->
-                    <!-- <Toolbar v-if="bus.inManagementMode"
-                        :selectedCount="twofaccounts.selectedCount"
-                        @clear-selected="twofaccounts.selectNone()"
-                        @select-all="twofaccounts.selectAll()"
-                        @sort-asc="twofaccounts.sortAsc()"
-                        @sort-desc="twofaccounts.sortDesc()">
-                    </Toolbar> -->
-                    <!-- group switch toggle -->
-                    <div class="has-text-centered">
-                        <div class="columns">
-                            <!-- <div class="column" v-if="showGroupSwitch">
-                                <button type="button" id="btnHideGroupSwitch" :title="$t('tooltip.hide_group_selector')" tabindex="1" class="button is-text is-like-text" :class="{'has-text-grey' : mode != 'dark'}" @click.stop="showGroupSwitch = !showGroupSwitch">
-                                    {{ $t('label.select_accounts_to_show') }}
-                                </button>
-                            </div> -->
-                            <div class="column">
-                                <button type="button" id="btnShowGroupSwitch" :title="$t('tooltip.show_group_selector')" tabindex="1" class="button is-text is-like-text" :class="{'has-text-grey' : mode != 'dark'}" @click.stop="showGroupSwitch = !showGroupSwitch">
-                                    {{ groups.current ? groups.current : $t('label.all') }} ({{ twofaccounts.filteredCount }})&nbsp;
-                                     <LucideChevronsDownUp v-if="showGroupSwitch" />
-                                     <LucideChevronsUpDown v-else />
-                                </button>
-                            </div>
+    <div class="ext-full-height">
+        <StackLayout>
+            <template #header v-if="showAccounts || showGroupSwitch">
+                <div class="header">
+                    <div class="columns is-gapless is-mobile is-centered">
+                        <div class="column is-three-quarters-mobile">
+                            <!-- search -->
+                            <SearchBox v-model:keyword="twofaccounts.filter"/>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </template>
+            <template #subheader v-if="showAccounts || showGroupSwitch">
+                <!-- group switch toggle -->
+                <div class="has-text-centered">
+                    <div>
+                        <button type="button" id="btnShowGroupSwitch" :title="$t('tooltip.show_group_selector')" tabindex="1" class="button is-text is-like-text has-text-grey-dark" :class="{'has-text-grey' : mode != 'dark'}" @click.stop="showGroupSwitch = !showGroupSwitch">
+                            {{ groups.current ? groups.current : $t('label.all') }} ({{ twofaccounts.filteredCount }})&nbsp;
+                                <LucideChevronsDownUp v-if="showGroupSwitch" />
+                                <LucideChevronsUpDown v-else />
+                        </button>
+                    </div>
+                </div>
+            </template>
+            <template #content>
+                <!-- group switch -->
+                <GroupSwitch
+                    v-model:is-visible="showGroupSwitch"
+                    v-model:active-group="preferenceStore.activeGroup"
+                    :groups="groups.items">
+                    <!-- TODO : Add @show-group-less handler-->
+                </GroupSwitch>
+                <!-- show accounts list -->
+                <div v-if="showAccounts == true">
+                    <!-- accounts -->
+                    <div class="accounts">
+                        <span id="dv" class="columns is-multiline m-0">
+                            <div class="tfa-list column is-narrow" v-for="account in twofaccounts.filtered" :key="account.id">
+                                <div class="tfa-container">
+                                    <div tabindex="0" class="tfa-cell tfa-content is-size-4" @click.exact="showOrCopy(account)" @keyup.enter="showOrCopy(account)" @click.ctrl="getAndCopyOTP(account)" role="button">  
+                                        <div class="tfa-text has-ellipsis">
+                                            <img v-if="account.icon && preferenceStore.showAccountsIcons" role="presentation" class="tfa-icon" :src="settingStore.hostUrl + '/storage/icons/' + account.icon" alt="">
+                                            <img v-else-if="account.icon == null && preferenceStore.showAccountsIcons" role="presentation" class="tfa-icon" :src="settingStore.hostUrl + '/storage/noicon.svg'" alt="">
+                                            {{ account.service ? account.service : $t('message.no_service') }}
+                                            <LucideCircleAlert class="has-text-danger ml-2" v-if="account.account === $t('error.indecipherable')" />
+                                            <span class="is-block has-ellipsis is-family-primary is-size-6 is-size-7-mobile has-text-grey ">{{ account.account }}</span>
+                                        </div>
+                                    </div>
+                                    <transition name="popLater">
+                                        <div v-show="preferenceStore.getOtpOnRequest == false" class="has-text-right">
+                                            <!-- POST SHOW-NEXT-OTP ( >= 2FAuth v5.5.0) -->
+                                            <div v-if="settingStore.hasFeature_showNextOtp && account.otp != undefined">
+                                                <div class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('label.copy_to_clipboard')">
+                                                    {{  
+                                                        useVisiblePassword(
+                                                            account.otp.password,
+                                                            preferenceStore.formatPassword,
+                                                            preferenceStore.formatPasswordBy,
+                                                            preferenceStore.showOtpAsDot,
+                                                            preferenceStore.revealDottedOTP && revealPassword == account.id
+                                                        )
+                                                    }}
+                                                </div>
+                                                <div class="has-nowrap" style="line-height: 0.9;">
+                                                    <span v-if="preferenceStore.showNextOtp" class="always-on-otp is-clickable has-nowrap has-text-grey is-size-7 mr-2" :class="opacities[account.period]" @click="copyToClipboard(account.otp.next_password)" @keyup.enter="copyToClipboard(account.otp.next_password)" :title="$t('tooltip.copy_next_password')">
+                                                        {{  
+                                                            useVisiblePassword(
+                                                                account.otp.next_password,
+                                                                preferenceStore.formatPassword,
+                                                                preferenceStore.formatPasswordBy,
+                                                                preferenceStore.showOtpAsDot,
+                                                                preferenceStore.revealDottedOTP && revealPassword == account.id
+                                                            )
+                                                        }}
+                                                    </span>
+                                                    <Dots
+                                                        v-if="account.otp_type.includes('totp')"
+                                                        ref="dotsRefs"
+                                                        :class="'is-inline-block'"
+                                                        :isCondensed="true"
+                                                        :period="account.period" />
+                                                </div>
+                                            </div>
+                                            <!-- PRE SHOW-NEXT-OTP ( < 2FAuth v5.5.0) -->
+                                            <span v-else-if="account.otp != undefined">
+                                                <span v-if="isRenewingOTPs == true && (renewedPeriod == -1 || renewedPeriod == account.period)" class="has-nowrap has-text-grey has-text-centered is-size-5">
+                                                    <LucideLoaderCircle class="spinning" />
+                                                </span>
+                                                <span v-else class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('tooltip.copy_to_clipboard')">
+                                                    {{ 
+                                                        useVisiblePassword(
+                                                            account.otp.password,
+                                                            preferenceStore.formatPassword,
+                                                            preferenceStore.formatPasswordBy,
+                                                            preferenceStore.showOtpAsDot,
+                                                            preferenceStore.revealDottedOTP && revealPassword == account.id
+                                                        )
+                                                    }}
+                                                </span>
+                                                <Dots
+                                                    v-if="account.otp_type.includes('totp')"
+                                                    ref="dotsRefs"
+                                                    :isCondensed="true"
+                                                    :period="account.period" />
+                                            </span>
+                                            <div v-else>
+                                                <!-- get hotp button -->
+                                                <button type="button" class="button tag" :class="mode == 'dark' ? 'is-dark' : 'is-white'" @click="showOTP(account)" :title="$t('tooltip.import_this_account')">
+                                                    {{ $t('label.generate') }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </transition>
+                                    <transition name="popLater" v-if="preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP">
+                                        <div v-show="preferenceStore.getOtpOnRequest == false" class="has-text-right">
+                                            <button v-if="revealPassword == account.id" type="button" class="pr-0 button is-ghost has-text-grey-dark" @click.stop="revealPassword = null">
+                                                <LucideEye class="lucide-icon" />
+                                            </button>
+                                            <button v-else type="button" class="pr-0 button is-ghost has-text-grey-dark" @click.stop="revealPassword = account.id">
+                                                <LucideEyeOff />
+                                            </button>
+                                        </div>
+                                    </transition>
+                                </div>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </template>
+            <template #footer v-if="showGroupSwitch">
+                <VueFooter :show-buttons="true">
+                    <NavigationButton action="close" :use-link-tag="false" @closed="showGroupSwitch = false" />
+                </VueFooter>
+            </template>
+            <template #footer v-else-if="showAccounts">
+                <VueFooter>
+                    <template #default>
+                        <ActionButtons
+                            @capture-button-clicked="scanForQrCodeInTab()">
+                        </ActionButtons>
+                    </template>
+                    <template #subpart>
+                        <router-link id="lnkSettings" :to="{ name: 'settings.options' }" class="has-text-grey">
+                            {{ $t('link.settings') }}
+                        </router-link>
+                    </template>
+                </VueFooter>
+            </template>
+        </StackLayout>
         <!-- otp modal -->
         <Modal v-model="showOtpInModal">
             <OtpDisplay
@@ -361,114 +469,6 @@
                 @stepping-ended="updateTotps(period.period)"
             ></DotsController>
         </span>
-        <!-- show accounts list -->
-        <div class="container" v-if="showAccounts == true">
-            <!-- accounts -->
-            <div class="accounts">
-                <span id="dv" class="columns is-multiline">
-                    <div class="tfa-list column is-narrow" v-for="account in twofaccounts.filtered" :key="account.id">
-                        <div class="tfa-container">
-                            <div tabindex="0" class="tfa-cell tfa-content is-size-4" @click.exact="showOrCopy(account)" @keyup.enter="showOrCopy(account)" @click.ctrl="getAndCopyOTP(account)" role="button">  
-                                <div class="tfa-text has-ellipsis">
-                                    <img v-if="account.icon && preferenceStore.showAccountsIcons" role="presentation" class="tfa-icon" :src="settingStore.hostUrl + '/storage/icons/' + account.icon" alt="">
-                                    <img v-else-if="account.icon == null && preferenceStore.showAccountsIcons" role="presentation" class="tfa-icon" :src="settingStore.hostUrl + '/storage/noicon.svg'" alt="">
-                                    {{ account.service ? account.service : $t('message.no_service') }}
-                                    <LucideCircleAlert class="has-text-danger ml-2" v-if="account.account === $t('error.indecipherable')" />
-                                    <span class="is-block has-ellipsis is-family-primary is-size-6 is-size-7-mobile has-text-grey ">{{ account.account }}</span>
-                                </div>
-                            </div>
-                            <transition name="popLater">
-                                <div v-show="preferenceStore.getOtpOnRequest == false" class="has-text-right">
-                                    <!-- POST SHOW-NEXT-OTP ( >= 2FAuth v5.5.0) -->
-                                    <div v-if="settingStore.hasFeature_showNextOtp && account.otp != undefined">
-                                        <div class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('label.copy_to_clipboard')">
-                                            {{  
-                                                useVisiblePassword(
-                                                    account.otp.password,
-                                                    preferenceStore.formatPassword,
-                                                    preferenceStore.formatPasswordBy,
-                                                    preferenceStore.showOtpAsDot,
-                                                    preferenceStore.revealDottedOTP && revealPassword == account.id
-                                                )
-                                            }}
-                                        </div>
-                                        <div class="has-nowrap" style="line-height: 0.9;">
-                                            <span v-if="preferenceStore.showNextOtp" class="always-on-otp is-clickable has-nowrap has-text-grey is-size-7 mr-2" :class="opacities[account.period]" @click="copyToClipboard(account.otp.next_password)" @keyup.enter="copyToClipboard(account.otp.next_password)" :title="$t('tooltip.copy_next_password')">
-                                                {{  
-                                                    useVisiblePassword(
-                                                        account.otp.next_password,
-                                                        preferenceStore.formatPassword,
-                                                        preferenceStore.formatPasswordBy,
-                                                        preferenceStore.showOtpAsDot,
-                                                        preferenceStore.revealDottedOTP && revealPassword == account.id
-                                                    )
-                                                }}
-                                            </span>
-                                            <Dots
-                                                v-if="account.otp_type.includes('totp')"
-                                                ref="dotsRefs"
-                                                :class="'is-inline-block'"
-                                                :isCondensed="true"
-                                                :period="account.period" />
-                                        </div>
-                                    </div>
-                                    <!-- PRE SHOW-NEXT-OTP ( < 2FAuth v5.5.0) -->
-                                    <span v-else-if="account.otp != undefined">
-                                        <span v-if="isRenewingOTPs == true && (renewedPeriod == -1 || renewedPeriod == account.period)" class="has-nowrap has-text-grey has-text-centered is-size-5">
-                                            <LucideLoaderCircle class="spinning" />
-                                        </span>
-                                        <span v-else class="always-on-otp is-clickable has-nowrap has-text-grey is-size-5 ml-4" @click="copyToClipboard(account.otp.password)" @keyup.enter="copyToClipboard(account.otp.password)" :title="$t('tooltip.copy_to_clipboard')">
-                                            {{ 
-                                                useVisiblePassword(
-                                                    account.otp.password,
-                                                    preferenceStore.formatPassword,
-                                                    preferenceStore.formatPasswordBy,
-                                                    preferenceStore.showOtpAsDot,
-                                                    preferenceStore.revealDottedOTP && revealPassword == account.id
-                                                )
-                                            }}
-                                        </span>
-                                        <Dots
-                                            v-if="account.otp_type.includes('totp')"
-                                            ref="dotsRefs"
-                                            :isCondensed="true"
-                                            :period="account.period" />
-                                    </span>
-                                    <div v-else>
-                                        <!-- get hotp button -->
-                                        <button type="button" class="button tag" :class="mode == 'dark' ? 'is-dark' : 'is-white'" @click="showOTP(account)" :title="$t('tooltip.import_this_account')">
-                                            {{ $t('label.generate') }}
-                                        </button>
-                                    </div>
-                                </div>
-                            </transition>
-                            <transition name="popLater" v-if="preferenceStore.showOtpAsDot && preferenceStore.revealDottedOTP">
-                                <div v-show="preferenceStore.getOtpOnRequest == false" class="has-text-right">
-                                    <button v-if="revealPassword == account.id" type="button" class="pr-0 button is-ghost has-text-grey-dark" @click.stop="revealPassword = null">
-                                        <LucideEye class="lucide-icon" />
-                                    </button>
-                                    <button v-else type="button" class="pr-0 button is-ghost has-text-grey-dark" @click.stop="revealPassword = account.id">
-                                        <LucideEyeOff />
-                                    </button>
-                                </div>
-                            </transition>
-                        </div>
-                    </div>
-                </span>
-            </div>
-            <VueFooter>
-                <template #default>
-                    <ActionButtons
-                        @capture-button-clicked="scanForQrCodeInTab()">
-                    </ActionButtons>
-                </template>
-                <template #subpart>
-                    <router-link id="lnkSettings" :to="{ name: 'settings.options' }" class="has-text-grey">
-                        {{ $t('link.settings') }}
-                    </router-link>
-                </template>
-            </VueFooter>
-        </div>
         <Spinner
             :type="'fullscreen-overlay'"
             :isVisible="!showAccounts && !showGroupSwitch"

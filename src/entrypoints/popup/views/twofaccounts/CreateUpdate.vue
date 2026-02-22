@@ -160,7 +160,7 @@
             message="message.parsing_data"
         />
         <!-- alternatives -->
-        <Modal v-model="showAlternatives" :isFullHeight="false">
+        <Modal v-model="showAlternatives">
             <QrContentDisplay :qrContent="uri" :isCompact="true" />
         </Modal>
     </div>
