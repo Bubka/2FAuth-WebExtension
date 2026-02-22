@@ -49,7 +49,7 @@ Some parts of the Js front-end are provided by the [2FAuth-Components library](h
 Assuming the library repository is cloned in the same directory as the webext repository, linking can be done by running the following npm command:
 
 ```shell
-npm link ../2FAuth-Components/packages/ui ../2FAuth-Components/packages/formcontrols ../2FAuth-Components/packages/styles ../2FAuth-Components/packages/stores
+npm link --save-dev ../2FAuth-Components/packages/ui ../2FAuth-Components/packages/formcontrols ../2FAuth-Components/packages/styles ../2FAuth-Components/packages/stores
 ```
 
 See [pnpm link usage](https://serko.dev/post/pnpm-link-usage#directory-link)
