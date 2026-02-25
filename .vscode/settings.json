@@ -26,5 +26,6 @@
     "**/dist/**/*",
     "**/public/**/*",
     "**/releases/**/*",
-  ]
+  ],
+  "vue.editor.templateInterpolationDecorators": false,
 }
