@@ -106,6 +106,7 @@
         }
 
         preferenceStore.syncWithServer()
+        settingStore.fetchFeatureFlags()
     })
 
     onBeforeRouteLeave((to) => {

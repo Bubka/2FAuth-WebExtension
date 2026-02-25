@@ -49,6 +49,7 @@
         preferenceStore.applyTheme()
         preferenceStore.applyLanguage()
         preferenceStore.resetGroupFilter()
+        settingStore.fetchFeatureFlags()
     })
 
     onMounted(async () => {

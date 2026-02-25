@@ -1,29 +1,80 @@
 import { defineStore } from 'pinia'
+import featureFlagService from '@popup/services/featureFlagService'
+import { asArray } from '@popup/composables/helpers'
 
-export const useSettingStore = defineStore('settings', {
+export const useSettingStore = defineStore('settings', () => {
 
-    state: () => {
-        return {
-            hostUrl: '',
+    // STATE
 
-            // Used only if the server runs 2FAuth v5.5.0 or higher
-            hasLockedPreferences: false, 
-            lockedPreferences: [], 
-        }
-    },
+    const hostUrl = ref('')
 
-    getters: {
-        isConfigured: (state) => state.hostUrl.length > 0,
+    // Used only if the server runs 2FAuth v5.5.0 or higher
+    const hasLockedPreferences = ref(false)
+    const lockedPreferences = ref([])
+    const featureFlags = ref([])
 
-        // The showNextOtp preference has been introduced in 2FAuth v5.5.0, the version that also introduced the preference locking feature.
-        // For now there is no way to identify the 2FAuth version ran by the server so we evaluate the presence of
-        // locked preference to determine the availability of the showNextOtp feature on server side.
-        //
-        // TODO: Find a way to identify 2FAuth version running on server side
-        hasFeature_showNextOtp: (state) => state.hasLockedPreferences,
-    },
+    // GETTERS
 
-    actions: {
+    const isConfigured = computed(() => hostUrl.value.length > 0)
+    const hasFeature_showNextOtp = computed(() => hasLockedPreferences.value)
+    const hasFeature_iconPack = computed(() => hasFeature('iconPack'))
 
-    },
+    // ACTIONS
+
+    function $reset() {
+        hostUrl.value = '';
+        hasLockedPreferences.value = false;
+        lockedPreferences.value = [];
+    }
+
+    function fetchFeatureFlags()
+    {
+        featureFlagService.getAll({returnError: true}).then((response) => {
+            // Until 2FAuth v6.1, the API returns the laravel landing view
+            // html code when the requested endpoint does not exist.
+            if (String(response.data).startsWith('<!DOCTYPE'))
+            {
+                return
+            }
+
+            featureFlags.value = []
+            
+            asArray(response?.data).forEach(featureFlag => {
+                featureFlags.value.push(featureFlag)
+            })
+        })
+        .catch((error) => {
+            // Since 2FAuth v6.1 we receive a 404 response
+        })
+    }
+
+    // NOT EXPOSED
+
+    /**
+     * 
+     * @param {string} featureName 
+     * @returns 
+     */
+    function hasFeature(name)
+    {
+        return name && featureFlags.value.find(feature => feature.name == name && feature.state == 'enabled') != undefined
+    }
+
+
+    return {
+        // STATE
+        hostUrl,
+        hasLockedPreferences,
+        lockedPreferences,
+        featureFlags,
+
+        // GETTERS
+        isConfigured,
+        hasFeature_showNextOtp,
+        hasFeature_iconPack,
+
+        // ACTIONS
+        $reset,
+        fetchFeatureFlags,
+    }
 })
