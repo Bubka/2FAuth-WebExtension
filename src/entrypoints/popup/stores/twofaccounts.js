@@ -15,13 +15,18 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
     const backendWasNewer = ref(false)
     const fetchedOn = ref(null)
     const isFetching = ref(false)
+    const groupLessOnly = ref(false)
 
     // GETTERS
 
     const filtered = computed(() => {
         return items.value.filter(
             item => {
-                if (parseInt(preferenceStore.activeGroup) > 0 ) {
+
+                if (groupLessOnly.value == true) {
+                    return item.group_id == null
+                }
+                else if (parseInt(preferenceStore.activeGroup) > 0) {
                     return ((item.service ? item.service.toLowerCase().includes(filter.value.toLowerCase()) : false) ||
                         item.account.toLowerCase().includes(filter.value.toLowerCase())) &&
                         (item.group_id == parseInt(preferenceStore.activeGroup))
@@ -124,6 +129,7 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
         backendWasNewer,
         fetchedOn,
         isFetching,
+        groupLessOnly,
 
         // GETTERS
         filtered,

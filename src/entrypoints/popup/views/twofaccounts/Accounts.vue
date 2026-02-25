@@ -10,7 +10,7 @@
     import { useTwofaccounts } from '@popup/stores/twofaccounts'
     import { useGroups } from '@popup/stores/groups'
     import { UseColorMode } from '@vueuse/components'
-    import { LucideLoaderCircle, LucideEye, LucideEyeOff, LucideCircleAlert, LucideChevronsDownUp, LucideChevronsUpDown } from 'lucide-vue-next'
+    import { LucideLoaderCircle, LucideEye, LucideEyeOff, LucideCircleAlert, LucideChevronDown } from 'lucide-vue-next'
     import { Dots, OtpDisplay, DotsController, Spinner, useVisiblePassword, GroupSwitch } from '@2fauth/ui'
 
     const { t } = useI18n()
@@ -285,6 +285,22 @@
         groups.fetch()
     })
 
+    /**
+     * Saves the active group to the store
+     */
+    // TODO : Delegate this to the store or a global watcher
+    function saveActiveGroup(newActiveGroupId) {
+        twofaccounts.groupLessOnly = false
+
+        // When invoked by GroupSwitch event,  newActiveGroupId should
+        // be the same as preferenceStore.activeGroup because of the v-model
+        // binding.
+        // When invoked by OtpDisplay we have to update the user preference too.
+        if (preferenceStore.activeGroup != newActiveGroupId) {
+            preferenceStore.activeGroup = newActiveGroupId
+        }
+    }
+
 </script>
 
 <template>
@@ -304,11 +320,23 @@
             <template #subheader v-if="showAccounts || showGroupSwitch">
                 <!-- group switch toggle -->
                 <div class="has-text-centered">
-                    <div>
+                    <div v-if="showGroupSwitch">
+                        <button type="button" id="btnHideGroupSwitch" :title="$t('tooltip.hide_group_selector')" tabindex="1" class="button is-text is-like-text has-text-grey-dark" :class="{'has-text-grey' : mode != 'dark'}" @click.stop="showGroupSwitch = !showGroupSwitch">
+                            {{ $t('label.select_accounts_to_show') }}
+                        </button>
+                    </div>
+                    <div v-else>
                         <button type="button" id="btnShowGroupSwitch" :title="$t('tooltip.show_group_selector')" tabindex="1" class="button is-text is-like-text has-text-grey-dark" :class="{'has-text-grey' : mode != 'dark'}" @click.stop="showGroupSwitch = !showGroupSwitch">
-                            {{ groups.current ? groups.current : $t('label.all') }} ({{ twofaccounts.filteredCount }})&nbsp;
-                                <LucideChevronsDownUp v-if="showGroupSwitch" />
-                                <LucideChevronsUpDown v-else />
+                            <template v-if="twofaccounts.groupLessOnly">
+                                {{ $t('label.group_less') }} ({{ twofaccounts.filteredCount }})&nbsp;
+                            </template>
+                            <template v-else-if="groups.current">
+                                {{ groups.current }} ({{ twofaccounts.filteredCount }})&nbsp;
+                            </template>
+                            <template v-else>
+                                {{ $t('label.all') }} ({{ twofaccounts.filteredCount }})&nbsp;
+                            </template>
+                            <LucideChevronDown class="mt-1" />
                         </button>
                     </div>
                 </div>
@@ -318,8 +346,9 @@
                 <GroupSwitch
                     v-model:is-visible="showGroupSwitch"
                     v-model:active-group="preferenceStore.activeGroup"
-                    :groups="groups.items">
-                    <!-- TODO : Add @show-group-less handler-->
+                    :groups="groups.items"
+                    @active-group-changed="saveActiveGroup"
+                    @show-group-less="twofaccounts.groupLessOnly = true">
                 </GroupSwitch>
                 <!-- show accounts list -->
                 <div v-if="showAccounts == true">
