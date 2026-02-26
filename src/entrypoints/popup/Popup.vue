@@ -29,6 +29,7 @@
         sendMessage('CHECK_IS_LOCKED', { }, 'background').then(({locked}) => {
             if (! locked && settingStore.isConfigured) {
                 preferenceStore.syncWithServer()
+                settingStore.fetchFeatureFlags()
             }
         })
         
@@ -49,7 +50,6 @@
         preferenceStore.applyTheme()
         preferenceStore.applyLanguage()
         preferenceStore.resetGroupFilter()
-        settingStore.fetchFeatureFlags()
     })
 
     onMounted(async () => {
