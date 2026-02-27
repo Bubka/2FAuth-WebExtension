@@ -56,7 +56,7 @@ export default defineBackground({
         let qrImageMimeType = null
 
         //  MARK: Listeners
-        // Lancer quand une fenêtre est fermée.
+        // Lancé quand une fenêtre est fermée.
         browser.windows.onRemoved.addListener(handleBrowserClosed)
 
         // Lancé quand un profil ayant cette extension installée démarre une session
@@ -80,7 +80,7 @@ export default defineBackground({
         //     "vérouillé" si l'écran est vérouillé ou si l'économisateur d'écran s'active
         //     "inactif" si le système est vérouillé ou si l'économisateur n'a généré aucune entrée pendant un nombre de secondes spécifié. Ce nombre est défini par défaut sur 60, mais peut-être défini à l'aide de idle.setDetectionInterval().
         //     "actif" quand l'utilisateur génère une entrée sur un système inactif.
-        browser.idle.onStateChanged.addListener(handleSystemStateChange)
+        // browser.idle.onStateChanged.addListener(handleSystemStateChange)
 
         // Lancé quand une connexion est établie avec un processus d'extension ou un script de contenu.
         browser.runtime.onConnect.addListener(handleOnConnect)
@@ -401,6 +401,15 @@ export default defineBackground({
             }
         }
 
+        /**
+         * Tells if the user has set an autolock option
+         * 
+         * @returns {boolean}
+         */
+        function hasAutoLockEnabled() {
+            return state.kickAfter == -1 || state.kickAfter > 0
+        }
+
         //  MARK: Events
         
         /**
@@ -412,7 +421,7 @@ export default defineBackground({
         function handleBrowserClosed(window_id) {
             browser.windows.getAll().then(window_list => {
                 if (window_list.length === 0) {
-                    if (state.kickAfter !== null) {
+                    if (hasAutoLockEnabled()) {
                         lockNow('handleBrowserClosed()')
                     } else {
                         storeState()
@@ -447,11 +456,11 @@ export default defineBackground({
         function handleOnConnect(externalPort) {
             swlogTitle('ON CONNECT HANDLING')
             if (state.isLoaded === false) {
-                handleStartup()
+                startup()
             }
             else {
                 if (state.locked) {
-                    lockNow('handleStartup()')
+                    lockNow('handleOnConnect()')
                 }
                 else {
                     storeState().then(() => {
@@ -468,26 +477,26 @@ export default defineBackground({
          * Detect the system state change
          * MARK: On sys change
          */
-        function handleSystemStateChange(new_state) {
-            swlogTitle('SYSTEM CHANGE HANDLING')
+        // function handleSystemStateChange(new_state) {
+        //     swlogTitle('SYSTEM CHANGE HANDLING')
 
-            function checkLockState() {
-                if (state.kickAfter !== null && state.kickAfter !== -1) {
-                    lockNow('handleSystemStateChange()')
-                }
-            }
+        //     function checkLockState() {
+        //         if (hasAutoLockEnabled()) {
+        //             lockNow('handleSystemStateChange()')
+        //         }
+        //     }
 
-            swlog('System switched to ' + new_state)
-            if (new_state === 'locked') {
-                if (state.isLoaded) {
-                    checkLockState()
-                } else {
-                    loadState().then(() => {
-                        checkLockState()
-                    })
-                }
-            }
-        }
+        //     swlog('System switched to ' + new_state)
+        //     if (new_state === 'locked') {
+        //         if (state.isLoaded) {
+        //             checkLockState()
+        //         } else {
+        //             loadState().then(() => {
+        //                 checkLockState()
+        //             })
+        //         }
+        //     }
+        // }
 
         /**
          * Handle startup tasks
@@ -496,15 +505,28 @@ export default defineBackground({
         function handleStartup() {
             swlogTitle('STARTUP HANDLING')
 
+            startup(true)
+        }
+
+        /**
+         * startup
+         * MARK: Startup
+         */
+        function startup(fromHandleStartup = false) {
+            swlogTitle('STARTUP')
+
             setPopupIcon()
             loadState().then(() => {
+                if (fromHandleStartup && hasAutoLockEnabled()) {
+                    lockNow('fromHandleStartup()')
+                }
                 if (state.locked) {
-                    lockNow('handleStartup()')
+                    lockNow('startup()')
                 }
                 else {
                     storeState().then(() => {
                         browser.alarms.clear('lock-extension').then((cleared) => {
-                            if (cleared) swlog('⏰ lock-extension alarm cleared by handleStartup()')
+                            if (cleared) swlog('⏰ lock-extension alarm cleared by startup()')
                         })
                     })
                 }
@@ -519,7 +541,7 @@ export default defineBackground({
             swlogTitle('UPDATES HANDLING')
             // if (details.reason === 'update') {
             // }
-            handleStartup()
+            startup()
         }
 
         /**
