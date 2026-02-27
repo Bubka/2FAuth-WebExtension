@@ -1,5 +1,23 @@
 # Change log
 
+## [1.2.0] - 2026-02-27
+
+### Added
+
+- QR Code Capture: The extension can now detect and read QR codes on the active web page to ease 2FA registration. Once decoded, the underlying 2FA data is automatically added to your 2FAuth account. ([#410](https://github.com/Bubka/2FAuth/issues/410))
+- Translations for all supported languages in 2FAuth.
+- The Group-less filter.
+
+### Changed
+
+- The Chrome/Edge extension no longer runs in the background after the browser has been closed.
+
+### Fixed
+
+- [issue #461](https://github.com/Bubka/2FAuth/issues/461) l.forEach is not a function
+- [issue #491](https://github.com/Bubka/2FAuth/issues/491) e.value.filter & t.value.find is not a function
+- [issue #512](https://github.com/Bubka/2FAuth/issues/512) Unauthorized Data cannot be refreshed from server
+
 ## [1.1.2] - 2025-07-04
 
 ### Changed
