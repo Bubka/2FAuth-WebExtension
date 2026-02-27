@@ -82,7 +82,23 @@
             value: 'browser'
         }];
 
-        let availableLocales = ['en', 'fr']
+        let availableLocales = [
+            'bg',
+            'zh-CN',
+            'da',
+            'nl',
+            'en',
+            'fr',
+            'de',
+            'hi',
+            'it',
+            'ja',
+            'ko',
+            'pt-BR',
+            'ru',
+            'es-ES',
+            'tr',
+        ]
 
         for (const locale of availableLocales) {
             locales.push({
