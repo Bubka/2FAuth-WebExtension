@@ -47,7 +47,7 @@
         "vue-i18n": "^11.2.8",
         "vue-router": "^5.0.2",
         "webext-bridge": "^6.0.1",
-        "wxt": "^0.20.17"
+        "wxt": "^0.20.18"
     },
     "dependencies": {
         "vue": "^3.5.28"
