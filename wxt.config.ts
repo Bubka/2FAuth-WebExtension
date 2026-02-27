@@ -1,5 +1,5 @@
 import { defineConfig } from 'wxt'
-import { defineBuildVar as buildVar } from './define.buildvar.js'
+import { defineViteConfig as define } from './define.config.js'
 import vueI18n from '@intlify/unplugin-vue-i18n/vite'
 // import vue from '@vitejs/plugin-vue'
 
@@ -106,7 +106,7 @@ export default defineConfig({
                 ]
             }),
         ],
-        buildVar,
+        define,
         resolve: {
             dedupe: [
                 'pinia',
