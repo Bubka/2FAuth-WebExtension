@@ -24,7 +24,6 @@ export default defineConfig({
         ]
 
         if (browser === 'chrome' || browser === 'edge' ) {
-            permissions.push('background')
             permissions.push('offscreen')
         }
 
