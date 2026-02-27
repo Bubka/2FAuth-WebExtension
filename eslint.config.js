@@ -2,7 +2,7 @@ import js from '@eslint/js'
 import pluginVue from 'eslint-plugin-vue'
 import globals from 'globals'
 import autoImports from './.wxt/eslint-auto-imports.mjs'
-import { defineViteConfig as define } from './define.config.js'
+import { defineBuildVar as buildVar } from './define.buildvar.js'
 
 export default [
     autoImports,
@@ -31,7 +31,7 @@ export default [
                 ...globals.browser,
                 ...globals.worker,
                 ...globals.webextensions,
-                ...define,
+                ...buildVar,
                 // ...autoImports.globals,
             }
         }
