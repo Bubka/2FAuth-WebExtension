@@ -21,6 +21,8 @@ export const usePreferenceStore = defineStore('preferences', () => {
     const activeGroup = ref(0)
     const kickUserAfter = ref(15)
     const rememberActiveGroup = ref(true)
+    const useGroupChips = ref(true)
+    const showVirtualChips = ref(true)
     const viewDefaultGroupOnCopy = ref(false)
     const defaultGroup = ref(0)
     const defaultCaptureMode = ref('livescan')
@@ -56,6 +58,8 @@ export const usePreferenceStore = defineStore('preferences', () => {
         activeGroup.value = 0
         kickUserAfter.value = 15
         rememberActiveGroup.value = true
+        useGroupChips.value = true
+        showVirtualChips.value = true
         viewDefaultGroupOnCopy.value = false
         defaultGroup.value = 0
         defaultCaptureMode.value = 'livescan'
@@ -182,6 +186,8 @@ export const usePreferenceStore = defineStore('preferences', () => {
         activeGroup,
         kickUserAfter,
         rememberActiveGroup,
+        useGroupChips,
+        showVirtualChips,
         viewDefaultGroupOnCopy,
         defaultGroup,
         defaultCaptureMode,
