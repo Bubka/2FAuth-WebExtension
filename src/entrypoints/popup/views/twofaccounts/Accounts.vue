@@ -11,8 +11,8 @@
     import { useTwofaccounts } from '@popup/stores/twofaccounts'
     import { useGroups } from '@popup/stores/groups'
     import { UseColorMode } from '@vueuse/components'
-    import { LucideLoaderCircle, LucideEye, LucideEyeOff, LucideCircleAlert, LucideChevronDown, LucideUserCheck, LucideUsers } from '@lucide/vue'
-    import { Dots, OtpDisplay, DotsController, Spinner, useVisiblePassword, GroupChips, GroupSwitch } from '@2fauth/ui'
+    import { LucideLoaderCircle, LucideEye, LucideEyeOff, LucideCircleAlert, LucideUserCheck, LucideUsers } from '@lucide/vue'
+    import { Dots, OtpDisplay, DotsController, Spinner, useVisiblePassword, GroupCallToSwitch, GroupChips, GroupSwitch } from '@2fauth/ui'
 
     const { t } = useI18n()
     const router = useRouter()
@@ -341,24 +341,12 @@
                             :useShareAllScope="settingStore.hasFeature_allUsersSharingScope"
                             :useVirtualChips="preferenceStore.showVirtualChips"
                             @active-group-changed="saveActiveGroup" />
-                        <button v-else type="button" id="btnShowGroupSwitch" :title="$t('tooltip.show_group_selector')" tabindex="1" class="button is-text is-like-text has-text-grey-dark" :class="{'has-text-grey' : mode != 'dark'}" @click.stop="showGroupSwitch = !showGroupSwitch">
-                            <template v-if="parseInt(preferenceStore.activeGroup) == -1">
-                                {{ $t('label.group_less') }} ({{ twofaccounts.filteredCount }})&nbsp;
-                            </template>
-                            <template v-else-if="settingStore.hasFeature_sharing && parseInt(preferenceStore.activeGroup) == -2">
-                                {{ $t('label.shared_by_me') }} ({{ twofaccounts.filteredCount }})&nbsp;
-                            </template>
-                            <template v-else-if="settingStore.hasFeature_sharing && parseInt(preferenceStore.activeGroup) == -3">
-                                 {{ $t('label.shared_with_me') }} ({{ twofaccounts.filteredCount }})&nbsp;
-                            </template>
-                            <template v-else-if="groups.current">
-                                {{ groups.current }} ({{ twofaccounts.filteredCount }})&nbsp;
-                            </template>
-                            <template v-else>
-                                {{ $t('label.all') }} ({{ twofaccounts.filteredCount }})&nbsp;
-                            </template>
-                            <LucideChevronDown class="mt-1" />
-                        </button>
+                        <GroupCallToSwitch v-else
+                            v-model:show-group-switch="showGroupSwitch"
+                            :activeGroup="preferenceStore.activeGroup"
+                            :currentGroup="groups.current"
+                            :filteredCount="twofaccounts.filteredCount"
+                            :useShare="settingStore.hasFeature_sharing" />
                     </div>
                 </div>
             </template>
