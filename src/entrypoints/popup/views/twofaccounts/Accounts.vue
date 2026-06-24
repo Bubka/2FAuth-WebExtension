@@ -349,14 +349,17 @@
                                     ...
                                 </button>
                                 <template v-if="preferenceStore.showVirtualChips">
-                                    <button v-if="settingStore.enableSharing" class="button tag" :class="{'has-text-grey' : mode == 'dark' && preferenceStore.activeGroup != -2, 'is-white has-text-grey' : mode != 'dark'&& preferenceStore.activeGroup != -2, 'is-link' : preferenceStore.activeGroup == -2}" @click="saveActiveGroup(-2)" :title="$t('label.accounts_I_m_sharing')">
-                                        <template v-if="settingStore.enableAllUsersSharingScope"><LucideUsers class="icon-size-0-9 mr-1" />|</template><LucideUserCheck class="ml-1 icon-size-0-9" />
+                                    <button v-if="settingStore.hasFeature_sharing" class="button tag" :class="{'has-text-grey' : mode == 'dark' && preferenceStore.activeGroup != -2, 'is-white has-text-grey' : mode != 'dark'&& preferenceStore.activeGroup != -2, 'is-link' : preferenceStore.activeGroup == -2}" @click="saveActiveGroup(-2)" :title="$t('label.accounts_I_m_sharing')">
+                                        <template v-if="settingStore.hasFeature_allUsersSharingScope">
+                                            <LucideUsers class="icon-size-0-9 mr-1" />|
+                                        </template>
+                                        <LucideUserCheck class="ml-1 icon-size-0-9"  :class="{ 'mr-1': preferenceStore.activeGroup == -2 }" />{{ preferenceStore.activeGroup == -2 ? `• ${twofaccounts.filteredCount}` : '' }}
                                     </button>
-                                    <button v-if="settingStore.enableSharing" class="button tag" :class="{'has-text-grey' : mode == 'dark' && preferenceStore.activeGroup != -3, 'is-white has-text-grey' : mode != 'dark'&& preferenceStore.activeGroup != -3, 'is-link' : preferenceStore.activeGroup == -3}" @click="saveActiveGroup(-3)" :title="$t('label.accounts_shared_with_me')">
-                                        <LucideAtSign class="icon-size-0-9" />
+                                    <button v-if="settingStore.hasFeature_sharing" class="button tag" :class="{'has-text-grey' : mode == 'dark' && preferenceStore.activeGroup != -3, 'is-white has-text-grey' : mode != 'dark'&& preferenceStore.activeGroup != -3, 'is-link' : preferenceStore.activeGroup == -3}" @click="saveActiveGroup(-3)" :title="$t('label.accounts_shared_with_me')">
+                                        <LucideAtSign class="icon-size-0-9" :class="{ 'mr-1': preferenceStore.activeGroup == -3 }" />{{ preferenceStore.activeGroup == -3 ? `• ${twofaccounts.filteredCount}` : '' }}
                                     </button>
                                     <button class="button tag" :class="{'has-text-grey' : mode == 'dark' && preferenceStore.activeGroup != -1, 'is-white has-text-grey' : mode != 'dark' && preferenceStore.activeGroup != -1, 'is-link' : preferenceStore.activeGroup == -1}" @click="saveActiveGroup(-1)" :title="$t('label.group_less_accounts')">
-                                        <LucideSquareSlash class="icon-size-1" />
+                                        <LucideSquareSlash class="icon-size-1" :class="{ 'mr-1': preferenceStore.activeGroup == -1 }" />{{ preferenceStore.activeGroup == -1 ? `• ${twofaccounts.filteredCount}` : '' }}
                                     </button>
                                 </template>
                             </div>
