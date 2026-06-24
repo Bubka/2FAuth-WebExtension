@@ -1,5 +1,16 @@
 # Change log
 
+## [1.3.0] - 2026-06-24
+
+### Added
+
+- Group switching can be done directly from the main view using chips
+- A link in the Group selection menu to open 2FAuth when no user group exist
+
+### Changed
+
+- User preferences in Settings > Options have been reorganized to match 2FAuth v8 layout
+
 ## [1.2.1] - 2026-06-05
 
 ### Changed
