@@ -4,7 +4,7 @@
     import twofaccountService from '@popup/services/twofaccountService'
     import { usePreferenceStore } from '@/stores/preferenceStore'
     import { useSettingStore } from '@/stores/settingStore'
-    import { asArray } from '@popup/composables/helpers'
+    import { asArray, openUrlInNewTab } from '@popup/composables/helpers'
     import { getPopupHeight } from '@popup/composables/getPopupHeight'
     import { useNotify, SearchBox } from '@2fauth/ui'
     import { useErrorHandler } from '@2fauth/stores'
@@ -361,6 +361,10 @@
                     :groups="groups.items"
                     :useShare="settingStore.hasFeature_sharing"
                     @active-group-changed="saveActiveGroup">
+                        <template v-if="groups.items.length < 2">
+                            <p class="my-5">{{ $t('message.no_group_yet') }}</p>
+                            <a @click="openUrlInNewTab(settingStore.hostUrl)">{{ $t('link.open_2fauth_to_create_group') }}</a>
+                        </template>
                 </GroupSwitch>
                 <!-- show accounts list -->
                 <div v-if="showAccounts == true">
