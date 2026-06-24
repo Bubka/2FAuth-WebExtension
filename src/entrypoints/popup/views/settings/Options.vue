@@ -201,13 +201,32 @@
                 </div> -->
                 <!-- theme -->
                 <FormToggle v-model="preferenceStore.theme" @update:model-value="applyTheme()" :choices="themes" fieldName="theme" :isLocked="settingStore.lockedPreferences.includes('theme')" label="field.theme" help="field.theme.help"/>
-                <!-- show icon -->
-                <FormCheckbox v-model="preferenceStore.showAccountsIcons" @update:model-value="notifySuccess" fieldName="showAccountsIcons" :isLocked="settingStore.lockedPreferences.includes('showAccountsIcons')" label="field.show_accounts_icons" help="field.show_accounts_icons.help" />
+
+                <h4 class="title is-4 pt-4">{{ $t('heading.2fa_accounts') }}</h4>
+                <h5 ref="otp" class="title is-5 mb-3">{{ $t('heading.one_time_passwords') }}</h5>
+                <!-- get OTP on request -->
+                <FormToggle v-model="preferenceStore.getOtpOnRequest" @update:model-value="notifySuccess" :choices="getOtpTriggers" fieldName="getOtpOnRequest" :isLocked="settingStore.lockedPreferences.includes('getOtpOnRequest')" label="field.otp_generation" help="field.otp_generation.help"/>
+                    <!-- close otp on copy -->
+                    <FormCheckbox v-model="preferenceStore.closeOtpOnCopy" @update:model-value="notifySuccess" fieldName="closeOtpOnCopy" :isLocked="settingStore.lockedPreferences.includes('closeOtpOnCopy')" :isDisabled="!preferenceStore.getOtpOnRequest" label="field.close_otp_on_copy" help="field.close_otp_on_copy.help" :isIndented="true" />
+                    <!-- auto-close timeout -->
+                    <FormSelect v-model="preferenceStore.autoCloseTimeout" @update:model-value="notifySuccess" :options="autoCloseTimeout" :isLocked="settingStore.lockedPreferences.includes('autoCloseTimeout')" :isDisabled="!preferenceStore.getOtpOnRequest" fieldName="autoCloseTimeout" label="field.auto_close_timeout" help="field.auto_close_timeout.help" :isIndented="true" />
+                    <!-- clear search on copy -->
+                    <FormCheckbox v-model="preferenceStore.copyOtpOnDisplay" @update:model-value="notifySuccess" fieldName="copyOtpOnDisplay" :isLocked="settingStore.lockedPreferences.includes('copyOtpOnDisplay')" :isDisabled="!preferenceStore.getOtpOnRequest" label="field.copy_otp_on_display" help="field.copy_otp_on_display.help" :isIndented="true" />
                 <!-- password format -->
                 <FormCheckbox v-model="preferenceStore.formatPassword" @update:model-value="notifySuccess" fieldName="formatPassword" :isLocked="settingStore.lockedPreferences.includes('formatPassword')" label="field.password_format" help="field.password_format.help" />
-                <FormToggle v-model="preferenceStore.formatPasswordBy" @update:model-value="notifySuccess" :choices="passwordFormats" fieldName="formatPasswordBy" :isLocked="settingStore.lockedPreferences.includes('formatPasswordBy')" :isDisabled="!preferenceStore.formatPassword" />
+                <FormToggle class="mb-4" v-model="preferenceStore.formatPasswordBy" @update:model-value="notifySuccess" :choices="passwordFormats" fieldName="formatPasswordBy" :isLocked="settingStore.lockedPreferences.includes('formatPasswordBy')" :isDisabled="!preferenceStore.formatPassword" />
+                <!-- otp as dot -->
+                <FormCheckbox v-model="preferenceStore.showOtpAsDot" @update:model-value="notifySuccess" fieldName="showOtpAsDot" :isLocked="settingStore.lockedPreferences.includes('showOtpAsDot')" label="field.show_otp_as_dot" help="field.show_otp_as_dot.help" />
+                    <!-- reveal dotted OTPs -->
+                    <FormCheckbox v-model="preferenceStore.revealDottedOTP" @update:model-value="notifySuccess" fieldName="revealDottedOTP" :isLocked="settingStore.lockedPreferences.includes('revealDottedOTP')" :isDisabled="!preferenceStore.showOtpAsDot" label="field.reveal_dotted_otp" help="field.reveal_dotted_otp.help" :isIndented="true" />
+                <!-- show next OTP -->
+                <FormCheckbox v-if="settingStore.hasFeature_showNextOtp" v-model="preferenceStore.showNextOtp" @update:model-value="notifySuccess" fieldName="showNextOtp" :isLocked="settingStore.lockedPreferences.includes('showNextOtp')" label="field.show_next_otp" help="field.show_next_otp.help" />
                 <!-- clear search on copy -->
                 <FormCheckbox v-model="preferenceStore.clearSearchOnCopy" @update:model-value="notifySuccess" fieldName="clearSearchOnCopy" :isLocked="settingStore.lockedPreferences.includes('clearSearchOnCopy')" label="field.clear_search_on_copy" help="field.clear_search_on_copy.help" />
+
+                <h5 ref="icons" class="title is-5 pt-3 mb-4">{{ $t('heading.icons') }}</h5>
+                <!-- show icon -->
+                <FormCheckbox v-model="preferenceStore.showAccountsIcons" @update:model-value="notifySuccess" fieldName="showAccountsIcons" :isLocked="settingStore.lockedPreferences.includes('showAccountsIcons')" label="field.show_accounts_icons" help="field.show_accounts_icons.help" />
                 
                 <h4 class="title is-4 pt-4">{{ $t('heading.groups') }}</h4>
                 <!-- default group -->
@@ -224,20 +243,6 @@
                 <h4 class="title is-4 pt-4">{{ $t('heading.security') }}</h4>
                 <!-- auto lock -->
                 <FormSelect v-model="kickAfter" @update:model-value="changeAutolockDelay()" :options="kickUserAfters" fieldName="kickUserAfter" :isLocked="settingStore.lockedPreferences.includes('kickUserAfter')" label="field.auto_lock_extension" help="field.auto_lock_extension.help" />
-                <!-- get OTP on request -->
-                <FormToggle v-model="preferenceStore.getOtpOnRequest" @update:model-value="notifySuccess" :choices="getOtpTriggers" fieldName="getOtpOnRequest" :isLocked="settingStore.lockedPreferences.includes('getOtpOnRequest')" label="field.otp_generation" help="field.otp_generation.help"/>
-                    <!-- close otp on copy -->
-                    <FormCheckbox v-model="preferenceStore.closeOtpOnCopy" @update:model-value="notifySuccess" fieldName="closeOtpOnCopy" :isLocked="settingStore.lockedPreferences.includes('closeOtpOnCopy')" :isDisabled="!preferenceStore.getOtpOnRequest" label="field.close_otp_on_copy" help="field.close_otp_on_copy.help" :isIndented="true" />
-                    <!-- auto-close timeout -->
-                    <FormSelect v-model="preferenceStore.autoCloseTimeout" @update:model-value="notifySuccess" :options="autoCloseTimeout" :isLocked="settingStore.lockedPreferences.includes('autoCloseTimeout')" :isDisabled="!preferenceStore.getOtpOnRequest" fieldName="autoCloseTimeout" label="field.auto_close_timeout" help="field.auto_close_timeout.help" :isIndented="true" />
-                    <!-- clear search on copy -->
-                    <FormCheckbox v-model="preferenceStore.copyOtpOnDisplay" @update:model-value="notifySuccess" fieldName="copyOtpOnDisplay" :isLocked="settingStore.lockedPreferences.includes('copyOtpOnDisplay')" :isDisabled="!preferenceStore.getOtpOnRequest" label="field.copy_otp_on_display" help="field.copy_otp_on_display.help" :isIndented="true" />
-                <!-- otp as dot -->
-                <FormCheckbox v-model="preferenceStore.showOtpAsDot" @update:model-value="notifySuccess" fieldName="showOtpAsDot" :isLocked="settingStore.lockedPreferences.includes('showOtpAsDot')" label="field.show_otp_as_dot" help="field.show_otp_as_dot.help" />
-                    <!-- reveal dotted OTPs -->
-                    <FormCheckbox v-model="preferenceStore.revealDottedOTP" @update:model-value="notifySuccess" fieldName="revealDottedOTP" :isLocked="settingStore.lockedPreferences.includes('revealDottedOTP')" :isDisabled="!preferenceStore.showOtpAsDot" label="field.reveal_dotted_otp" help="field.reveal_dotted_otp.help" :isIndented="true" />
-                <!-- show next OTP -->
-                <FormCheckbox v-if="settingStore.hasFeature_showNextOtp" v-model="preferenceStore.showNextOtp" @update:model-value="notifySuccess" fieldName="showNextOtp" :isLocked="settingStore.lockedPreferences.includes('showNextOtp')" label="field.show_next_otp" help="field.show_next_otp.help" />
             </form>
         </template>
         <template #footer>
