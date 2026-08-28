@@ -33,6 +33,15 @@
     const username = ref(null)
     const canOpenPopup = ref(true)
 
+    const fetchOptions = computed(() => {
+        return {
+            baseURL: _hostUrl.value + '/api/v1',
+            headers: { 'Authorization': 'Bearer ' + _apiToken.value , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' },
+            returnError: true,
+            ignoreRequestInterceptor: true,
+        }
+    })
+
     onMounted(async () => {
         // Test if browser supports opening popup programmatically
         const result = await sendMessage('TEST_OPENPOPUP_CAPABILITY', {}, 'background')
@@ -57,12 +66,8 @@
             isConnected.value = null
             username.value = null
 
-            userService.get({
-                baseURL: _hostUrl.value + '/api/v1',
-                headers: { 'Authorization': 'Bearer ' + _apiToken.value , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' },
-                returnError: true,
-                ignoreRequestInterceptor: true,
-            }).then(response => {
+            userService.get(fetchOptions.value)
+            .then(response => {
                 username.value = response.data.name
                 isConnected.value = true
             })
@@ -94,12 +99,8 @@
         if (hasValidHostUrl && hasValidApiToken && hasValidPassword) {
             isSaving.value = true
 
-            userService.getPreferences({
-                baseURL: _hostUrl.value + '/api/v1',
-                headers: { 'Authorization': 'Bearer ' + _apiToken.value , 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' },
-                returnError: true,
-                ignoreRequestInterceptor: true,
-            }).then(async ({ data: fetchedPreferences }) => {
+            userService.getPreferences(fetchOptions.value)
+            .then(async ({ data: fetchedPreferences }) => {
                 // Setting enc key
                 const { status: setEncKeyStatus } = await sendMessage('SET_PASSWORD', { password: _extPassword.value }, 'background')
 
@@ -162,8 +163,13 @@
         }
     }
 
+    function removeTrailingSlashes(url) {
+        return url.replace(/\/+$/, '')
+    }
+
     function validateHostUrl() {
         errors.value.hostUrl = ''
+        _hostUrl.value = removeTrailingSlashes(_hostUrl.value)
 
         if (! isFilled(_hostUrl.value) || ! isHttpUrl(_hostUrl.value)) {
             errors.value.hostUrl = t('error.field_is_required_and_valid_url')
