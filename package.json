@@ -1,7 +1,7 @@
 {
     "name": "2fauth-browser-extension",
     "displayName": "2FAuth",
-    "version": "1.3.0",
+    "version": "1.3.1",
     "description": "Access your 2FAuth details and generate 2FA passwords directly from your browser toolbar",
     "private": true,
     "type": "module",

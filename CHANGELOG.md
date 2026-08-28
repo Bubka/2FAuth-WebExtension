@@ -1,5 +1,11 @@
 # Change log
 
+## [1.3.1] - 2026-08-28
+
+### Fixed
+
+- Trailing slash in server url causing error during extension configuration [related to issue #565](https://github.com/Bubka/2FAuth/issues/565)
+
 ## [1.3.0] - 2026-06-24
 
 ### Added
