@@ -177,6 +177,7 @@
 </script>
 
 <template>
+    <div class="ext-full-height">
     <StackLayout>
         <template #header>
             <TabBar :tabs="tabs" :active-tab="'settings.options'" :is-responsive="false" @tab-selected="(to) => router.push({ name: to })" />
@@ -251,4 +252,5 @@
             </VueFooter>
         </template>
     </StackLayout>
+    </div>
 </template>
