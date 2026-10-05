@@ -1,4 +1,4 @@
-import { I18nLocales, I18nSchema } from '@/utils/i18n';
+import type { I18nLocales, I18nSchema } from '@/utils/i18n';
 import { useI18n } from 'vue-i18n';
 
 export default function () {
