@@ -21,6 +21,7 @@ export const useSettingStore = defineStore('settings', () => {
     const hasFeature_sharing = computed(() => hasFeature('sharing'))
     const hasFeature_allUsersSharingScope = computed(() => hasFeature('allUsersSharingScope'))
     const hasFeature_groupChips = computed(() => hasFeature('groupChips'))
+    const hasFeature_favorites = computed(() => hasFeature('favorites'))
 
     // ACTIONS
 
@@ -78,6 +79,7 @@ export const useSettingStore = defineStore('settings', () => {
         hasFeature_sharing,
         hasFeature_allUsersSharingScope,
         hasFeature_groupChips,
+        hasFeature_favorites,
 
         // ACTIONS
         $reset,

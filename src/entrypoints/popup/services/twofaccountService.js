@@ -74,5 +74,9 @@ export default {
     count(config = {}) {
         return apiClient.get('/twofaccounts/count', { ...config })
     },
+
+    toggleFavorite(id, is_favorite, config = {}) {
+        return apiClient.patch('/twofaccounts/' + id + '/favorite', { 'is_favorite': is_favorite }, { ...config })
+    },
     
 }

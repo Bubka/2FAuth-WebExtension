@@ -1,5 +1,11 @@
 # Change log
 
+## [1.4.0] - 2026-mm-dd
+
+### Added
+
+- Favorite system: Frequently used 2FA accounts can be marked as favorite, regardless of whether they belong to a group. You can easily find your favorites again thanks to a brand new toggle in the filter bar. This feature requires a 2FAuth v9 server or higher.
+
 ## [1.3.2] - 2026-09-23
 
 ### Fixed

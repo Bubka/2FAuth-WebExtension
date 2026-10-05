@@ -42,6 +42,7 @@ export const usePreferenceStore = defineStore('preferences', () => {
     const AutoSaveQrcodedAccount = ref(false)
     const showEmailInFooter = ref(true)
     const showNextOtp = ref(true)
+    const enableFavorites = ref(true)
 
     // ACTIONS
 
@@ -79,6 +80,7 @@ export const usePreferenceStore = defineStore('preferences', () => {
         AutoSaveQrcodedAccount.value = false
         showEmailInFooter.value = true
         showNextOtp.value = true
+        enableFavorites.value = true
     }
 
     /**
@@ -207,6 +209,7 @@ export const usePreferenceStore = defineStore('preferences', () => {
         AutoSaveQrcodedAccount,
         showEmailInFooter,
         showNextOtp,
+        enableFavorites,
 
         // GETTERS
 

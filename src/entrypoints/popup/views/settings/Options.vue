@@ -204,6 +204,8 @@
                 <FormToggle v-model="preferenceStore.theme" @update:model-value="applyTheme()" :choices="themes" fieldName="theme" :isLocked="settingStore.lockedPreferences.includes('theme')" label="field.theme" help="field.theme.help"/>
 
                 <h4 class="title is-4 pt-4">{{ $t('heading.2fa_accounts') }}</h4>
+                <!-- enable favorites -->
+                <FormCheckbox v-if="settingStore.hasFeature_favorites" v-model="preferenceStore.enableFavorites" @update:model-value="notifySuccess" fieldName="enableFavorites" :isLocked="settingStore.lockedPreferences.includes('enableFavorites')" label="field.enable_favorites" help="field.enable_favorites.help" />
                 <h5 ref="otp" class="title is-5 mb-3">{{ $t('heading.one_time_passwords') }}</h5>
                 <!-- get OTP on request -->
                 <FormToggle v-model="preferenceStore.getOtpOnRequest" @update:model-value="notifySuccess" :choices="getOtpTriggers" fieldName="getOtpOnRequest" :isLocked="settingStore.lockedPreferences.includes('getOtpOnRequest')" label="field.otp_generation" help="field.otp_generation.help"/>

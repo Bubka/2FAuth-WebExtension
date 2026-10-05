@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia'
+import { useNotify } from '@2fauth/ui'
+import { useErrorHandler } from '@2fauth/stores'
 import { usePreferenceStore } from '@/stores/preferenceStore'
 import twofaccountService from '@popup/services/twofaccountService'
 import { asArray } from '@popup/composables/helpers'
@@ -12,6 +14,7 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
     const items = ref([])
     // const selectedIds = ref([])
     const filter = ref('')
+    const showFavoritesOnly = ref(false)
     const backendWasNewer = ref(false)
     const fetchedOn = ref(null)
     const isFetching = ref(false)
@@ -58,6 +61,10 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
                     )
                 }
 
+                if (showFavoritesOnly.value) {
+                    itemMatch = itemMatch && item.is_favorite == true
+                }
+
                 return itemMatch
             }
         )
@@ -88,6 +95,7 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
     function $reset() {
         items.value = []
         filter.value = ''
+        showFavoritesOnly.value = false
         backendWasNewer.value = false
         fetchedOn.value = null
         isFetching.value = false
@@ -144,12 +152,48 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
     function accountIdsWithPeriod(period) {
         return items.value.filter(a => a.period == period).map(item => item.id)
     }
+
+    /**
+     * Toggle the favorite status of an account
+     */
+    async function toggleIsFavorite(accountId) {
+        const notify = useNotify()
+        const errorHandler = useErrorHandler()
+        const index = items.value.findIndex(acc => acc.id === parseInt(accountId))
+
+        if (index > -1) {
+            const is_favorite = ! items.value[index].is_favorite
+
+            await twofaccountService.toggleFavorite(accountId, is_favorite, { returnError: true }).then(response => {
+                items.value[index].is_favorite = is_favorite
+            })
+            .catch(error => {
+                if( error.response.status < 500 ) {
+                    notify.alert({ text: this.$i18n.global.t('error.failed_to_set_favorite_status') })
+                }
+                else {
+                    errorHandler.show(error)
+                }
+            })
+        }
+        else {
+            notify.alert({ text: this.$i18n.global.t('error.failed_to_set_favorite_status') })
+        }
+    }
+
+    /**
+     * Get a 2FA account by its ID
+     */
+    function getById(id) {
+        return items.value.find(a => a.id == id)
+    }
     
     return {
         // STATE
         items,
         // selectedIds,
         filter,
+        showFavoritesOnly,
         backendWasNewer,
         fetchedOn,
         isFetching,
@@ -165,5 +209,7 @@ export const useTwofaccounts = defineStore('twofaccounts', () => {
         $reset,
         fetch,
         accountIdsWithPeriod,
+        toggleIsFavorite,
+        getById,
     }
 })

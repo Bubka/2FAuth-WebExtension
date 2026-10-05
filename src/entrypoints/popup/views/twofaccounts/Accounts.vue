@@ -42,7 +42,8 @@
         algorithm : '',
         period : null,
         counter : null,
-        image : ''
+        image : '',
+        is_favorite: false
     })
     const dotsControllers = ref([])
     const dotsRefs = ref([])
@@ -64,6 +65,7 @@
         accountParams.value.service = account.service
         accountParams.value.account = account.account
         accountParams.value.icon = account.icon
+        accountParams.value.is_favorite = account.is_favorite
 
         visibleAccount.value = account
 
@@ -291,6 +293,10 @@
             })
         }
         groups.fetch()
+
+        if (! settingStore.hasFeature_favorites || ! preferenceStore.enableFavorites) {
+            twofaccounts.showFavoritesOnly = false
+        }
     })
 
     /**
@@ -304,6 +310,18 @@
         // When invoked by OtpDisplay we have to update the user preference too.
         if (preferenceStore.activeGroup != newActiveGroupId) {
             preferenceStore.activeGroup = newActiveGroupId
+        }
+    }
+
+    /**
+     * Toggles the favorite status of a given account
+     */
+    async function toggleOtpDisplayFavorite(accountId) {
+        await twofaccounts.toggleIsFavorite(accountId)
+        const account = twofaccounts.getById(accountId)
+
+        if (account != undefined) {
+            otpDisplay.value?.setFavorite(account.is_favorite)
         }
     }
 
@@ -335,11 +353,13 @@
                         <GroupChips v-if="settingStore.hasFeature_groupChips && preferenceStore.useGroupChips"
                             v-model:active-group="preferenceStore.activeGroup"
                             v-model:show-group-switch="showGroupSwitch"
+                            v-model:show-favorites-only="twofaccounts.showFavoritesOnly"
                             :groups="groups.items"
                             :filteredCount="twofaccounts.filteredCount"
                             :useShare="settingStore.hasFeature_sharing"
                             :useShareAllScope="settingStore.hasFeature_allUsersSharingScope"
                             :useVirtualChips="preferenceStore.showVirtualChips"
+                            :useFavorites="settingStore.hasFeature_favorites && preferenceStore.enableFavorites"
                             @active-group-changed="saveActiveGroup" />
                         <GroupCallToSwitch v-else
                             v-model:show-group-switch="showGroupSwitch"
@@ -500,11 +520,13 @@
                     :preferences="preferenceStore.$state"
                     :twofaccountService="twofaccountService"
                     :can_showNextOtp="settingStore.hasFeature_showNextOtp"
+                    :can_showFavorite="settingStore.hasFeature_favorites"
                     :iconPathPrefix="settingStore.hostUrl"
                     @please-close-me="showOtpInModal = false; showFooterMenu = false"
                     @please-clear-search="twofaccounts.filter = ''"
                     @kickme="lockExtension"
                     @please-update-activeGroup="(newActiveGroup) => preferenceStore.activeGroup = newActiveGroup"
+                    @please-toggle-favorite="toggleOtpDisplayFavorite"
                     @otp-copied-to-clipboard="notify.success({ text: t('notification.copied_to_clipboard') })"
                     @error="(error) => errorHandler.show(error)"
                 />
