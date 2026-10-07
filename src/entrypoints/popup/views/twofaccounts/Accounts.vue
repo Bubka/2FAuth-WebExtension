@@ -492,7 +492,7 @@
                 </div>
             </template>
             <template #footer v-if="showGroupSwitch">
-                <VueFooter :show-buttons="true">
+                <VueFooter>
                     <NavigationButton action="close" :use-link-tag="false" @closed="showGroupSwitch = false" />
                 </VueFooter>
             </template>
